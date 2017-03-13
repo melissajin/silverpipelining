@@ -24,10 +24,10 @@ module cpu_datapath
 // Memory Signals
 assign i_mem_address = pc_out;
 
-assign ir_4 = ;
-assign ir_5 = ;
-assign ir_11 = ;
-
+// Control Signals
+assign ir_4 = ir_10_0[4];
+assign ir_5 = ir_10_0[5];
+assign ir_11 = dest_ID_out[2];
 
 // Stage 1
 lc3b_word pcmux_out, pc_out;
@@ -37,7 +37,6 @@ lc3b_word adj11_offset, adj9_offset;
 // Stage 2
 lc3b_word pc_ID_out;
 lc3b_ir_10_0 ir_10_0;
-
 lc3b_reg dest_ID_out, src1, src2;
 lc3b_reg destmux_out, src2mux_out;
 lc3b_word src1_data_out, src2_data_out;
@@ -45,6 +44,9 @@ lc3b_word regfilemux_out;
 lc3b_nzp gencc_out, cc_out;
 
 // Stage 3
+lc3b_control_word_ex ex_sig_3;
+lc3b_control_word_mem mem_sig_3;
+lc3b_control_word_wb wb_sig_3;
 lc3b_reg dest_EX_out;
 lc3b_word pc_EX_out, marmux_EX_out, mdrmux_EX_out;
 lc3b_word src1_data_EX, src2_data_EX, alu_out, alumux_out;
@@ -55,11 +57,14 @@ lc3b_trapvect8 trapVect8_EX;
 lc3b_offset11 PCoffset11_EX;
 
 // Stage 4
+lc3b_control_word_mem mem_sig_4;
+lc3b_control_word_wb wb_sig_4;
 lc3b_reg dest_MEM_out;
 lc3b_word pc_MEM_out, mar_MEM_out;
 lc3b_offset11 PCoffset11_MEM;
 
 // Stage 5
+lc3b_control_word_wb wb_sig_5;
 lc3b_reg dest_WB_out;
 lc3b_word pc_WB_out, mdr_WB_out, mdr_WB_mod;
 lc3b_offset9 PCoffset9_WB;
@@ -123,6 +128,7 @@ adj #(11) offset11_adjuster
 );
 
 
+/************************* Stage 2 *************************/
 /***** IF_ID Pipeline Register *****/
 if_id IF_ID
 (
@@ -134,7 +140,6 @@ if_id IF_ID
     .src1(src1), .src2(src2), .ir_10_0(ir_10_0)
 );
 
-/************************* Stage 2 *************************/
 mux2 #(3) destmux
 (
     .sel(destmux_sel),
@@ -145,7 +150,7 @@ mux2 #(3) destmux
 
 mux2 #(3) src2mux
 (
-    .sel(src2mux_sel),
+    .sel(cw.src2mux_sel),
     .a(src2),
     .b(dest_ID_out),
     .f(src2mux_out)
@@ -196,12 +201,15 @@ cccomp cccomp_inst
     .br_enable(/*TODO*/)
 );
 
+/************************* Stage 3 *************************/
 /***** ID_EX Pipeline Register *****/
 id_ex ID_EX
 (
-    /* control signals inputs and outputs */
-    /* EX, MEM, WB */
-    // TODO
+    /* control inputs */
+    .ex_sig_in(cw.ex), .mem_sig_in(cw.mem), .wb_sig_in(cw.wb),
+
+    /* control outputs */
+    .ex_sig_in(ex_sig_3), .mem_sig_out(mem_sig_3), .wb_sig_out(wb_sig_3),
 
     /* data inputs */
     .clk, .dest_EX_in(dest_ID_out), .pc_EX_in(pc_ID_out),
@@ -216,7 +224,6 @@ id_ex ID_EX
     .trapVect8_EX(trapVect8_EX), .offset11_EX_out(PCoffset11_EX)
 );
 
-/************************* Stage 3 *************************/
 adj #(6) offset6_adjuster
 (
     .lsse(offset6_lsse),
@@ -261,13 +268,15 @@ mux4 mdrmux_ex
 );
 
 
-
+/************************* Stage 4 *************************/
 /***** EX_MEM Pipeline Register *****/
 ex_mem EX_MEM
 (
-    /* control signals inputs and outputs */
-    /* MEM, WB */
-    // TODO
+    /* control inputs */
+    .mem_sig_in(mem_sig_3), .wb_sig_in(wb_sig_3),
+
+    /* control outputs */
+    .mem_sig_out(mem_sig_4), .wb_sig_out(wb_sig_4),
 
     /* data inputs */
     .clk, .dest_MEM_in(dest_EX_out), .pc_MEM_in(pc_EX_out),
@@ -280,7 +289,6 @@ ex_mem EX_MEM
     .offset11_MEM_out(PCoffset11_MEM)
 );
 
-/************************* Stage 4 *************************/
 mux2 indirectmux
 (
     .sel(indirectmux_sel),
@@ -289,13 +297,15 @@ mux2 indirectmux
     .f(d_mem_address)
 );
 
-
+/************************* Stage 5 *************************/
 /***** MEM_WB Pipeline Register *****/
 mem_wb MEM_WB
 (
-    /* control signals inputs and outputs */
-    /* MEM, WB */
-    // TODO
+    /* control Signals */
+    .wb_sig_in(wb_sig_4),
+
+    /* control outputs */
+    .wb_sig_out(wb_sig_5),
 
     /* data inputs */
     .clk, .dest_WB_in(dest_MEM_out),
@@ -308,7 +318,6 @@ mem_wb MEM_WB
     .offset9_WB_out(PCoffset9_WB), .offset11_WB_out(PCoffset11_WB)
 );
 
-/************************* Stage 5 *************************/
 mux4 mdrmux_wb
 (
     .sel(mdrmux_WB_sel),

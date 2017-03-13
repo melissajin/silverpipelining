@@ -3,8 +3,12 @@ import lc3b_types::*;
 module ex_mem
 (
     /* control inputs */
+    input lc3b_control_word_mem mem_sig_in;
+    input lc3b_control_word_wb wb_sig_in;
+
     /* control outputs */
-    // TODO
+    output lc3b_control_word_mem mem_sig_out;
+    output lc3b_control_word_wb wb_sig_out;
 
     /* data inputs */
     input clk,
