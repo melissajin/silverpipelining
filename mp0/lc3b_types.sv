@@ -51,28 +51,39 @@ typedef enum bit [3:0] {
 } lc3b_aluop;
 
 typedef struct packed {
+    lc3b_aluop aluop;
+    logic offset6_lsse;
+    logic marmux_EX_sel;
+    logic[1:0] alumux_sel;
+    logic[1:0] mdrmux_EX_sel;
+} lc3b_control_word_ex;
+
+typedef struct packed {
+    logic indirectmux_sel;
+    logic d_mem_read;
+    logic d_mem_write;
+} lc3b_control_word_mem;
+
+typedef struct packed {
+    logic addrmux_sel;
+    logic destmux_sel;
+    logic[1:0] pcmux_sel;
+    logic[1:0] mdrmux_WB_sel;
+    logic[1:0] regfilemux_sel;
+
+    logic load_cc;
+    logic load_regfile;
+    logic load_pc;                             // const load except stalling
+    logic load_ir;                             // same as above
+} lc3b_control_word_wb;
+
+typedef struct packed {
 	lc3b_opcode opcode;
-	lc3b_aluop aluop;
-	logic addermux_sel;
-	logic[1:0] pcmux_sel;
-	logic[1:0] destmux_sel;
-	logic src2mux_sel;
-	logic[1:0] regfilemux_sel;
-	logic[1:0] alumux_sel;
-	logic marmux_sel;
-	logic indirectmux_sel;
-	logic ldb_sel;
-	logic stb_sel;
-	logic adj_sel;
-	
-	logic load_cc;
-	logic load_regfile;
-	logic load_pc;
-	logic load_ir; // This may not be necessary
-	
-	logic dmem_read;
-	logic dmem_write;
-	
+    logic src2mux_sel;
+    lc3b_control_word_ex ex;
+    lc3b_control_word_mem mem;
+    lc3b_control_word_wb wb;
 } lc3b_control_word;
+
 
 endpackage : lc3b_types

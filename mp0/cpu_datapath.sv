@@ -4,8 +4,12 @@ module cpu_datapath
 (
     input clk,
 
-    /* control signals */
-    input pcmux_sel,
+    /* Control Signals */
+    input lc3b_control_word cw,
+    output lc3b_opcode opcode,
+    output logic ir_4,
+    output logic ir_5,
+    output logic ir_11,
 
     /* Instruction Memory signals */
     input lc3b_word i_mem_rdata,
@@ -19,6 +23,11 @@ module cpu_datapath
 
 // Memory Signals
 assign i_mem_address = pc_out;
+
+assign ir_4 = ;
+assign ir_5 = ;
+assign ir_11 = ;
+
 
 // Stage 1
 lc3b_word pcmux_out, pc_out;
@@ -55,37 +64,6 @@ lc3b_reg dest_WB_out;
 lc3b_word pc_WB_out, mdr_WB_out, mdr_WB_mod;
 lc3b_offset9 PCoffset9_WB;
 lc3b_offset11 PCoffset11_WB;
-
-
-// tests
-logic addrmux_sel; 
-logic destmux_sel; 
-logic src2mux_sel; 
-logic load_regfile; 
-logic [1:0] regfilemux_sel; 
-logic load_cc; 
-logic offset6_lsse; 
-logic [1:0] alumux_sel; 
-lc3b_aluop aluop; 
-logic marmux_EX_sel; 
-logic [1:0] mdrmux_EX_sel; 
-logic indirectmux_sel; 
-logic [1:0] mdrmux_WB_sel; 
-
-assign addrmux_sel = 0; 
-assign destmux_sel = 0; 
-assign src2mux_sel = 0; 
-assign load_regfile = 0; 
-assign regfilemux_sel = 0; 
-assign load_cc = 0; 
-assign offset6_lsse = 0; 
-assign alumux_sel = 0; 
-assign aluop = alu_pass; 
-assign marmux_EX_sel = 0; 
-assign mdrmux_EX_sel = 0; 
-assign indirectmux_sel = 0; 
-assign mdrmux_WB_sel = 0; 
-
 
 
 /************************* Stage 1 *************************/
@@ -152,7 +130,7 @@ if_id IF_ID
     .clk, .pc_ID_in(pc_plus2_out), .ir_in(i_mem_rdata),
 
     /* outputs */
-    .pc_ID_out(pc_ID_out), .opcode(/* TODO: Goes to control unit*/), .dest_ID_out(dest_ID_out),
+    .pc_ID_out(pc_ID_out), .opcode(opcode), .dest_ID_out(dest_ID_out),
     .src1(src1), .src2(src2), .ir_10_0(ir_10_0)
 );
 
