@@ -50,4 +50,29 @@ typedef enum bit [3:0] {
     alu_sra
 } lc3b_aluop;
 
+typedef struct packed {
+	lc3b_opcode opcode;
+	lc3b_aluop aluop;
+	logic addermux_sel;
+	logic[1:0] pcmux_sel;
+	logic[1:0] destmux_sel;
+	logic src2mux_sel;
+	logic[1:0] regfilemux_sel;
+	logic[1:0] alumux_sel;
+	logic marmux_sel;
+	logic indirectmux_sel;
+	logic ldb_sel;
+	logic stb_sel;
+	logic adj_sel;
+	
+	logic load_cc;
+	logic load_regfile;
+	logic load_pc;
+	logic load_ir; // This may not be necessary
+	
+	logic dmem_read;
+	logic dmem_write;
+	
+} lc3b_control_word;
+
 endpackage : lc3b_types
