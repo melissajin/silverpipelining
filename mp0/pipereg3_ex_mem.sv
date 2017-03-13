@@ -18,7 +18,7 @@ module ex_mem
     output lc3b_reg dest_MEM_out,
     output lc3b_word pc_MEM_out,
     output lc3b_word mar_MEM_out, mdr_MEM_out,
-    output lc3b_offset11 offset11_MEM_out,
+    output lc3b_offset11 offset11_MEM_out
 );
 
 /* Control Signal Registers */

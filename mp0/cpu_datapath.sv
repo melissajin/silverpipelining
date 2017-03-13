@@ -29,7 +29,6 @@ lc3b_word adj11_offset, adj9_offset;
 lc3b_word pc_ID_out;
 lc3b_ir_10_0 ir_10_0;
 
-lc3b_word destmux_out;
 lc3b_reg dest_ID_out, src1, src2;
 lc3b_reg destmux_out, src2mux_out;
 lc3b_word src1_data_out, src2_data_out;
@@ -38,24 +37,55 @@ lc3b_nzp gencc_out, cc_out;
 
 // Stage 3
 lc3b_reg dest_EX_out;
-lc3b_word pc_EX_out;
-
+lc3b_word pc_EX_out, marmux_EX_out, mdrmux_EX_out;
+lc3b_word src1_data_EX, src2_data_EX, alu_out, alumux_out;
 lc3b_imm4 imm4_EX;
 lc3b_imm5 imm5_EX;
-lc3b_offset6 offset6_EX;
+lc3b_offset6 offset6_EX, adj6_offset;
 lc3b_trapvect8 trapVect8_EX;
 lc3b_offset11 PCoffset11_EX;
 
 // Stage 4
 lc3b_reg dest_MEM_out;
-lc3b_word pc_MEM_out;
+lc3b_word pc_MEM_out, mar_MEM_out;
 lc3b_offset11 PCoffset11_MEM;
 
 // Stage 5
 lc3b_reg dest_WB_out;
-lc3b_word pc_WB_out;
+lc3b_word pc_WB_out, mdr_WB_out, mdr_WB_mod;
 lc3b_offset9 PCoffset9_WB;
 lc3b_offset11 PCoffset11_WB;
+
+
+// tests
+logic addrmux_sel; 
+logic destmux_sel; 
+logic src2mux_sel; 
+logic load_regfile; 
+logic [1:0] regfilemux_sel; 
+logic load_cc; 
+logic offset6_lsse; 
+logic [1:0] alumux_sel; 
+lc3b_aluop aluop; 
+logic marmux_EX_sel; 
+logic [1:0] mdrmux_EX_sel; 
+logic indirectmux_sel; 
+logic [1:0] mdrmux_WB_sel; 
+
+assign addrmux_sel = 0; 
+assign destmux_sel = 0; 
+assign src2mux_sel = 0; 
+assign load_regfile = 0; 
+assign regfilemux_sel = 0; 
+assign load_cc = 0; 
+assign offset6_lsse = 0; 
+assign alumux_sel = 0; 
+assign aluop = alu_pass; 
+assign marmux_EX_sel = 0; 
+assign mdrmux_EX_sel = 0; 
+assign indirectmux_sel = 0; 
+assign mdrmux_WB_sel = 0; 
+
 
 
 /************************* Stage 1 *************************/
@@ -204,8 +234,8 @@ id_ex ID_EX
     .dest_EX_out(dest_EX_out), .pc_EX_out(pc_EX_out),
     .src1_data_EX(src1_data_EX), .src2_data_EX(src2_data_EX),
 
-    .imm4(imm4_EX), .imm5(imm5_EX), .offset6(offset6_EX),
-    .trapVect(trapVect8_EX), .offset11(PCoffset11_EX)
+    .imm4_EX(imm4_EX), .imm5_EX(imm5_EX), .offset6_EX(offset6_EX),
+    .trapVect8_EX(trapVect8_EX), .offset11_EX_out(PCoffset11_EX)
 );
 
 /************************* Stage 3 *************************/
@@ -220,8 +250,8 @@ mux4 alumux
 (
     .sel(alumux_sel),
     .a(src2_data_EX),
-    .b({12'h000,imm4}),
-    .c({{11{imm5[4]}},imm5}),
+    .b({12'h000,imm4_EX}),
+    .c({{11{imm5_EX[4]}},imm5_EX}),
     .d(adj6_offset),
     .f(alumux_out)
 );
@@ -242,7 +272,7 @@ mux2 marmux_ex
     .f(marmux_EX_out)
 );
 
-mux4
+mux4 mdrmux_ex
 (
     .sel(mdrmux_EX_sel),
     .a(alu_out),
@@ -264,11 +294,11 @@ ex_mem EX_MEM
     /* data inputs */
     .clk, .dest_MEM_in(dest_EX_out), .pc_MEM_in(pc_EX_out),
     .mar_MEM_in(marmux_EX_out), .mdr_MEM_in(mdrmux_EX_out),
-    .offset11_MEM_in(PCoffset11_EX)
+    .offset11_MEM_in(PCoffset11_EX),
 
     /* data outputs */
     .dest_MEM_out(dest_MEM_out), .pc_MEM_out(pc_MEM_out),
-    .mar_MEM_out(mar_MEM_out), .mdr_MEM_out(d_mem_wdata)
+    .mar_MEM_out(mar_MEM_out), .mdr_MEM_out(d_mem_wdata),
     .offset11_MEM_out(PCoffset11_MEM)
 );
 
@@ -277,7 +307,7 @@ mux2 indirectmux
 (
     .sel(indirectmux_sel),
     .a(mar_MEM_out),
-    .b(mdr_WB_out),
+    .b(mdr_WB_mod),
     .f(d_mem_address)
 );
 
@@ -292,11 +322,11 @@ mem_wb MEM_WB
     /* data inputs */
     .clk, .dest_WB_in(dest_MEM_out),
     .pc_WB_in(pc_MEM_out), .mdr_WB_in(d_mem_rdata),
-    .offset11_WB_in(PCoffset11_MEM)
+    .offset11_WB_in(PCoffset11_MEM),
 
     /* data outputs */
     .dest_WB_out(dest_WB_out),
-    .pc_WB_out(pc_WB_out), .mdr_WB_out(mdr_WB_out)
+    .pc_WB_out(pc_WB_out), .mdr_WB_out(mdr_WB_out),
     .offset9_WB_out(PCoffset9_WB), .offset11_WB_out(PCoffset11_WB)
 );
 

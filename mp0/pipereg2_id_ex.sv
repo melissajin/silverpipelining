@@ -23,7 +23,7 @@ module id_ex
     output lc3b_imm5 imm5_EX,
     output lc3b_offset6 offset6_EX,
     output lc3b_trapvect8 trapVect8_EX,
-    output lc3b_offset11 PCoffset11_EX
+    output lc3b_offset11 offset11_EX_out
 );
 
 
@@ -67,9 +67,9 @@ register src2_data_reg
 ir_ex_reg ir_ex_reg_inst
 (
     .clk, .load(1'b1), .in(ir_10_0_in),
-    .imm4(imm4_EX), imm5(imm5_EX),
+    .imm4(imm4_EX), .imm5(imm5_EX),
     .offset6(offset6_EX), .trapVect8(trapVect8_EX),
-    .offset11(PCoffset11_EX)
+    .offset11(offset11_EX_out)
 );
 
 endmodule : id_ex

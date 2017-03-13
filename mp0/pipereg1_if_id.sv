@@ -29,7 +29,7 @@ ir_id_reg ir_id
 
     // outputs
     .opcode(opcode), .dest(dest_ID_out), .src1(src1),
-    .src2(src2), .IR_10_0(ir_10_0)
+    .src2(src2), .ir_10_0(ir_10_0)
 );
 
 endmodule : if_id

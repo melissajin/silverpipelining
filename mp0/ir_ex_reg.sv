@@ -9,7 +9,7 @@ module ir_ex_reg
     output lc3b_imm5 imm5,
     output lc3b_offset6 offset6,
     output lc3b_trapvect8 trapVect8,
-    output lc3b_offset11 offset11,
+    output lc3b_offset11 offset11
 );
 
 lc3b_word data;
