@@ -10,12 +10,19 @@ module mem_wb
     input clk,
 
     input lc3b_reg dest_WB_in,
+    input lc3b_word pc_WB_in,
     input lc3b_word mdr_WB_in,
+    input lc3b_offset11 offset11_WB_in,
 
     /* data outputs */
     output lc3b_reg dest_WB_out,
+    output lc3b_word pc_WB_out,
     output lc3b_word mdr_WB_out,
+    output lc3b_offset9 offset9_WB_out,
+    output lc3b_offset11 offset11_WB_out
 );
+
+assign offset9_WB_out = offset11_WB_out[8:0];
 
 /* Control Signal Registers */
 // TODO
@@ -29,12 +36,28 @@ register #(3) dest_wb
     .out(dest_WB_out)
 );
 
+register pc_wb
+(
+    .clk,
+    .load(1'b1),
+    .in(pc_WB_in),
+    .out(pc_WB_out)
+);
+
 register mdr_wb
 (
     .clk,
     .load(1'b1),
     .in(mdr_WB_in),
     .out(mdr_WB_out)
+);
+
+register #(11) offset11_wb
+(
+    .clk,
+    .load(1'b1),
+    .in(offset11_WB_in),
+    .out(offset11_WB_out)
 );
 
 

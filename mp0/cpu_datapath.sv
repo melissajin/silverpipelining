@@ -44,8 +44,18 @@ lc3b_imm4 imm4_EX;
 lc3b_imm5 imm5_EX;
 lc3b_offset6 offset6_EX;
 lc3b_trapvect8 trapVect8_EX;
-lc3b_offset9 PCoffset9_EX;
 lc3b_offset11 PCoffset11_EX;
+
+// Stage 4
+lc3b_reg dest_MEM_out;
+lc3b_word pc_MEM_out;
+lc3b_offset11 PCoffset11_MEM;
+
+// Stage 5
+lc3b_reg dest_WB_out;
+lc3b_word pc_WB_out;
+lc3b_offset9 PCoffset9_WB;
+lc3b_offset11 PCoffset11_WB;
 
 
 /************************* Stage 1 *************************/
@@ -56,7 +66,7 @@ mux4 pcmux
     .a(pc_plus2_out),
     .b(pc_plus_off),
     .c(alu_out),
-    .d(mdr_wb_mod),
+    .d(mdr_WB_mod),
     .f(pcmux_out)
 );
 
@@ -93,14 +103,14 @@ mux2 addrmux
 adj #(9) offset9_adjuster
 (
     .lsse(1'b1),
-    .in(PCoffset9_EX),
+    .in(PCoffset9_WB),
     .out(adj9_offset)
 );
 
 adj #(11) offset11_adjuster
 (
     .lsse(1'b1),
-    .in(PCoffset11_EX),
+    .in(PCoffset11_WB),
     .out(adj11_offset)
 );
 
@@ -117,13 +127,11 @@ if_id IF_ID
 );
 
 /************************* Stage 2 *************************/
-mux4 #(3) destmux
+mux2 #(3) destmux
 (
     .sel(destmux_sel),
-    .a(3'b111),
-    .b(dest_EX_out),
-    .c(dest_wb_out),
-    .d(3'b000),
+    .a(dest_WB_out),
+    .b(3'b111),
     .f(destmux_out)
 );
 
@@ -152,9 +160,9 @@ mux4 regfilemux
 (
     .sel(regfilemux_sel),
     .a(alu_out),
-    .b(mdr_wb_mod),
+    .b(mdr_WB_mod),
     .c(pc_plus_off),
-    .d(pc_EX_out),
+    .d(pc_WB_out),
     .f(regfilemux_out)
 );
 
@@ -176,7 +184,7 @@ register #(3) cc
 cccomp cccomp_inst
 (
     .cur_cc(cc_out),
-    .br_cc(dest_EX_out),
+    .br_cc(dest_WB_out),
     .br_enable(/*TODO*/)
 );
 
@@ -197,8 +205,7 @@ id_ex ID_EX
     .src1_data_EX(src1_data_EX), .src2_data_EX(src2_data_EX),
 
     .imm4(imm4_EX), .imm5(imm5_EX), .offset6(offset6_EX),
-    .trapVect(trapVect8_EX), .offset9(PCoffset9_EX),
-    .offset11(PCoffset11_EX)
+    .trapVect(trapVect8_EX), .offset11(PCoffset11_EX)
 );
 
 /************************* Stage 3 *************************/
@@ -255,12 +262,14 @@ ex_mem EX_MEM
     // TODO
 
     /* data inputs */
-    .clk, .dest_MEM_in(dest_EX_out),
+    .clk, .dest_MEM_in(dest_EX_out), .pc_MEM_in(pc_EX_out),
     .mar_MEM_in(marmux_EX_out), .mdr_MEM_in(mdrmux_EX_out),
+    .offset11_MEM_in(PCoffset11_EX)
 
     /* data outputs */
-    .dest_MEM_out(dest_MEM_out),
+    .dest_MEM_out(dest_MEM_out), .pc_MEM_out(pc_MEM_out),
     .mar_MEM_out(mar_MEM_out), .mdr_MEM_out(d_mem_wdata)
+    .offset11_MEM_out(PCoffset11_MEM)
 );
 
 /************************* Stage 4 *************************/
@@ -281,13 +290,14 @@ mem_wb MEM_WB
     // TODO
 
     /* data inputs */
-    .clk,
-    .dest_WB_in(dest_MEM_out),
-    .mdr_WB_in(d_mem_rdata),
+    .clk, .dest_WB_in(dest_MEM_out),
+    .pc_WB_in(pc_MEM_out), .mdr_WB_in(d_mem_rdata),
+    .offset11_WB_in(PCoffset11_MEM)
 
     /* data outputs */
     .dest_WB_out(dest_WB_out),
-    .mdr_WB_out(mdr_WB_out)
+    .pc_WB_out(pc_WB_out), .mdr_WB_out(mdr_WB_out)
+    .offset9_WB_out(PCoffset9_WB), .offset11_WB_out(PCoffset11_WB)
 );
 
 /************************* Stage 5 *************************/
@@ -298,7 +308,7 @@ mux4 mdrmux_wb
     .b({8'h00, mdr_WB_out[7:0]}),
     .c({8'h00, mdr_WB_out[15:8]}),
     .d(16'h0000),
-    .f(mdr_wb_mod)
+    .f(mdr_WB_mod)
 );
 
 endmodule : cpu_datapath

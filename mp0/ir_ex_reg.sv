@@ -9,7 +9,6 @@ module ir_ex_reg
     output lc3b_imm5 imm5,
     output lc3b_offset6 offset6,
     output lc3b_trapvect8 trapVect8,
-    output lc3b_offset9 offset9,
     output lc3b_offset11 offset11,
 );
 
@@ -29,7 +28,6 @@ begin
     imm5 = data[4:0];
     offset6 = data[5:0];
     trapVect8 = data[7:0];
-    offset9 = data[8:0];
     offset11 = data[10:0];
 
 end
