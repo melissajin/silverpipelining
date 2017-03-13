@@ -77,7 +77,7 @@ plus2 pcPlus2
 
 adder pc_plus_off_adder
 (
-    .a(pc_EX_out),
+    .a(pc_WB_out),
     .b(addrmux_out),
     .c(pc_plus_off)
 );
