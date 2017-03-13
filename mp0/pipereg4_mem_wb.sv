@@ -3,10 +3,10 @@ import lc3b_types::*;
 module mem_wb
 (
     /* control inputs */
-    input lc3b_control_word_wb wb_sig_in;
+    input lc3b_control_word_wb wb_sig_in,
 
     /* control outputs */
-    output lc3b_control_word_wb wb_sig_out;
+    output lc3b_control_word_wb wb_sig_out,
 
     /* data inputs */
     input clk,
@@ -27,8 +27,13 @@ module mem_wb
 assign offset9_WB_out = offset11_WB_out[8:0];
 
 /* Control Signal Registers */
-// TODO
-
+register #($bits(lc3b_control_word_wb)) wb_sig
+(
+    .clk,
+    .load(1'b1),
+    .in(wb_sig_in),
+    .out(wb_sig_out)
+);
 
 register #(3) dest_wb
 (

@@ -18,16 +18,9 @@ module cpu_datapath
     /* Data Memory signals */
     input lc3b_word d_mem_rdata,
     output lc3b_word d_mem_address,
-    output lc3b_word d_mem_wdata
+    output lc3b_word d_mem_wdata,
+    output logic d_mem_read, d_mem_write
 );
-
-// Memory Signals
-assign i_mem_address = pc_out;
-
-// Control Signals
-assign ir_4 = ir_10_0[4];
-assign ir_5 = ir_10_0[5];
-assign ir_11 = dest_ID_out[2];
 
 // Stage 1
 lc3b_word pcmux_out, pc_out;
@@ -70,12 +63,22 @@ lc3b_word pc_WB_out, mdr_WB_out, mdr_WB_mod;
 lc3b_offset9 PCoffset9_WB;
 lc3b_offset11 PCoffset11_WB;
 
+// Memory Signals
+assign i_mem_address = pc_out;
+assign d_mem_read = mem_sig_4.d_mem_read;
+assign d_mem_write = mem_sig_4.d_mem_write;
+
+// Control Signals
+assign ir_4 = ir_10_0[4];
+assign ir_5 = ir_10_0[5];
+assign ir_11 = dest_ID_out[2];
+
 
 /************************* Stage 1 *************************/
 /***** PC *****/
 mux4 pcmux
 (
-    .sel(pcmux_sel),
+    .sel(wb_sig_5.pcmux_sel),
     .a(pc_plus2_out),
     .b(pc_plus_off),
     .c(alu_out),
@@ -107,7 +110,7 @@ adder pc_plus_off_adder
 
 mux2 addrmux
 (
-    .sel(addrmux_sel),
+    .sel(wb_sig_5.addrmux_sel),
     .a(adj9_offset),
     .b(adj11_offset),
     .f(addrmux_out)
@@ -142,7 +145,7 @@ if_id IF_ID
 
 mux2 #(3) destmux
 (
-    .sel(destmux_sel),
+    .sel(wb_sig_5.destmux_sel),
     .a(dest_WB_out),
     .b(3'b111),
     .f(destmux_out)
@@ -160,7 +163,7 @@ mux2 #(3) src2mux
 regfile regfile_inst
 (
     .clk,
-    .load(load_regfile),
+    .load(wb_sig_5.load_regfile),
     .in(regfilemux_out),
     .src_a(src1),
     .src_b(src2mux_out),
@@ -171,7 +174,7 @@ regfile regfile_inst
 
 mux4 regfilemux
 (
-    .sel(regfilemux_sel),
+    .sel(wb_sig_5.regfilemux_sel),
     .a(alu_out),
     .b(mdr_WB_mod),
     .c(pc_plus_off),
@@ -189,7 +192,7 @@ gencc gencc_inst
 register #(3) cc
 (
     .clk,
-    .load(load_cc),
+    .load(wb_sig_5.load_cc),
     .in(gencc_out),
     .out(cc_out)
 );
@@ -209,7 +212,7 @@ id_ex ID_EX
     .ex_sig_in(cw.ex), .mem_sig_in(cw.mem), .wb_sig_in(cw.wb),
 
     /* control outputs */
-    .ex_sig_in(ex_sig_3), .mem_sig_out(mem_sig_3), .wb_sig_out(wb_sig_3),
+    .ex_sig_out(ex_sig_3), .mem_sig_out(mem_sig_3), .wb_sig_out(wb_sig_3),
 
     /* data inputs */
     .clk, .dest_EX_in(dest_ID_out), .pc_EX_in(pc_ID_out),
@@ -226,14 +229,14 @@ id_ex ID_EX
 
 adj #(6) offset6_adjuster
 (
-    .lsse(offset6_lsse),
+    .lsse(ex_sig_3.offset6_lsse),
     .in(offset6_EX),
     .out(adj6_offset)
 );
 
 mux4 alumux
 (
-    .sel(alumux_sel),
+    .sel(ex_sig_3.alumux_sel),
     .a(src2_data_EX),
     .b({12'h000,imm4_EX}),
     .c({{11{imm5_EX[4]}},imm5_EX}),
@@ -243,7 +246,7 @@ mux4 alumux
 
 alu alu_inst
 (
-    .aluop(aluop),
+    .aluop(ex_sig_3.aluop),
     .a(src1_data_EX),
     .b(alumux_out),
     .f(alu_out)
@@ -251,7 +254,7 @@ alu alu_inst
 
 mux2 marmux_ex
 (
-    .sel(marmux_EX_sel),
+    .sel(ex_sig_3.marmux_EX_sel),
     .a(alu_out),
     .b({7'h00,trapVect8_EX,1'b0}),
     .f(marmux_EX_out)
@@ -259,7 +262,7 @@ mux2 marmux_ex
 
 mux4 mdrmux_ex
 (
-    .sel(mdrmux_EX_sel),
+    .sel(ex_sig_3.mdrmux_EX_sel),
     .a(alu_out),
     .b({8'h00, alu_out[7:0]}),
     .c({alu_out[7:0], 8'h00}),
@@ -291,7 +294,7 @@ ex_mem EX_MEM
 
 mux2 indirectmux
 (
-    .sel(indirectmux_sel),
+    .sel(mem_sig_4.indirectmux_sel),
     .a(mar_MEM_out),
     .b(mdr_WB_mod),
     .f(d_mem_address)
@@ -320,7 +323,7 @@ mem_wb MEM_WB
 
 mux4 mdrmux_wb
 (
-    .sel(mdrmux_WB_sel),
+    .sel(wb_sig_5.mdrmux_WB_sel),
     .a(mdr_WB_out),
     .b({8'h00, mdr_WB_out[7:0]}),
     .c({8'h00, mdr_WB_out[15:8]}),

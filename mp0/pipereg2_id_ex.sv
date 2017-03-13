@@ -3,14 +3,14 @@ import lc3b_types::*;
 module id_ex
 (
     /* control inputs */
-    input lc3b_control_word_ex ex_sig_in;
-    input lc3b_control_word_mem mem_sig_in;
-    input lc3b_control_word_wb wb_sig_in;
+    input lc3b_control_word_ex ex_sig_in,
+    input lc3b_control_word_mem mem_sig_in,
+    input lc3b_control_word_wb wb_sig_in,
 
     /* control outputs */
-    output lc3b_control_word_ex ex_sig_in;
-    output lc3b_control_word_mem mem_sig_out;
-    output lc3b_control_word_wb wb_sig_out;
+    output lc3b_control_word_ex ex_sig_out,
+    output lc3b_control_word_mem mem_sig_out,
+    output lc3b_control_word_wb wb_sig_out,
 
     /* data inputs */
     input clk,
@@ -34,8 +34,29 @@ module id_ex
 
 
 /* Control Signal Registers */
-// TODO
+register #($bits(lc3b_control_word_ex)) ex_sig
+(
+    .clk,
+    .load(1'b1),
+    .in(ex_sig_in),
+    .out(ex_sig_out)
+);
 
+register #($bits(lc3b_control_word_mem)) mem_sig
+(
+    .clk,
+    .load(1'b1),
+    .in(mem_sig_in),
+    .out(mem_sig_out)
+);
+
+register #($bits(lc3b_control_word_wb)) wb_sig
+(
+    .clk,
+    .load(1'b1),
+    .in(wb_sig_in),
+    .out(wb_sig_out)
+);
 
 register #(3) dest_ex
 (
