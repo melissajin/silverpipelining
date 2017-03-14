@@ -86,5 +86,5 @@ set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id mp0_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "200 ns" -section_id mp0_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME mp0_tb -section_id mp0_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE mp0_tb.sv -section_id mp0_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE magic_memory.sv -section_id mp0_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE magic_memory_dp.sv -section_id mp0_tb
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

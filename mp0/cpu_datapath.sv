@@ -12,11 +12,13 @@ module cpu_datapath
     output logic ir_11,
 
     /* Instruction Memory signals */
-    // input lc3b_word i_mem_rdata,
-    // output lc3b_word i_mem_address,
+    input i_mem_resp,                                   // TODO: Need to use to handle stalling for CP2
+    input lc3b_word i_mem_rdata,
+    output lc3b_word i_mem_address,
+    output logic i_mem_read,
 
     /* Data Memory signals */
-    input d_mem_resp,
+    input d_mem_resp,                                   // TODO: Need to use to handle stalling for CP2
     input lc3b_word d_mem_rdata,
     output lc3b_word d_mem_address,
     output lc3b_word d_mem_wdata,
@@ -139,7 +141,7 @@ if_id IF_ID
     .clk, .load(load),
 
     /* data inputs */
-    .pc_ID_in(pc_plus2_out), .ir_in(d_mem_rdata /*TODO: CHANGE TO i_mem_rdata*/),
+    .pc_ID_in(pc_plus2_out), .ir_in(i_mem_rdata),
 
     /* data outputs */
     .pc_ID_out(pc_ID_out), .opcode(opcode), .dest_ID_out(dest_ID_out),
@@ -345,21 +347,26 @@ mux4 mdrmux_wb
     .f(mdr_WB_mod)
 );
 
-// Memory Signals
-assign d_mem_address = (mem_sig_4.d_mem_read)? indirectmux_out : pc_out;
-assign d_mem_read = (load | mem_sig_4.d_mem_read) ^ d_mem_write;
+// Data Memory Signals
+assign d_mem_address =  indirectmux_out;
+assign d_mem_read = mem_sig_4.d_mem_read;
 assign d_mem_write = mem_sig_4.d_mem_write;
 assign d_mem_byte_enable = mem_sig_4.d_mem_byte_enable;
+
+// Instruction Memory Signals
+assign i_mem_address = pc_out;
+assign i_mem_read = 1'b1;
 
 // Control Signals
 assign ir_4 = ir_10_0[4];
 assign ir_5 = ir_10_0[5];
 assign ir_11 = dest_ID_out[2];
 
-// This is wrong. Everything else is right.
-assign load = (d_mem_resp | (~init_MEM_out)
-              | (mem_sig_4.load_pipe_mem & wb_sig_5.load_pipe_wb)
-              | (mem_sig_4.load_pipe_mem & (~init_WB_out))) & (~(mem_sig_4.d_mem_read ^ mem_sig_4.d_mem_write));
+// assign load = (d_mem_resp | (~init_MEM_out)
+//               | (mem_sig_4.load_pipe_mem & wb_sig_5.load_pipe_wb)
+//               | (mem_sig_4.load_pipe_mem & (~init_WB_out))) & (~(mem_sig_4.d_mem_read ^ mem_sig_4.d_mem_write));
+// TODO: Needs to change to handle stalling
+assign load = 1'b1;
 
 /***** pcmux_sel and addrmux_sel logic *****/
 always_comb
