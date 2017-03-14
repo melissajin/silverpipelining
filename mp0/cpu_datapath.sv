@@ -24,11 +24,8 @@ module cpu_datapath
     output lc3b_mem_wmask d_mem_byte_enable
 );
 
+// Internal Signals
 logic load;
-
-assign load = d_mem_resp | (~init_MEM_out)
-              | (mem_sig_4.load_pipe_mem & wb_sig_5.load_pipe_wb)
-              | (mem_sig_4.load_pipe_mem & (~init_WB_out));
 
 // Stage 1
 lc3b_word pcmux_out, pc_out;
@@ -69,28 +66,20 @@ lc3b_offset11 PCoffset11_MEM;
 
 // Stage 5
 logic init_WB_out;
+logic addrmux_sel;
+logic [1:0] pcmux_sel;
+logic br_enable;
 lc3b_control_word_wb wb_sig_5;
 lc3b_reg dest_WB_out;
 lc3b_word pc_WB_out, mdr_WB_out, mdr_WB_mod, alu_WB_out;
 lc3b_offset9 PCoffset9_WB;
 lc3b_offset11 PCoffset11_WB;
 
-// Memory Signals
-assign i_mem_address = pc_out;
-assign d_mem_read = mem_sig_4.d_mem_read;
-assign d_mem_write = mem_sig_4.d_mem_write;
-
-// Control Signals
-assign ir_4 = ir_10_0[4];
-assign ir_5 = ir_10_0[5];
-assign ir_11 = dest_ID_out[2];
-
-
 /************************* Stage 1 *************************/
 /***** PC *****/
 mux4 pcmux
 (
-    .sel(wb_sig_5.pcmux_sel),
+    .sel(),
     .a(pc_plus2_out),
     .b(pc_plus_off),
     .c(alu_WB_out),
@@ -147,10 +136,12 @@ adj #(11) offset11_adjuster
 /***** IF_ID Pipeline Register *****/
 if_id IF_ID
 (
-    /* inputs */
-    .clk, .pc_ID_in(pc_plus2_out), .ir_in(i_mem_rdata),
+    .clk, .load(load),
 
-    /* outputs */
+    /* data inputs */
+    .pc_ID_in(pc_plus2_out), .ir_in(i_mem_rdata),
+
+    /* data outputs */
     .pc_ID_out(pc_ID_out), .opcode(opcode), .dest_ID_out(dest_ID_out),
     .src1(src1), .src2(src2), .ir_10_0(ir_10_0), .init_ID_out(init_ID_out)
 );
@@ -213,13 +204,15 @@ cccomp cccomp_inst
 (
     .cur_cc(cc_out),
     .br_cc(dest_WB_out),
-    .br_enable(/*TODO*/)
+    .br_enable(br_enable)
 );
 
 /************************* Stage 3 *************************/
 /***** ID_EX Pipeline Register *****/
 id_ex ID_EX
 (
+    .clk, .load(load),
+
     /* control inputs */
     .ex_sig_in(cw.ex), .mem_sig_in(cw.mem), .wb_sig_in(cw.wb),
 
@@ -227,7 +220,7 @@ id_ex ID_EX
     .ex_sig_out(ex_sig_3), .mem_sig_out(mem_sig_3), .wb_sig_out(wb_sig_3),
 
     /* data inputs */
-    .clk, .dest_EX_in(dest_ID_out), .pc_EX_in(pc_ID_out),
+    .dest_EX_in(dest_ID_out), .pc_EX_in(pc_ID_out),
     .src1_data_in(src1_data_out), .src2_data_in(src2_data_out),
     .ir_10_0_in(ir_10_0), .init_EX_in(init_ID_out),
 
@@ -288,6 +281,8 @@ mux4 mdrmux_ex
 /***** EX_MEM Pipeline Register *****/
 ex_mem EX_MEM
 (
+    .clk, .load(load),
+
     /* control inputs */
     .mem_sig_in(mem_sig_3), .wb_sig_in(wb_sig_3),
 
@@ -295,7 +290,7 @@ ex_mem EX_MEM
     .mem_sig_out(mem_sig_4), .wb_sig_out(wb_sig_4),
 
     /* data inputs */
-    .clk, .dest_MEM_in(dest_EX_out), .pc_MEM_in(pc_EX_out),
+    .dest_MEM_in(dest_EX_out), .pc_MEM_in(pc_EX_out),
     .alu_MEM_in(alu_EX_out), .mar_MEM_in(marmux_EX_out),
     .mdr_MEM_in(mdrmux_EX_out), .offset11_MEM_in(PCoffset11_EX),
     .init_MEM_in(init_EX_out),
@@ -319,6 +314,8 @@ mux2 indirectmux
 /***** MEM_WB Pipeline Register *****/
 mem_wb MEM_WB
 (
+    .clk, .load(load),
+
     /* control Signals */
     .wb_sig_in(wb_sig_4),
 
@@ -326,7 +323,7 @@ mem_wb MEM_WB
     .wb_sig_out(wb_sig_5),
 
     /* data inputs */
-    .clk, .dest_WB_in(dest_MEM_out),
+    .dest_WB_in(dest_MEM_out),
     .pc_WB_in(pc_MEM_out), .alu_WB_in(alu_MEM_out),
     .mdr_WB_in(d_mem_rdata), .offset11_WB_in(PCoffset11_MEM),
     .init_WB_in(init_MEM_out),
@@ -347,5 +344,46 @@ mux4 mdrmux_wb
     .d(16'h0000),
     .f(mdr_WB_mod)
 );
+
+// Memory Signals
+assign i_mem_address = pc_out;
+assign d_mem_read = mem_sig_4.d_mem_read;
+assign d_mem_write = mem_sig_4.d_mem_write;
+
+// Control Signals
+assign ir_4 = ir_10_0[4];
+assign ir_5 = ir_10_0[5];
+assign ir_11 = dest_ID_out[2];
+
+assign load = d_mem_resp | (~init_MEM_out)
+              | (mem_sig_4.load_pipe_mem & wb_sig_5.load_pipe_wb)
+              | (mem_sig_4.load_pipe_mem & (~init_WB_out));
+
+/***** pcmux_sel and addrmux_sel logic *****/
+always_comb
+begin
+    pcmux_sel = 2'b00;
+    addrmux_sel = 1'b0;
+    case (wb_sig_5.opcode)
+        op_br: begin
+            if(br_enable)
+                pcmux_sel = 2'b01;
+        end
+        op_jmp: begin
+            pcmux_sel = 2'b10;
+        end
+        op_jsr: begin
+            addrmux_sel = 1'b1;
+            if(ir_11)
+                pcmux_sel = 2'b01;
+            else
+                pcmux_sel = 2'b10;
+        end
+        op_trap: begin
+            pcmux_sel = 2'b11;
+        end
+        default: pcmux_sel = 2'b00;
+    endcase
+end
 
 endmodule : cpu_datapath

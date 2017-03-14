@@ -2,6 +2,8 @@ import lc3b_types::*;
 
 module ex_mem
 (
+    input clk, load,
+
     /* control inputs */
     input lc3b_control_word_mem mem_sig_in,
     input lc3b_control_word_wb wb_sig_in,
@@ -11,8 +13,6 @@ module ex_mem
     output lc3b_control_word_wb wb_sig_out,
 
     /* data inputs */
-    input clk,
-
     input lc3b_reg dest_MEM_in,
     input lc3b_word pc_MEM_in, alu_MEM_in,
     input lc3b_word mar_MEM_in, mdr_MEM_in,
@@ -31,7 +31,7 @@ module ex_mem
 register #($bits(lc3b_control_word_mem)) mem_sig
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(mem_sig_in),
     .out(mem_sig_out)
 );
@@ -39,7 +39,7 @@ register #($bits(lc3b_control_word_mem)) mem_sig
 register #($bits(lc3b_control_word_wb)) wb_sig
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(wb_sig_in),
     .out(wb_sig_out)
 );
@@ -48,7 +48,7 @@ register #($bits(lc3b_control_word_wb)) wb_sig
 register #(3) dest_mem
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(dest_MEM_in),
     .out(dest_MEM_out)
 );
@@ -56,7 +56,7 @@ register #(3) dest_mem
 register alu_mem
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(alu_MEM_in),
     .out(alu_MEM_out)
 );
@@ -64,7 +64,7 @@ register alu_mem
 register pc_mem
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(pc_MEM_in),
     .out(pc_MEM_out)
 );
@@ -72,7 +72,7 @@ register pc_mem
 register mar_mem
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(mar_MEM_in),
     .out(mar_MEM_out)
 );
@@ -80,7 +80,7 @@ register mar_mem
 register mdr_mem
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(mdr_MEM_in),
     .out(mdr_MEM_out)
 );
@@ -88,7 +88,7 @@ register mdr_mem
 register #(11) offset11_mem
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(offset11_MEM_in),
     .out(offset11_MEM_out)
 );

@@ -2,6 +2,8 @@ import lc3b_types::*;
 
 module id_ex
 (
+    input clk, load,
+
     /* control inputs */
     input lc3b_control_word_ex ex_sig_in,
     input lc3b_control_word_mem mem_sig_in,
@@ -13,8 +15,6 @@ module id_ex
     output lc3b_control_word_wb wb_sig_out,
 
     /* data inputs */
-    input clk,
-
     input lc3b_reg dest_EX_in,
     input lc3b_word pc_EX_in,
     input lc3b_word src1_data_in, src2_data_in,
@@ -39,7 +39,7 @@ module id_ex
 register #($bits(lc3b_control_word_ex)) ex_sig
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(ex_sig_in),
     .out(ex_sig_out)
 );
@@ -47,7 +47,7 @@ register #($bits(lc3b_control_word_ex)) ex_sig
 register #($bits(lc3b_control_word_mem)) mem_sig
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(mem_sig_in),
     .out(mem_sig_out)
 );
@@ -55,7 +55,7 @@ register #($bits(lc3b_control_word_mem)) mem_sig
 register #($bits(lc3b_control_word_wb)) wb_sig
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(wb_sig_in),
     .out(wb_sig_out)
 );
@@ -63,7 +63,7 @@ register #($bits(lc3b_control_word_wb)) wb_sig
 register #(3) dest_ex
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(dest_EX_in),
     .out(dest_EX_out)
 );
@@ -71,7 +71,7 @@ register #(3) dest_ex
 register pc_ex
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(pc_EX_in),
     .out(pc_EX_out)
 );
@@ -79,7 +79,7 @@ register pc_ex
 register src1_data_reg
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(src1_data_in),
     .out(src1_data_EX)
 );
@@ -87,7 +87,7 @@ register src1_data_reg
 register src2_data_reg
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(src2_data_in),
     .out(src2_data_EX)
 );
@@ -95,7 +95,7 @@ register src2_data_reg
 /* IR[10:0] */
 ir_ex_reg ir_ex_reg_inst
 (
-    .clk, .load(1'b1), .in(ir_10_0_in),
+    .clk, .load, .in(ir_10_0_in),
     .imm4(imm4_EX), .imm5(imm5_EX),
     .offset6(offset6_EX), .trapVect8(trapVect8_EX),
     .offset11(offset11_EX_out)

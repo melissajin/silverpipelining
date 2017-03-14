@@ -2,6 +2,8 @@ import lc3b_types::*;
 
 module mem_wb
 (
+    input clk, load,
+
     /* control inputs */
     input lc3b_control_word_wb wb_sig_in,
 
@@ -9,8 +11,6 @@ module mem_wb
     output lc3b_control_word_wb wb_sig_out,
 
     /* data inputs */
-    input clk,
-
     input lc3b_reg dest_WB_in,
     input lc3b_word pc_WB_in, alu_WB_in,
     input lc3b_word mdr_WB_in,
@@ -32,7 +32,7 @@ assign offset9_WB_out = offset11_WB_out[8:0];
 register #($bits(lc3b_control_word_wb)) wb_sig
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(wb_sig_in),
     .out(wb_sig_out)
 );
@@ -40,7 +40,7 @@ register #($bits(lc3b_control_word_wb)) wb_sig
 register #(3) dest_wb
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(dest_WB_in),
     .out(dest_WB_out)
 );
@@ -48,7 +48,7 @@ register #(3) dest_wb
 register alu_wb
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(alu_WB_in),
     .out(alu_WB_out)
 );
@@ -56,7 +56,7 @@ register alu_wb
 register pc_wb
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(pc_WB_in),
     .out(pc_WB_out)
 );
@@ -64,7 +64,7 @@ register pc_wb
 register mdr_wb
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(mdr_WB_in),
     .out(mdr_WB_out)
 );
@@ -72,7 +72,7 @@ register mdr_wb
 register #(11) offset11_wb
 (
     .clk,
-    .load(1'b1),
+    .load,
     .in(offset11_WB_in),
     .out(offset11_WB_out)
 );

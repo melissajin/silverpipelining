@@ -66,9 +66,8 @@ typedef struct packed {
 } lc3b_control_word_mem;
 
 typedef struct packed {
-    logic addrmux_sel;
+    lc3b_opcode opcode;
     logic destmux_sel;
-    logic[1:0] pcmux_sel;
     logic[1:0] mdrmux_WB_sel;
     logic[1:0] regfilemux_sel;
 
@@ -80,7 +79,6 @@ typedef struct packed {
 } lc3b_control_word_wb;
 
 typedef struct packed {
-	lc3b_opcode opcode;
     logic src2mux_sel;
     lc3b_control_word_ex ex;
     lc3b_control_word_mem mem;
