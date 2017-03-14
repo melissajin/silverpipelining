@@ -12,8 +12,8 @@ module cpu_datapath
     output logic ir_11,
 
     /* Instruction Memory signals */
-    input lc3b_word i_mem_rdata,
-    output lc3b_word i_mem_address,
+    // input lc3b_word i_mem_rdata,
+    // output lc3b_word i_mem_address,
 
     /* Data Memory signals */
     input d_mem_resp,
@@ -24,7 +24,7 @@ module cpu_datapath
     output lc3b_mem_wmask d_mem_byte_enable
 );
 
-// Internal Signals
+/********** Internal Signals **********/
 logic load;
 
 // Stage 1
@@ -48,11 +48,11 @@ lc3b_control_word_ex ex_sig_3;
 lc3b_control_word_mem mem_sig_3;
 lc3b_control_word_wb wb_sig_3;
 lc3b_reg dest_EX_out;
-lc3b_word pc_EX_out, marmux_EX_out, mdrmux_EX_out;
+lc3b_word pc_EX_out, marmux_EX_out, mdrmux_EX_out, adj6_offset;
 lc3b_word src1_data_EX, src2_data_EX, alu_EX_out, alumux_out;
 lc3b_imm4 imm4_EX;
 lc3b_imm5 imm5_EX;
-lc3b_offset6 offset6_EX, adj6_offset;
+lc3b_offset6 offset6_EX;
 lc3b_trapvect8 trapVect8_EX;
 lc3b_offset11 PCoffset11_EX;
 
@@ -61,7 +61,7 @@ logic init_MEM_out;
 lc3b_control_word_mem mem_sig_4;
 lc3b_control_word_wb wb_sig_4;
 lc3b_reg dest_MEM_out;
-lc3b_word pc_MEM_out, mar_MEM_out, alu_MEM_out;
+lc3b_word pc_MEM_out, mar_MEM_out, alu_MEM_out, indirectmux_out;
 lc3b_offset11 PCoffset11_MEM;
 
 // Stage 5
@@ -79,7 +79,7 @@ lc3b_offset11 PCoffset11_WB;
 /***** PC *****/
 mux4 pcmux
 (
-    .sel(),
+    .sel(pcmux_sel),
     .a(pc_plus2_out),
     .b(pc_plus_off),
     .c(alu_WB_out),
@@ -111,7 +111,7 @@ adder pc_plus_off_adder
 
 mux2 addrmux
 (
-    .sel(wb_sig_5.addrmux_sel),
+    .sel(addrmux_sel),
     .a(adj9_offset),
     .b(adj11_offset),
     .f(addrmux_out)
@@ -139,7 +139,7 @@ if_id IF_ID
     .clk, .load(load),
 
     /* data inputs */
-    .pc_ID_in(pc_plus2_out), .ir_in(i_mem_rdata),
+    .pc_ID_in(pc_plus2_out), .ir_in(d_mem_rdata /*TODO: CHANGE TO i_mem_rdata*/),
 
     /* data outputs */
     .pc_ID_out(pc_ID_out), .opcode(opcode), .dest_ID_out(dest_ID_out),
@@ -307,7 +307,7 @@ mux2 indirectmux
     .sel(mem_sig_4.indirectmux_sel),
     .a(mar_MEM_out),
     .b(mdr_WB_mod),
-    .f(d_mem_address)
+    .f(indirectmux_out)
 );
 
 /************************* Stage 5 *************************/
@@ -346,9 +346,10 @@ mux4 mdrmux_wb
 );
 
 // Memory Signals
-assign i_mem_address = pc_out;
-assign d_mem_read = mem_sig_4.d_mem_read;
+assign d_mem_address = (load)? pc_out : indirectmux_out;
+assign d_mem_read = load | mem_sig_4.d_mem_read;
 assign d_mem_write = mem_sig_4.d_mem_write;
+assign d_mem_byte_enable = mem_sig_4.d_mem_byte_enable;
 
 // Control Signals
 assign ir_4 = ir_10_0[4];

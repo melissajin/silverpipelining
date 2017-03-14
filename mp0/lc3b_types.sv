@@ -63,6 +63,7 @@ typedef struct packed {
     logic load_pipe_mem;
     logic d_mem_read;
     logic d_mem_write;
+    logic [1:0] d_mem_byte_enable;
 } lc3b_control_word_mem;
 
 typedef struct packed {
@@ -74,8 +75,6 @@ typedef struct packed {
     logic load_pipe_wb;
     logic load_cc;
     logic load_regfile;
-    logic load_pc;                             // const load except stalling
-    logic load_ir;                             // same as above
 } lc3b_control_word_wb;
 
 typedef struct packed {

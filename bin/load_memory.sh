@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Settings
-DEFAULT_TARGET=$HOME/ece411/mp0/simulation/modelsim/memory.lst
-ASSEMBLER=$HOME/ece411/bin/LC3bAssembler
+DEFAULT_TARGET=$HOME/ece411/mp3/mp0/simulation/modelsim/memory.lst
+ASSEMBLER=$HOME/ece411/mp3/bin/LC3bAssembler
 ADDRESSABILITY=1
 
 # Command line parameters

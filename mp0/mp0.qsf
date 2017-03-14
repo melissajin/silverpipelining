@@ -38,7 +38,7 @@
 
 set_global_assignment -name FAMILY "Stratix III"
 set_global_assignment -name DEVICE EP3SE50F780C2
-set_global_assignment -name TOP_LEVEL_ENTITY cpu_datapath
+set_global_assignment -name TOP_LEVEL_ENTITY mp0
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 13.1
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "00:00:00  AUGUST 25, 2014"
 set_global_assignment -name LAST_QUARTUS_VERSION 13.1
@@ -53,6 +53,8 @@ set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 1.1V
 set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (SystemVerilog)"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "SYSTEMVERILOG HDL" -section_id eda_simulation
 
+set_global_assignment -name SYSTEMVERILOG_FILE mp0.sv
+set_global_assignment -name SYSTEMVERILOG_FILE cpu_control.sv
 set_global_assignment -name SYSTEMVERILOG_FILE pipereg2_id_ex.sv
 set_global_assignment -name SYSTEMVERILOG_FILE pipereg1_if_id.sv
 set_global_assignment -name SYSTEMVERILOG_FILE pipereg3_ex_mem.sv
@@ -62,7 +64,6 @@ set_global_assignment -name SYSTEMVERILOG_FILE plus2.sv
 set_global_assignment -name SYSTEMVERILOG_FILE mux8.sv
 set_global_assignment -name SYSTEMVERILOG_FILE mux4.sv
 set_global_assignment -name SYSTEMVERILOG_FILE mux2.sv
-set_global_assignment -name SYSTEMVERILOG_FILE magic_memory.sv
 set_global_assignment -name SYSTEMVERILOG_FILE lc3b_types.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ir_id_reg.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ir_ex_reg.sv
