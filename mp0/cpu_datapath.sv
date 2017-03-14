@@ -346,8 +346,8 @@ mux4 mdrmux_wb
 );
 
 // Memory Signals
-assign d_mem_address = (load)? pc_out : indirectmux_out;
-assign d_mem_read = load | mem_sig_4.d_mem_read;
+assign d_mem_address = (mem_sig_4.d_mem_read)? indirectmux_out : pc_out;
+assign d_mem_read = (load | mem_sig_4.d_mem_read) ^ d_mem_write;
 assign d_mem_write = mem_sig_4.d_mem_write;
 assign d_mem_byte_enable = mem_sig_4.d_mem_byte_enable;
 
@@ -356,9 +356,10 @@ assign ir_4 = ir_10_0[4];
 assign ir_5 = ir_10_0[5];
 assign ir_11 = dest_ID_out[2];
 
-assign load = d_mem_resp | (~init_MEM_out)
+// This is wrong. Everything else is right.
+assign load = (d_mem_resp | (~init_MEM_out)
               | (mem_sig_4.load_pipe_mem & wb_sig_5.load_pipe_wb)
-              | (mem_sig_4.load_pipe_mem & (~init_WB_out));
+              | (mem_sig_4.load_pipe_mem & (~init_WB_out))) & (~(mem_sig_4.d_mem_read ^ mem_sig_4.d_mem_write));
 
 /***** pcmux_sel and addrmux_sel logic *****/
 always_comb
