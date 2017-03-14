@@ -11,7 +11,8 @@ module if_id
     output lc3b_word pc_ID_out,
     output lc3b_opcode opcode,
     output lc3b_reg dest_ID_out, src1, src2,
-    output lc3b_ir_10_0 ir_10_0
+    output lc3b_ir_10_0 ir_10_0,
+    output logic init_ID_out
 );
 
 register pc_id
@@ -30,6 +31,14 @@ ir_id_reg ir_id
     // outputs
     .opcode(opcode), .dest(dest_ID_out), .src1(src1),
     .src2(src2), .ir_10_0(ir_10_0)
+);
+
+register #(1) init_id
+(
+    .clk,
+    .load(1'b1),
+    .in(1'b1),
+    .out(init_ID_out)
 );
 
 endmodule : if_id

@@ -25,6 +25,7 @@ begin : state_actions
 
     // Stage 4 Signals
     cw.mem.indirectmux_sel = 1'b0;
+    cw.mem.load_pipe_mem = 1'b1;
     cw.mem.d_mem_read = 1'b0;
     cw.mem.d_mem_write = 1'b0;
 
@@ -34,6 +35,7 @@ begin : state_actions
     cw.wb.pcmux_sel = 2'b00;
     cw.wb.mdrmux_WB_sel = 2'b00;
     cw.wb.regfilemux_sel = 2'b00;
+    cw.wb.load_pipe_wb = 1'b1;
     cw.wb.load_cc = 1'b0;
     cw.wb.load_regfile = 1'b0;
     cw.wb.load_pc = 1'b0;
@@ -70,7 +72,7 @@ begin : state_actions
             cw.wb.load_cc = 1'b1;
         end
         op_ldr: begin
-            
+
         end
         op_str: begin
 

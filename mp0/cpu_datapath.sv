@@ -16,11 +16,19 @@ module cpu_datapath
     output lc3b_word i_mem_address,
 
     /* Data Memory signals */
+    input d_mem_resp,
     input lc3b_word d_mem_rdata,
     output lc3b_word d_mem_address,
     output lc3b_word d_mem_wdata,
-    output logic d_mem_read, d_mem_write
+    output logic d_mem_read, d_mem_write,
+    output lc3b_mem_wmask d_mem_byte_enable
 );
+
+logic load;
+
+assign load = d_mem_resp | (~init_MEM_out)
+              | (mem_sig_4.load_pipe_mem & wb_sig_5.load_pipe_wb)
+              | (mem_sig_4.load_pipe_mem & (~init_WB_out));
 
 // Stage 1
 lc3b_word pcmux_out, pc_out;
@@ -28,6 +36,7 @@ lc3b_word pc_plus_off, pc_plus2_out, addrmux_out;
 lc3b_word adj11_offset, adj9_offset;
 
 // Stage 2
+logic init_ID_out;
 lc3b_word pc_ID_out;
 lc3b_ir_10_0 ir_10_0;
 lc3b_reg dest_ID_out, src1, src2;
@@ -37,6 +46,7 @@ lc3b_word regfilemux_out;
 lc3b_nzp gencc_out, cc_out;
 
 // Stage 3
+logic init_EX_out;
 lc3b_control_word_ex ex_sig_3;
 lc3b_control_word_mem mem_sig_3;
 lc3b_control_word_wb wb_sig_3;
@@ -50,6 +60,7 @@ lc3b_trapvect8 trapVect8_EX;
 lc3b_offset11 PCoffset11_EX;
 
 // Stage 4
+logic init_MEM_out;
 lc3b_control_word_mem mem_sig_4;
 lc3b_control_word_wb wb_sig_4;
 lc3b_reg dest_MEM_out;
@@ -57,6 +68,7 @@ lc3b_word pc_MEM_out, mar_MEM_out, alu_MEM_out;
 lc3b_offset11 PCoffset11_MEM;
 
 // Stage 5
+logic init_WB_out;
 lc3b_control_word_wb wb_sig_5;
 lc3b_reg dest_WB_out;
 lc3b_word pc_WB_out, mdr_WB_out, mdr_WB_mod, alu_WB_out;
@@ -89,7 +101,7 @@ mux4 pcmux
 register pc
 (
     .clk,
-    .load(1'b1),                // Since PC is always being loaded
+    .load(load),
     .in(pcmux_out),
     .out(pc_out)
 );
@@ -140,7 +152,7 @@ if_id IF_ID
 
     /* outputs */
     .pc_ID_out(pc_ID_out), .opcode(opcode), .dest_ID_out(dest_ID_out),
-    .src1(src1), .src2(src2), .ir_10_0(ir_10_0)
+    .src1(src1), .src2(src2), .ir_10_0(ir_10_0), .init_ID_out(init_ID_out)
 );
 
 mux2 #(3) destmux
@@ -217,14 +229,15 @@ id_ex ID_EX
     /* data inputs */
     .clk, .dest_EX_in(dest_ID_out), .pc_EX_in(pc_ID_out),
     .src1_data_in(src1_data_out), .src2_data_in(src2_data_out),
-    .ir_10_0_in(ir_10_0),
+    .ir_10_0_in(ir_10_0), .init_EX_in(init_ID_out),
 
     /* data outputs */
     .dest_EX_out(dest_EX_out), .pc_EX_out(pc_EX_out),
     .src1_data_EX(src1_data_EX), .src2_data_EX(src2_data_EX),
 
     .imm4_EX(imm4_EX), .imm5_EX(imm5_EX), .offset6_EX(offset6_EX),
-    .trapVect8_EX(trapVect8_EX), .offset11_EX_out(PCoffset11_EX)
+    .trapVect8_EX(trapVect8_EX), .offset11_EX_out(PCoffset11_EX),
+    .init_EX_out(init_EX_out)
 );
 
 adj #(6) offset6_adjuster
@@ -285,11 +298,13 @@ ex_mem EX_MEM
     .clk, .dest_MEM_in(dest_EX_out), .pc_MEM_in(pc_EX_out),
     .alu_MEM_in(alu_EX_out), .mar_MEM_in(marmux_EX_out),
     .mdr_MEM_in(mdrmux_EX_out), .offset11_MEM_in(PCoffset11_EX),
+    .init_MEM_in(init_EX_out),
 
     /* data outputs */
     .dest_MEM_out(dest_MEM_out), .pc_MEM_out(pc_MEM_out),
     .alu_MEM_out(alu_MEM_out), .mar_MEM_out(mar_MEM_out),
-    .mdr_MEM_out(d_mem_wdata), .offset11_MEM_out(PCoffset11_MEM)
+    .mdr_MEM_out(d_mem_wdata), .offset11_MEM_out(PCoffset11_MEM),
+    .init_MEM_out(init_MEM_out)
 );
 
 mux2 indirectmux
@@ -314,11 +329,13 @@ mem_wb MEM_WB
     .clk, .dest_WB_in(dest_MEM_out),
     .pc_WB_in(pc_MEM_out), .alu_WB_in(alu_MEM_out),
     .mdr_WB_in(d_mem_rdata), .offset11_WB_in(PCoffset11_MEM),
+    .init_WB_in(init_MEM_out),
 
     /* data outputs */
     .dest_WB_out(dest_WB_out), .pc_WB_out(pc_WB_out),
     .alu_WB_out(alu_WB_out), .mdr_WB_out(mdr_WB_out),
-    .offset9_WB_out(PCoffset9_WB), .offset11_WB_out(PCoffset11_WB)
+    .offset9_WB_out(PCoffset9_WB), .offset11_WB_out(PCoffset11_WB),
+    .init_WB_out(init_WB_out)
 );
 
 mux4 mdrmux_wb

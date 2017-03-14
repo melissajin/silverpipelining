@@ -17,12 +17,14 @@ module ex_mem
     input lc3b_word pc_MEM_in, alu_MEM_in,
     input lc3b_word mar_MEM_in, mdr_MEM_in,
     input lc3b_offset11 offset11_MEM_in,
+    input logic init_MEM_in,
 
     /* data outputs */
     output lc3b_reg dest_MEM_out,
     output lc3b_word pc_MEM_out, alu_MEM_out,
     output lc3b_word mar_MEM_out, mdr_MEM_out,
-    output lc3b_offset11 offset11_MEM_out
+    output lc3b_offset11 offset11_MEM_out,
+    output logic init_MEM_out
 );
 
 /* Control Signal Registers */
@@ -91,5 +93,12 @@ register #(11) offset11_mem
     .out(offset11_MEM_out)
 );
 
+register #(1) init_mem
+(
+    .clk,
+    .load(1'b1),
+    .in(init_MEM_in),
+    .out(init_MEM_out)
+);
 
 endmodule : ex_mem
