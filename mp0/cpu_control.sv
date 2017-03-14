@@ -11,145 +11,78 @@ module cpu_control
 
 always_comb
 begin : state_actions
-    /* Default output assignments */
+    /************** Default output assignments **************/
+    // Stage 2 Signals
+    cw.opcode = opcode;
+    cw.src2mux_sel = 1'b0;
 
-	 cw.opcode = opcode;
-	 cw.aluop = alu_add;
-	 cw.addermux_sel = 1'b0;
-	 cw.pcmux_sel = 2'b00;
-	 cw.destmux_sel = 2'b00;
-	 cw.src2mux_sel = 1'b0;
-	 cw.regfilemux_sel = 2'b00;
-	 cw.alumux_sel = 2'b00;
-	 cw.marmux_sel = 1'b0;
-	 cw.indirectmux_sel = 1'b0;
-	 cw.ldb_sel = 1'b0;
-	 cw.stb_sel = 1'b0;
-	 cw.adj_sel = 1'b0;
+    // Stage 3 Signals
+    cw.ex.aluop = alu_pass;
+    cw.ex.offset6_lsse = 1'b1;
+    cw.ex.marmux_EX_sel = 1'b0;
+    cw.ex.alumux_sel = 2'b00;
+    cw.ex.mdrmux_EX_sel = 2'b00;
 
-	 cw.load_cc = 1'b0;
-	 cw.load_regfile = 1'b0;
-	 cw.load_pc = 1'b0;
-	 cw.load_ir = 1'b0; // Might not need this?
+    // Stage 4 Signals
+    cw.mem.indirectmux_sel = 1'b0;
+    cw.mem.d_mem_read = 1'b0;
+    cw.mem.d_mem_write = 1'b0;
 
-	 cw.dmem_read = 1'b0;
-	 cw.dmem_write = 1'b0;
+    // Stage 5 Signals
+    cw.wb.addrmux_sel = 1'b0;
+    cw.wb.destmux_sel = 1'b0;
+    cw.wb.pcmux_sel = 2'b00;
+    cw.wb.mdrmux_WB_sel = 2'b00;
+    cw.wb.regfilemux_sel = 2'b00;
+    cw.wb.load_cc = 1'b0;
+    cw.wb.load_regfile = 1'b0;
+    cw.wb.load_pc = 1'b0;
+    cw.wb.load_ir = 1'b0;
 
-    /* Actions for each state */
-	 case(opcode)
+    case (opcode)
+        op_add: begin
+            cw.ex.aluop = alu_add;
+            cw.wb.destmux_sel = 1'b0;           // selects DEST_WB
+            cw.wb.regfilemux_sel = 2'b00;       // selects alu_WB_out
+            cw.wb.load_regfile = 1'b1;
+            cw.wb.load_cc = 1'b1;
+            if(ir_5)
+                cw.ex.alumux_sel= 2'b10;        // selects imm5_EX
+            else
+                cw.ex.alumux_sel= 2'b00;        // selects src2_EX
+        end
+        op_and: begin
+            cw.ex.aluop = alu_and;
+            cw.wb.destmux_sel = 1'b0;           // selects DEST_WB
+            cw.wb.regfilemux_sel = 2'b00;       // selects alu_WB_out
+            cw.wb.load_regfile = 1'b1;
+            cw.wb.load_cc = 1'b1;
+            if(ir_5)
+                cw.ex.alumux_sel= 2'b10;        // selects imm5_EX
+            else
+                cw.ex.alumux_sel= 2'b00;        // selects src2_EX
+        end
+        op_not: begin
+            cw.ex.aluop = alu_not;
+            cw.wb.destmux_sel = 1'b0;           // selects DEST_WB
+            cw.wb.regfilemux_sel = 2'b00;       // selects alu_WB_out
+            cw.wb.load_regfile = 1'b1;
+            cw.wb.load_cc = 1'b1;
+        end
+        op_ldr: begin
+            
+        end
+        op_str: begin
 
-		op_add:
-			begin
-				if(immediate) // 1: ADDI
-					begin
-						cw.aluop = alu_add;
-						cw.alumux_sel = 2'b10; // selects imm5
+        end
+        op_br: begin
 
-						cw.destmux_sel = 2'b10; // selects DEST_WB
-						cw.regfilemux_sel = 2'b00; // selects alu_out
-						cw.load_regfile = 1'b1;
-						cw.load_cc = 1'b1;
-					end
+        end
 
-				else // 0: ADDR
-					begin
-						cw.aluop = alu_add;
-						cw.alumux_sel = 2'b00; // selects src2
+        default: ;
+    endcase
 
-						cw.destmux_sel = 2'b10; // selects DEST_WB
-						cw.regfilemux_sel = 2'b00; // selects alu_out
-						cw.load_regfile = 1'b1;
-						cw.load_cc = 1'b1;
-					end
-			end
 
-		op_and:
-			begin
-				if(immediate) // 1: ANDI
-					begin
-						cw.aluop = alu_and;
-						cw.alumux_sel = 2'b10; // selects imm5
-
-						cw.destmux_sel = 2'b10; // selects DEST_WB
-						cw.regfilemux_sel = 2'b00; // selects alu_out
-						cw.load_regfile = 1'b1;
-						cw.load_cc = 1'b1;
-					end
-
-				else // 0: ANDR
-					begin
-						cw.aluop = alu_and;
-						cw.alumux_sel = 2'b00; // selects src2
-
-						cw.destmux_sel = 2'b10; // selects DEST_WB
-						cw.regfilemux_sel = 2'b00; // selects alu_out
-						cw.load_regfile = 1'b1;
-						cw.load_cc = 1'b1;
-					end
-			end
-
-		op_not:
-			begin
-				cw.aluop = alu_not;
-
-				cw.destmux_sel = 2'b10; // selects DEST_WB
-				cw.regfilemux_sel = 2'b00; // selects alu_out
-				cw.load_regfile = 1'b1;
-				cw.load_cc = 1'b1;
-			end
-
-		op_ldr:
-			begin
-				// Address calculation
-				cw.adj_sel = 1'b1; // we want to left-shift/sign-extend the offset
-				cw.alumux_sel = 2'b11; // ADJ6 output
-				cw.aluop = alu_add;
-
-				// Other memory-related logic
-				cw.marmux_sel = 1'b0; // alu_out
-				cw.indirectmux_sel = 1'b0; // get output from MAR (this isn't LDI)
-				cw.ldb_sel = 1'b0; // not LDB
-				cw.dmem_read = 1'b1;
-
-				// Register file loading
-				cw.regfilemux_sel = 2'b01; // grab from MDR_WB
-				cw.destmux_sel = 2'b10; // selects DEST_WB
-				load_regfile = 1'b1;
-				load_cc = 1'b1;
-			end
-
-		op_str:
-			begin
-				// Address calculation
-				cw.adj_sel = 1'b1; // we want to left-shift/sign-extend the offset
-				cw.alumux_sel = 2'b11; // ADJ6 output
-				cw.aluop = alu_add;
-
-				// Other memory-related logic
-				cw.marmux_sel = 1'b0; // alu_out
-				cw.indirectmux_sel = 1'b0; // get output from MAR (this isn't LDI)
-				cw.src2mux_sel = 1'b1; // SR is where DR usually is
-				cw.stb_sel = 1'b0; // not STB
-				cw.dmem_write = 1'b1;
-			end
-
-		op_br:
-			begin
-				if(branch_enable) // Not sure about this- does the timing work out?
-					begin
-						cw.addermux_sel = 1'b0; // SEXT(offset9)
-						cw.pcmux_sel = 2'b01; // select PC_EX + SEXT(offset9)
-						load_pc = 1'b1;
-					end
-
-				else
-					begin ; end // nothing
-			end
-
-		default:
-			begin ; end // nothing
-
-	 endcase
 
 end
 

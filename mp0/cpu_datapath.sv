@@ -42,7 +42,7 @@ lc3b_control_word_mem mem_sig_3;
 lc3b_control_word_wb wb_sig_3;
 lc3b_reg dest_EX_out;
 lc3b_word pc_EX_out, marmux_EX_out, mdrmux_EX_out;
-lc3b_word src1_data_EX, src2_data_EX, alu_out, alumux_out;
+lc3b_word src1_data_EX, src2_data_EX, alu_EX_out, alumux_out;
 lc3b_imm4 imm4_EX;
 lc3b_imm5 imm5_EX;
 lc3b_offset6 offset6_EX, adj6_offset;
@@ -53,13 +53,13 @@ lc3b_offset11 PCoffset11_EX;
 lc3b_control_word_mem mem_sig_4;
 lc3b_control_word_wb wb_sig_4;
 lc3b_reg dest_MEM_out;
-lc3b_word pc_MEM_out, mar_MEM_out;
+lc3b_word pc_MEM_out, mar_MEM_out, alu_MEM_out;
 lc3b_offset11 PCoffset11_MEM;
 
 // Stage 5
 lc3b_control_word_wb wb_sig_5;
 lc3b_reg dest_WB_out;
-lc3b_word pc_WB_out, mdr_WB_out, mdr_WB_mod;
+lc3b_word pc_WB_out, mdr_WB_out, mdr_WB_mod, alu_WB_out;
 lc3b_offset9 PCoffset9_WB;
 lc3b_offset11 PCoffset11_WB;
 
@@ -81,7 +81,7 @@ mux4 pcmux
     .sel(wb_sig_5.pcmux_sel),
     .a(pc_plus2_out),
     .b(pc_plus_off),
-    .c(alu_out),
+    .c(alu_WB_out),
     .d(mdr_WB_mod),
     .f(pcmux_out)
 );
@@ -175,7 +175,7 @@ regfile regfile_inst
 mux4 regfilemux
 (
     .sel(wb_sig_5.regfilemux_sel),
-    .a(alu_out),
+    .a(alu_WB_out),
     .b(mdr_WB_mod),
     .c(pc_plus_off),
     .d(pc_WB_out),
@@ -249,13 +249,13 @@ alu alu_inst
     .aluop(ex_sig_3.aluop),
     .a(src1_data_EX),
     .b(alumux_out),
-    .f(alu_out)
+    .f(alu_EX_out)
 );
 
 mux2 marmux_ex
 (
     .sel(ex_sig_3.marmux_EX_sel),
-    .a(alu_out),
+    .a(alu_EX_out),
     .b({7'h00,trapVect8_EX,1'b0}),
     .f(marmux_EX_out)
 );
@@ -263,9 +263,9 @@ mux2 marmux_ex
 mux4 mdrmux_ex
 (
     .sel(ex_sig_3.mdrmux_EX_sel),
-    .a(alu_out),
-    .b({8'h00, alu_out[7:0]}),
-    .c({alu_out[7:0], 8'h00}),
+    .a(alu_EX_out),
+    .b({8'h00, alu_EX_out[7:0]}),
+    .c({alu_EX_out[7:0], 8'h00}),
     .d(src2_data_EX),
     .f(mdrmux_EX_out)
 );
@@ -283,13 +283,13 @@ ex_mem EX_MEM
 
     /* data inputs */
     .clk, .dest_MEM_in(dest_EX_out), .pc_MEM_in(pc_EX_out),
-    .mar_MEM_in(marmux_EX_out), .mdr_MEM_in(mdrmux_EX_out),
-    .offset11_MEM_in(PCoffset11_EX),
+    .alu_MEM_in(alu_EX_out), .mar_MEM_in(marmux_EX_out),
+    .mdr_MEM_in(mdrmux_EX_out), .offset11_MEM_in(PCoffset11_EX),
 
     /* data outputs */
     .dest_MEM_out(dest_MEM_out), .pc_MEM_out(pc_MEM_out),
-    .mar_MEM_out(mar_MEM_out), .mdr_MEM_out(d_mem_wdata),
-    .offset11_MEM_out(PCoffset11_MEM)
+    .alu_MEM_out(alu_MEM_out), .mar_MEM_out(mar_MEM_out),
+    .mdr_MEM_out(d_mem_wdata), .offset11_MEM_out(PCoffset11_MEM)
 );
 
 mux2 indirectmux
@@ -312,12 +312,12 @@ mem_wb MEM_WB
 
     /* data inputs */
     .clk, .dest_WB_in(dest_MEM_out),
-    .pc_WB_in(pc_MEM_out), .mdr_WB_in(d_mem_rdata),
-    .offset11_WB_in(PCoffset11_MEM),
+    .pc_WB_in(pc_MEM_out), .alu_WB_in(alu_MEM_out),
+    .mdr_WB_in(d_mem_rdata), .offset11_WB_in(PCoffset11_MEM),
 
     /* data outputs */
-    .dest_WB_out(dest_WB_out),
-    .pc_WB_out(pc_WB_out), .mdr_WB_out(mdr_WB_out),
+    .dest_WB_out(dest_WB_out), .pc_WB_out(pc_WB_out),
+    .alu_WB_out(alu_WB_out), .mdr_WB_out(mdr_WB_out),
     .offset9_WB_out(PCoffset9_WB), .offset11_WB_out(PCoffset11_WB)
 );
 
