@@ -24,7 +24,6 @@ begin : state_actions
     // Stage 4 Signals
     cw.mem.d_mem_read = 1'b0;
     cw.mem.d_mem_write = 1'b0;
-    cw.mem.d_mem_byte_enable = 2'b11;
 
     // Stage 5 Signals
     cw.wb.opcode = opcode;

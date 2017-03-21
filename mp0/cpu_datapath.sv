@@ -272,10 +272,10 @@ mux2 marmux_ex
 mux4 mdrmux_ex
 (
     .sel(mdrmux_EX_sel),
-    .a(src2_data_EX),
+    .a(16'h0000),
     .b({8'h00, src2_data_EX[7:0]}),
     .c({src2_data_EX[7:0], 8'h00}),
-    .d(16'h0000),
+    .d(src2_data_EX),
     .f(mdrmux_EX_out)
 );
 
@@ -296,12 +296,14 @@ ex_mem EX_MEM
     .dest_MEM_in(dest_EX_out), .pc_MEM_in(pc_EX_out),
     .alu_MEM_in(alu_EX_out), .mar_MEM_in(marmux_EX_out),
     .mdr_MEM_in(mdrmux_EX_out), .offset11_MEM_in(PCoffset11_EX),
+	 .mem_byte_enable_in(mdrmux_EX_sel),
     .init_MEM_in(init_EX_out),
 
     /* data outputs */
     .dest_MEM_out(dest_MEM_out), .pc_MEM_out(pc_MEM_out),
     .alu_MEM_out(alu_MEM_out), .mar_MEM_out(mar_MEM_out),
     .mdr_MEM_out(d_mem_wdata), .offset11_MEM_out(PCoffset11_MEM),
+ 	 .mem_byte_enable_out(d_mem_byte_enable),
     .init_MEM_out(init_MEM_out)
 );
 
@@ -352,7 +354,6 @@ mux4 mdrmux_wb
 assign d_mem_address =  indirectmux_out;
 assign d_mem_read = mem_sig_4.d_mem_read;
 assign d_mem_write = mem_sig_4.d_mem_write;
-assign d_mem_byte_enable = mem_sig_4.d_mem_byte_enable;
 
 // Instruction Memory Signals
 assign i_mem_address = pc_out;
@@ -361,7 +362,7 @@ assign i_mem_read = 1'b1;
 // Control Signals
 assign ir_4 = ir_10_0[4];
 assign ir_5 = ir_10_0[5];
-assign ir_11 = dest_ID_out[2];
+assign ir_11 = dest_WB_out[2];
 assign load = 1'b1;
 
 /***** pcmux_sel and addrmux_sel logic *****/
@@ -392,16 +393,17 @@ end
 
 /***** mdrmux_WB_sel and mdrmux_EX_sel logic *****/
 always_comb begin
-    mdrmux_EX_sel = 2'b00;
+    mdrmux_EX_sel = 2'b11;
+    if(wb_sig_3.opcode == op_stb) begin
+        if(alu_EX_out[0] == 1)
+            mdrmux_EX_sel = 2'b10;
+        else
+            mdrmux_EX_sel = 2'b01;
+    end
+
     mdrmux_WB_sel = 2'b00;
     if(wb_sig_5.opcode == op_ldb) begin
         if(mar_WB_lsb == 1)
-            mdrmux_WB_sel = 2'b10;
-        else
-            mdrmux_WB_sel = 2'b01;
-    end
-    if(wb_sig_3.opcode == op_stb) begin
-        if(alu_EX_out[0] == 1)
             mdrmux_WB_sel = 2'b10;
         else
             mdrmux_WB_sel = 2'b01;

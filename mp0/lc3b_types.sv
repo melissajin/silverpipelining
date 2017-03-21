@@ -60,7 +60,6 @@ typedef struct packed {
 typedef struct packed {
     logic d_mem_read;
     logic d_mem_write;
-    logic [1:0] d_mem_byte_enable;
 } lc3b_control_word_mem;
 
 typedef struct packed {
