@@ -308,7 +308,7 @@ mux2 indirectmux
 (
     .sel(mem_sig_4.indirectmux_sel),
     .a(mar_MEM_out),
-    .b(mdr_WB_mod),
+    .b(mdr_WB_out),
     .f(indirectmux_out)
 );
 
@@ -361,11 +361,6 @@ assign i_mem_read = 1'b1;
 assign ir_4 = ir_10_0[4];
 assign ir_5 = ir_10_0[5];
 assign ir_11 = dest_ID_out[2];
-
-// assign load = (d_mem_resp | (~init_MEM_out)
-//               | (mem_sig_4.load_pipe_mem & wb_sig_5.load_pipe_wb)
-//               | (mem_sig_4.load_pipe_mem & (~init_WB_out))) & (~(mem_sig_4.d_mem_read ^ mem_sig_4.d_mem_write));
-// TODO: Needs to change to handle stalling
 assign load = 1'b1;
 
 /***** pcmux_sel and addrmux_sel logic *****/
