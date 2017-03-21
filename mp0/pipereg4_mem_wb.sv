@@ -15,7 +15,7 @@ module mem_wb
     input lc3b_word pc_WB_in, alu_WB_in,
     input lc3b_word mdr_WB_in,
     input lc3b_offset11 offset11_WB_in,
-    input logic init_WB_in,
+    input logic mar_wb_lsb_in, init_WB_in,
 
     /* data outputs */
     output lc3b_reg dest_WB_out,
@@ -23,7 +23,7 @@ module mem_wb
     output lc3b_word mdr_WB_out,
     output lc3b_offset9 offset9_WB_out,
     output lc3b_offset11 offset11_WB_out,
-    output logic init_WB_out
+    output logic mar_wb_lsb_out, init_WB_out
 );
 
 assign offset9_WB_out = offset11_WB_out[8:0];
@@ -75,6 +75,14 @@ register #(11) offset11_wb
     .load,
     .in(offset11_WB_in),
     .out(offset11_WB_out)
+);
+
+register #(1) mar_wb_lsb
+(
+    .clk,
+    .load,
+    .in(mar_wb_lsb_in),
+    .out(mar_wb_lsb_out)
 );
 
 register #(1) init_wb

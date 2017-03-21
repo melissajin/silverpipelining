@@ -55,12 +55,9 @@ typedef struct packed {
     logic offset6_lsse;
     logic marmux_EX_sel;
     logic[1:0] alumux_sel;
-    logic[1:0] mdrmux_EX_sel;
 } lc3b_control_word_ex;
 
 typedef struct packed {
-    logic indirectmux_sel;
-    logic load_pipe_mem;
     logic d_mem_read;
     logic d_mem_write;
     logic [1:0] d_mem_byte_enable;
@@ -69,10 +66,8 @@ typedef struct packed {
 typedef struct packed {
     lc3b_opcode opcode;
     logic destmux_sel;
-    logic[1:0] mdrmux_WB_sel;
     logic[1:0] regfilemux_sel;
 
-    logic load_pipe_wb;
     logic load_cc;
     logic load_regfile;
 } lc3b_control_word_wb;

@@ -46,6 +46,7 @@ lc3b_nzp gencc_out, cc_out;
 
 // Stage 3
 logic init_EX_out;
+logic [1:0] mdrmux_EX_sel;
 lc3b_control_word_ex ex_sig_3;
 lc3b_control_word_mem mem_sig_3;
 lc3b_control_word_wb wb_sig_3;
@@ -68,8 +69,8 @@ lc3b_offset11 PCoffset11_MEM;
 
 // Stage 5
 logic init_WB_out;
-logic addrmux_sel;
-logic [1:0] pcmux_sel;
+logic addrmux_sel, indirectmux_sel, mar_WB_lsb;
+logic [1:0] pcmux_sel, mdrmux_WB_sel;
 logic br_enable;
 lc3b_control_word_wb wb_sig_5;
 lc3b_reg dest_WB_out;
@@ -270,11 +271,11 @@ mux2 marmux_ex
 
 mux4 mdrmux_ex
 (
-    .sel(ex_sig_3.mdrmux_EX_sel),
-    .a(alu_EX_out),
-    .b({8'h00, alu_EX_out[7:0]}),
-    .c({alu_EX_out[7:0], 8'h00}),
-    .d(src2_data_EX),
+    .sel(mdrmux_EX_sel),
+    .a(src2_data_EX),
+    .b({8'h00, src2_data_EX[7:0]}),
+    .c({src2_data_EX[7:0], 8'h00}),
+    .d(16'h0000),
     .f(mdrmux_EX_out)
 );
 
@@ -306,7 +307,7 @@ ex_mem EX_MEM
 
 mux2 indirectmux
 (
-    .sel(mem_sig_4.indirectmux_sel),
+    .sel(indirectmux_sel),
     .a(mar_MEM_out),
     .b(mdr_WB_out),
     .f(indirectmux_out)
@@ -328,18 +329,18 @@ mem_wb MEM_WB
     .dest_WB_in(dest_MEM_out),
     .pc_WB_in(pc_MEM_out), .alu_WB_in(alu_MEM_out),
     .mdr_WB_in(d_mem_rdata), .offset11_WB_in(PCoffset11_MEM),
-    .init_WB_in(init_MEM_out),
+    .init_WB_in(init_MEM_out), .mar_wb_lsb_in(indirectmux_out[0]),
 
     /* data outputs */
     .dest_WB_out(dest_WB_out), .pc_WB_out(pc_WB_out),
     .alu_WB_out(alu_WB_out), .mdr_WB_out(mdr_WB_out),
     .offset9_WB_out(PCoffset9_WB), .offset11_WB_out(PCoffset11_WB),
-    .init_WB_out(init_WB_out)
+    .init_WB_out(init_WB_out), .mar_wb_lsb_out(mar_WB_lsb)
 );
 
 mux4 mdrmux_wb
 (
-    .sel(wb_sig_5.mdrmux_WB_sel),
+    .sel(mdrmux_WB_sel),
     .a(mdr_WB_out),
     .b({8'h00, mdr_WB_out[7:0]}),
     .c({8'h00, mdr_WB_out[15:8]}),
@@ -364,8 +365,7 @@ assign ir_11 = dest_ID_out[2];
 assign load = 1'b1;
 
 /***** pcmux_sel and addrmux_sel logic *****/
-always_comb
-begin
+always_comb begin
     pcmux_sel = 2'b00;
     addrmux_sel = 1'b0;
     case (wb_sig_5.opcode)
@@ -388,6 +388,31 @@ begin
         end
         default: pcmux_sel = 2'b00;
     endcase
+end
+
+/***** mdrmux_WB_sel and mdrmux_EX_sel logic *****/
+always_comb begin
+    mdrmux_EX_sel = 2'b00;
+    mdrmux_WB_sel = 2'b00;
+    if(wb_sig_5.opcode == op_ldb) begin
+        if(mar_WB_lsb == 1)
+            mdrmux_WB_sel = 2'b10;
+        else
+            mdrmux_WB_sel = 2'b01;
+    end
+    if(wb_sig_3.opcode == op_stb) begin
+        if(alu_EX_out[0] == 1)
+            mdrmux_WB_sel = 2'b10;
+        else
+            mdrmux_WB_sel = 2'b01;
+    end
+end
+
+/***** indirectmux_sel logic *****/
+always_comb begin
+    indirectmux_sel = 1'b0;
+    if(wb_sig_5.opcode == op_ldi || wb_sig_5.opcode == op_sti)
+        indirectmux_sel = 1'b1;
 end
 
 endmodule : cpu_datapath

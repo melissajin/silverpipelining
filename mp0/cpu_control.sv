@@ -20,11 +20,8 @@ begin : state_actions
     cw.ex.offset6_lsse = 1'b1;
     cw.ex.marmux_EX_sel = 1'b0;
     cw.ex.alumux_sel = 2'b00;
-    cw.ex.mdrmux_EX_sel = 2'b00;
 
     // Stage 4 Signals
-    cw.mem.indirectmux_sel = 1'b0;
-    cw.mem.load_pipe_mem = 1'b1;
     cw.mem.d_mem_read = 1'b0;
     cw.mem.d_mem_write = 1'b0;
     cw.mem.d_mem_byte_enable = 2'b11;
@@ -32,9 +29,7 @@ begin : state_actions
     // Stage 5 Signals
     cw.wb.opcode = opcode;
     cw.wb.destmux_sel = 1'b0;
-    cw.wb.mdrmux_WB_sel = 2'b00;
     cw.wb.regfilemux_sel = 2'b00;
-    cw.wb.load_pipe_wb = 1'b1;
     cw.wb.load_cc = 1'b0;
     cw.wb.load_regfile = 1'b0;
 
@@ -73,7 +68,17 @@ begin : state_actions
             cw.wb.load_regfile = 1'b1;
         end
         op_ldb: begin
+            cw.ex.offset6_lsse = 1'b0;          // we want to sign-extend the offset
+            cw.ex.alumux_sel= 2'b11;            // ADJ6 output
+            cw.ex.aluop = alu_add;
+            cw.ex.marmux_EX_sel = 1'b0;         // alu_out
 
+            cw.mem.d_mem_read = 1'b1;
+
+            cw.wb.regfilemux_sel = 2'b01;       // grab from MDR_WB
+            cw.wb.destmux_sel = 1'b0;           // selects DEST_WB
+            cw.wb.load_regfile = 1'b1;
+            cw.wb.load_cc = 1'b1;
         end
         op_ldi: begin
 
@@ -84,10 +89,8 @@ begin : state_actions
             cw.ex.aluop = alu_add;
             cw.ex.marmux_EX_sel = 1'b0;         // alu_out
 
-            cw.mem.indirectmux_sel = 1'b0;      // get output from MAR (this isn't LDI)
             cw.mem.d_mem_read = 1'b1;
 
-            cw.wb.mdrmux_WB_sel = 2'b00;        // not LDB
             cw.wb.regfilemux_sel = 2'b01;       // grab from MDR_WB
             cw.wb.destmux_sel = 1'b0;           // selects DEST_WB
             cw.wb.load_regfile = 1'b1;
@@ -112,38 +115,42 @@ begin : state_actions
                 2'b01: cw.ex.aluop = alu_sll;
                 2'b10: cw.ex.aluop = alu_srl;
                 2'b11: cw.ex.aluop = alu_sra;
-            default: cw.ex.aluop = alu_pass;
-            cw.ex.alumux_sel= 2'b01;            // selects imm4_EX
+					default: cw.ex.aluop = alu_pass;
+				endcase
+				cw.ex.alumux_sel = 2'b01;            // selects imm4_EX
             cw.wb.destmux_sel = 1'b0;           // selects DEST_WB
             cw.wb.regfilemux_sel = 2'b00;       // selects alu_WB_out
             cw.wb.load_regfile = 1'b1;
             cw.wb.load_cc = 1'b1;
         end
         op_stb: begin
+            cw.src2mux_sel = 1'b1;              // dest
 
+            cw.ex.offset6_lsse = 1'b0;          // we want to sign-extend the offset
+            cw.ex.alumux_sel= 2'b11;            // ADJ6 output
+            cw.ex.aluop = alu_add;
+            cw.ex.marmux_EX_sel = 1'b0;         // alu_out
+
+            cw.mem.d_mem_write = 1'b1;
         end
         op_sti: begin
 
         end
         op_str: begin
-            cw.src2mux_sel = 1'b1;              // we want to left-shift/sign-extend the offset
+            cw.src2mux_sel = 1'b1;              // dest
 
             cw.ex.offset6_lsse = 1'b1;          // we want to left-shift/sign-extend the offset
             cw.ex.alumux_sel= 2'b11;            // ADJ6 output
             cw.ex.aluop = alu_add;
             cw.ex.marmux_EX_sel = 1'b0;         // alu_out
-            cw.ex.mdrmux_EX_sel = 2'b11;        // sr2
 
-            cw.mem.indirectmux_sel = 1'b0;      // get output from MAR (this isn't LDI)
             cw.mem.d_mem_write = 1'b1;
         end
         op_trap: begin
             cw.ex.marmux_EX_sel = 1'b1;         // trapVect8_EX
 
-            cw.mem.indirectmux_sel = 1'b0;      // MAR_MEM
             cw.mem.d_mem_read = 1'b1;
 
-            cw.wb.mdrmux_WB_sel = 2'b00;        // All 16 bits
             cw.wb.regfilemux_sel = 2'b11;       // grab from pc_WB_out
             cw.wb.destmux_sel = 1'b1;           // selects R7
             cw.wb.load_regfile = 1'b1;
