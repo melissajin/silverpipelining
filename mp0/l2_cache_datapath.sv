@@ -34,9 +34,8 @@ assign l2_wdata = wayselector_out;
 
 l2_cache_writelogic writelogic
 (
-    .l2_read, .mem_byte_enable,
-    .offset(mem_address[3:1]), .mem_wdata, .l2_rdata, .cur_cacheline(l2_wdata),
-    .output_cacheline(writelogic_out)
+    .pmem_read(), .pmem_rdata(), .l1_wdata(),
+    .output_cacheline()
 );
 
 
