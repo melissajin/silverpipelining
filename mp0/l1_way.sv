@@ -1,6 +1,6 @@
 import lc3b_types::*;
 
-module way
+module l1_way
 (
     input clk,
 
@@ -53,4 +53,4 @@ array #(128) data
     .dataout(data_out)
 );
 
-endmodule : way
+endmodule : l1_way
