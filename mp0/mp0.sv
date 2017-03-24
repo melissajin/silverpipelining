@@ -8,14 +8,14 @@ module mp0
     /* Instruction Memory signals */
     input i_mem_resp,
     input lc3b_word i_mem_rdata,
-    output i_mem_read,
+    output logic i_mem_read,
     output lc3b_word i_mem_address,
 
     /* Data Memory signals */
     input d_mem_resp,
     input lc3b_word d_mem_rdata,
-    output d_mem_read,
-    output d_mem_write,
+    output logic d_mem_read,
+    output logic d_mem_write,
     output lc3b_mem_wmask d_mem_byte_enable,
     output lc3b_word d_mem_address,
     output lc3b_word d_mem_wdata

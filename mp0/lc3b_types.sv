@@ -63,6 +63,9 @@ typedef struct packed {
 } lc3b_control_word_mem;
 
 typedef struct packed {
+    logic d_mem_read;               // need for LDI and STI
+    logic d_mem_write;
+
     lc3b_opcode opcode;
     logic destmux_sel;
     logic[1:0] regfilemux_sel;

@@ -1,0 +1,74 @@
+ORIGIN 0
+SEGMENT
+CodeSegment:
+
+    ; LDI stress test
+    LEA R0, DataSegment
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    LDI R7, R0, PTR7
+    LDI R6, R0, PTR6
+    LDI R5, R0, PTR5
+    LDI R4, R0, PTR4
+    LDI R3, R0, PTR3
+    LDI R2, R0, PTR2
+    LDI R1, R0, PTR1
+    LDI R0, R0, PTR0
+
+    ; STI stress test
+    LEA R0, DataSegment
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    STI R7, R0, PTR0
+    STI R6, R0, PTR1
+    STI R5, R0, PTR2
+    STI R4, R0, PTR3
+    STI R3, R0, PTR4
+    STI R2, R0, PTR5
+    STI R1, R0, PTR6
+    STI R0, R0, PTR7
+
+    ; Load back
+    LEA R0, DataSegment
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    LDI R7, R0, PTR7
+    LDI R6, R0, PTR6
+    LDI R5, R0, PTR5
+    LDI R4, R0, PTR4
+    LDI R3, R0, PTR3
+    LDI R2, R0, PTR2
+    LDI R1, R0, PTR1
+    LDI R0, R0, PTR0
+
+
+DONE:
+    BRnzp DONE
+
+
+SEGMENT        DataSegment:
+PTR0: DATA2 ADDR0
+PTR1: DATA2 ADDR1
+PTR2: DATA2 ADDR2
+PTR3: DATA2 ADDR3
+PTR4: DATA2 ADDR4
+PTR5: DATA2 ADDR5
+PTR6: DATA2 ADDR6
+PTR7: DATA2 ADDR7
+ADDR0: DATA2 4x4722
+ADDR1: DATA2 4x600D
+ADDR2: DATA2 4x2180
+ADDR3: DATA2 4x1293
+ADDR4: DATA2 4xF781
+ADDR5: DATA2 4x891E
+ADDR6: DATA2 4xCA61
+ADDR7: DATA2 4x09B9

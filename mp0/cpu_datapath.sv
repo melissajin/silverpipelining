@@ -12,13 +12,13 @@ module cpu_datapath
     output logic ir_11,
 
     /* Instruction Memory signals */
-    input i_mem_resp,                                   // TODO: Need to use to handle stalling for CP2
+    input i_mem_resp,
     input lc3b_word i_mem_rdata,
     output lc3b_word i_mem_address,
     output logic i_mem_read,
 
     /* Data Memory signals */
-    input d_mem_resp,                                   // TODO: Need to use to handle stalling for CP2
+    input d_mem_resp,
     input lc3b_word d_mem_rdata,
     output lc3b_word d_mem_address,
     output lc3b_word d_mem_wdata,
@@ -27,10 +27,10 @@ module cpu_datapath
 );
 
 /********** Internal Signals **********/
-logic load;
+logic load, load_mem_wb;
 
 // Stage 1
-lc3b_word pcmux_out, pc_out;
+lc3b_word pcmux_out, pc_out, irmux_out;
 lc3b_word pc_plus_off, pc_plus2_out, addrmux_out;
 lc3b_word adj11_offset, adj9_offset;
 
@@ -63,6 +63,7 @@ lc3b_offset11 PCoffset11_EX;
 logic init_MEM_out;
 lc3b_control_word_mem mem_sig_4;
 lc3b_control_word_wb wb_sig_4;
+lc3b_control_word_wb wb_sig_4_inter;
 lc3b_reg dest_MEM_out;
 lc3b_word pc_MEM_out, mar_MEM_out, alu_MEM_out, indirectmux_out;
 lc3b_offset11 PCoffset11_MEM;
@@ -77,6 +78,21 @@ lc3b_reg dest_WB_out;
 lc3b_word pc_WB_out, mdr_WB_out, mdr_WB_mod, alu_WB_out;
 lc3b_offset9 PCoffset9_WB;
 lc3b_offset11 PCoffset11_WB;
+
+
+/************************* Hazard Detection *************************/
+hazard_detection hazard_detection_inst
+(
+    /* inputs */
+    .i_mem_resp, .d_mem_resp,
+    .d_mem_read, .d_mem_write,
+    .MEM_inter_read(wb_sig_4_inter.d_mem_read), .MEM_inter_write(wb_sig_4_inter.d_mem_write),
+    .op_MEM(wb_sig_4.opcode), .op_MEM_inter(wb_sig_4_inter.opcode),
+
+    /* outputs */
+    .load(load)
+);
+
 
 /************************* Stage 1 *************************/
 /***** PC *****/
@@ -134,6 +150,14 @@ adj #(11) offset11_adjuster
     .out(adj11_offset)
 );
 
+mux2 irmux
+(
+    .sel(i_mem_resp),
+    .a(16'h0000),
+    .b(i_mem_rdata),
+    .f(irmux_out)
+);
+
 
 /************************* Stage 2 *************************/
 /***** IF_ID Pipeline Register *****/
@@ -142,7 +166,7 @@ if_id IF_ID
     .clk, .load(load),
 
     /* data inputs */
-    .pc_ID_in(pc_plus2_out), .ir_in(i_mem_rdata),
+    .pc_ID_in(pc_plus2_out), .ir_in(irmux_out),
 
     /* data outputs */
     .pc_ID_out(pc_ID_out), .opcode(opcode), .dest_ID_out(dest_ID_out),
@@ -319,10 +343,10 @@ mux2 indirectmux
 /***** MEM_WB Pipeline Register *****/
 mem_wb MEM_WB
 (
-    .clk, .load(load),
+    .clk, .load(load_mem_wb),
 
     /* control Signals */
-    .wb_sig_in(wb_sig_4),
+    .wb_sig_in(wb_sig_4_inter),
 
     /* control outputs */
     .wb_sig_out(wb_sig_5),
@@ -352,8 +376,8 @@ mux4 mdrmux_wb
 
 // Data Memory Signals
 assign d_mem_address =  indirectmux_out;
-assign d_mem_read = mem_sig_4.d_mem_read;
-assign d_mem_write = mem_sig_4.d_mem_write;
+assign d_mem_read = ({wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} == 2'b00) ? mem_sig_4.d_mem_read : wb_sig_5.d_mem_read;
+assign d_mem_write = ({wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} == 2'b00) ? mem_sig_4.d_mem_write : wb_sig_5.d_mem_write;
 
 // Instruction Memory Signals
 assign i_mem_address = pc_out;
@@ -363,7 +387,17 @@ assign i_mem_read = 1'b1;
 assign ir_4 = ir_10_0[4];
 assign ir_5 = ir_10_0[5];
 assign ir_11 = dest_WB_out[2];
-assign load = 1'b1;
+assign load_mem_wb = load | d_mem_resp;
+
+// LDI/STI control signal
+assign wb_sig_4_inter.d_mem_read = ((wb_sig_5.opcode == op_ldi || wb_sig_5.opcode == op_sti) && {wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} != 2'b00) ? 1'b0 : wb_sig_4.d_mem_read;
+assign wb_sig_4_inter.d_mem_write = ((wb_sig_5.opcode == op_ldi || wb_sig_5.opcode == op_sti) && {wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} != 2'b00) ? 1'b0 : wb_sig_4.d_mem_write;
+assign wb_sig_4_inter.opcode = wb_sig_4.opcode;
+assign wb_sig_4_inter.destmux_sel = wb_sig_4.destmux_sel;
+assign wb_sig_4_inter.regfilemux_sel = wb_sig_4.regfilemux_sel;
+assign wb_sig_4_inter.load_cc = wb_sig_4.load_cc;
+assign wb_sig_4_inter.load_regfile = wb_sig_4.load_regfile;
+
 
 /***** pcmux_sel and addrmux_sel logic *****/
 always_comb begin
@@ -413,7 +447,7 @@ end
 /***** indirectmux_sel logic *****/
 always_comb begin
     indirectmux_sel = 1'b0;
-    if(wb_sig_5.opcode == op_ldi || wb_sig_5.opcode == op_sti)
+    if((wb_sig_5.opcode == op_ldi || wb_sig_5.opcode == op_sti) && {wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} != 2'b00)
         indirectmux_sel = 1'b1;
 end
 
