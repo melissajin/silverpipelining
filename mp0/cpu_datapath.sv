@@ -28,11 +28,13 @@ module cpu_datapath
 
 /********** Internal Signals **********/
 logic load, load_mem_wb;
+logic load_pc, load_pcbak;
 
 // Stage 1
-lc3b_word pcmux_out, pc_out, irmux_out;
+lc3b_word pcmux_out, pc_out, pcbak_out, pcPlus2mux_out;
 lc3b_word pc_plus_off, pc_plus2_out, addrmux_out;
 lc3b_word adj11_offset, adj9_offset;
+lc3b_word irmux_out;
 
 // Stage 2
 logic init_ID_out;
@@ -84,13 +86,15 @@ lc3b_offset11 PCoffset11_WB;
 hazard_detection hazard_detection_inst
 (
     /* inputs */
+    .br_enable(br_enable),
     .i_mem_resp, .d_mem_resp,
     .d_mem_read, .d_mem_write,
     .MEM_inter_read(wb_sig_4_inter.d_mem_read), .MEM_inter_write(wb_sig_4_inter.d_mem_write),
     .op_MEM(wb_sig_4.opcode), .op_MEM_inter(wb_sig_4_inter.opcode),
+    .op_WB(wb_sig_5.opcode),
 
     /* outputs */
-    .load(load)
+    .load, .load_pc, .load_pcbak
 );
 
 
@@ -109,15 +113,31 @@ mux4 pcmux
 register pc
 (
     .clk,
-    .load(load),
+    .load(load_pc),
     .in(pcmux_out),
     .out(pc_out)
+);
+
+register pcbak
+(
+    .clk,
+    .load(load_pcbak),
+    .in(pcmux_out),
+    .out(pcbak_out)
+);
+
+mux2 pcPlus2mux
+(
+    .sel(pc_out != pcbak_out),
+    .a(pc_out),
+    .b(pcbak_out),
+    .f(pcPlus2mux_out)
 );
 
 // increments PC value to access next instruction
 plus2 pcPlus2
 (
-    .in(pc_out),
+    .in(pcPlus2mux_out),
     .out(pc_plus2_out)
 );
 
