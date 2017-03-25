@@ -15,18 +15,18 @@ module l2_cache
 
     /******* Signals between Cache and Physical Memory *******/
     // inputs
-    input l2_resp,                                                    // control
-    input lc3b_cacheline l2_rdata,                                    // datapath
+    input pmem_resp,                                                    // control
+    input lc3b_cacheline pmem_rdata,                                    // datapath
     // outputs
-    output logic l2_read, l2_write,                                   // control
-    output lc3b_word l2_address,                                      // datapath
-    output lc3b_cacheline l2_wdata                                    // datapath
+    output logic pmem_read, pmem_write,                                   // control
+    output lc3b_word pmem_address,                                      // datapath
+    output lc3b_cacheline pmem_wdata                                    // datapath
 );
 
-logic load_lru, l2wdata_sel;
+logic load_lru, pmemwdata_sel;
 logic load_d0, load_v0, load_TD0, d_set0, v_set0;
 logic load_d1, load_v1, load_TD1, d_set1, v_set1;
-logic [1:0] l2addr_sel;
+logic [1:0] pmemaddr_sel;
 logic lru, lru_set, dirty0, dirty1, hit0, hit1;
 
 l2_cache_control control
@@ -37,18 +37,18 @@ l2_cache_control control
     // inputs
     .lru_in(lru), .d_in0(dirty0), .d_in1(dirty1), .hit0, .hit1,
     // outputs
-    .load_lru, .lru_set, .l2wdata_sel,
+    .load_lru, .lru_set, .pmemwdata_sel,
     .load_d0, .load_v0, .load_TD0, .d_set0(d_set0), .v_set0(v_set0),
     .load_d1, .load_v1, .load_TD1, .d_set1(d_set1), .v_set1(v_set1),
-    .l2addr_sel,
+    .pmemaddr_sel,
 
     /* CPU signals */
     .mem_read, .mem_write,      // inputs
     .mem_resp,                  // outputs
 
     /* Memory signals */
-    .l2_resp,                 // inputs
-    .l2_read, .l2_write     // outputs
+    .pmem_resp,                 // inputs
+    .pmem_read, .pmem_write     // outputs
 );
 
 
@@ -58,10 +58,10 @@ l2_cache_datapath datapath
 
     /* Control signals */
     // inputs
-    .load_lru, .lru_in(lru_set), .l2wdata_sel,
+    .load_lru, .lru_in(lru_set), .pmemwdata_sel,
     .load_d0, .load_v0, .load_TD0, .d_in0(d_set0), .v_in0(v_set0),
     .load_d1, .load_v1, .load_TD1, .d_in1(d_set1), .v_in1(v_set1),
-    .l2addr_sel,
+    .pmemaddr_sel,
     // outputs
     .lru_out(lru), .d_out0(dirty0), .d_out1(dirty1), .hit0, .hit1,
 
@@ -70,8 +70,8 @@ l2_cache_datapath datapath
     .mem_rdata,                                      // outputs
 
     /* Memory signals */
-    .l2_read, .l2_rdata,                         // inputs
-    .l2_address, .l2_wdata                       // outputs
+    .pmem_read, .pmem_rdata,                         // inputs
+    .pmem_address, .pmem_wdata                       // outputs
 
 );
 

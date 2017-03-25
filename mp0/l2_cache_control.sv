@@ -5,18 +5,18 @@ module l2_cache_control
 
     /* Datapath controls */
     input lru_in, d_in0, d_in1, hit0, hit1,
-    output logic load_lru, lru_set, l2wdata_sel,
+    output logic load_lru, lru_set, pmemwdata_sel,
     output logic load_d0, load_v0, load_TD0, d_set0, v_set0,
     output logic load_d1, load_v1, load_TD1, d_set1, v_set1,
-    output logic [1:0] l2addr_sel,
+    output logic [1:0] pmemaddr_sel,
 
     /* CPU signals */
     input mem_read, mem_write,
     output logic mem_resp,
 
     /* Memory signals */
-    input l2_resp,
-    output logic l2_read, l2_write
+    input pmem_resp,
+    output logic pmem_read, pmem_write
 );
 
 /* List of states */
@@ -28,13 +28,13 @@ always_comb
 begin : state_actions
     /* Default output assignments */
     load_lru = 0; lru_set = 0;
-    l2wdata_sel = 0;
+    pmemwdata_sel = 0;
     load_d0 = 0; load_v0 = 0; load_TD0 = 0;
     d_set0 = 0; v_set0 = 0;
     load_d1 = 0; load_v1 = 0; load_TD1 = 0;
     d_set1 = 0; v_set1 = 0;
-    l2addr_sel = 2'b00;
-    mem_resp = 0; l2_read = 0; l2_write = 0;
+    pmemaddr_sel = 2'b00;
+    mem_resp = 0; pmem_read = 0; pmem_write = 0;
 
 
     case (state)
@@ -48,7 +48,7 @@ begin : state_actions
                 lru_set = 1;
                 load_lru = 1;
                 mem_resp = 1;
-	             l2wdata_sel = 0;
+	             pmemwdata_sel = 0;
             end
             if(hit1 & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -59,11 +59,11 @@ begin : state_actions
                 lru_set = 0;
                 load_lru = 1;
                 mem_resp = 1;
- 	             l2wdata_sel = 1;
+ 	             pmemwdata_sel = 1;
             end
         end
         fetch_cline: begin
-            l2_read = 1;
+            pmem_read = 1;
             if(lru_in == 0) begin
                 v_set0 = 1;
                 d_set0 = 0;
@@ -79,12 +79,12 @@ begin : state_actions
             end
         end
         write_back: begin
-            l2_write = 1;
-            l2wdata_sel = lru_in;
+            pmem_write = 1;
+            pmemwdata_sel = lru_in;
             if(lru_in == 0)
-                l2addr_sel = 2'b01;
+                pmemaddr_sel = 2'b01;
             else
-                l2addr_sel = 2'b10;
+                pmemaddr_sel = 2'b10;
         end
         default:;
     endcase
@@ -106,11 +106,11 @@ begin : next_state_logic
             end
         end
         fetch_cline: begin
-            if(l2_resp == 1)
+            if(pmem_resp == 1)
                 next_state = process_request;
         end
         write_back: begin
-            if(l2_resp == 1)
+            if(pmem_resp == 1)
                 next_state = fetch_cline;
         end
         default: next_state = process_request;
