@@ -7,7 +7,8 @@ module l2_cache
     /******* Signals between Arbiter and L2 Cache *******/
     // inputs
     input mem_read, mem_write,                                          // control
-    input lc3b_word mem_address, mem_wdata,                             // datapath
+    input lc3b_word mem_address,
+    input lc3b_cacheline mem_wdata,                             // datapath
     // outputs
     output logic mem_resp,                                              // control
     output lc3b_cacheline mem_rdata,                                         // datapath

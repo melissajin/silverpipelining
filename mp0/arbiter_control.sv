@@ -24,7 +24,8 @@
     /* List of states */
 	 idle,
 	 d_cache,
-	 i_cache
+	 i_cache,
+     buffer
  } state, next_state;
 
 
@@ -47,6 +48,11 @@
 				end
 
 			i_cache:
+				begin
+					cache_arbiter_sel = 1'b0;
+				end
+
+            buffer:
 				begin
 					cache_arbiter_sel = 1'b0;
 				end
@@ -86,20 +92,7 @@ always_comb
 				begin
 					if(l2_resp_in) // If the L2 has responded to D-cache's request
 						begin
-							if(d_cache_read_in | d_cache_write_in)
-								begin
-									next_state = d_cache; // Remain in the same state if D-cache has another request
-								end
-
-							else if(i_cache_read_in | i_cache_write_in) // I-Cache request
-								begin
-									next_state = i_cache;
-								end
-
-							else // No memory request
-								begin
-									next_state = idle;
-								end
+    						next_state = buffer;
 						end
 
 					else
@@ -115,20 +108,7 @@ always_comb
 				begin
 					if(l2_resp_in) // If the L2 has responded to I-cache's request
 						begin
-							if(d_cache_read_in | d_cache_write_in)
-								begin
-									next_state = d_cache; // Transition to the d-cache state if D-cache now has a request
-								end
-
-							else if(i_cache_read_in | i_cache_write_in) // Another I-Cache request
-								begin
-									next_state = i_cache; // Stay in the same state
-								end
-
-							else // No memory request
-								begin
-									next_state = idle;
-								end
+                            next_state = buffer;
 						end
 
 					else
@@ -139,6 +119,24 @@ always_comb
                                 next_state = idle;
 						end
 				end
+
+            buffer:
+                begin
+                    if(d_cache_read_in | d_cache_write_in)
+                        begin
+                            next_state = d_cache; // Transition to the d-cache state if D-cache now has a request
+                        end
+
+                    else if(i_cache_read_in | i_cache_write_in) // Another I-Cache request
+                        begin
+                            next_state = i_cache; // Stay in the same state
+                        end
+
+                    else // No memory request
+                        begin
+                            next_state = idle;
+                        end
+                end
 
 			default: begin ; end // Nothing
 
