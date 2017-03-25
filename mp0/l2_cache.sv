@@ -29,6 +29,10 @@ logic [2:0] pmemwdata_sel;
 logic [3:0] pmemaddr_sel;
 lc3b_L2_state cache_state;
 
+logic mem_read_sync, mem_write_sync;
+lc3b_word mem_address_sync;
+lc3b_cacheline mem_wdata_sync;
+
 l2_cache_control control
 (
     .clk,
@@ -41,7 +45,7 @@ l2_cache_control control
 
 
     /* Arbiter signals */
-    .mem_read, .mem_write,      // inputs
+    .mem_read(mem_read_sync), .mem_write(mem_write_sync),      // inputs
     .mem_resp,                  // outputs
 
     /* Memory signals */
@@ -60,7 +64,7 @@ l2_cache_datapath datapath
     .lru_out(lru_cur), .state(cache_state),
 
     /* Arbiter signals */
-    .mem_address, .l2_wdata(mem_wdata),              // inputs
+    .mem_address(mem_address_sync), .l2_wdata(mem_wdata_sync),              // inputs
     .l2_mem_rdata(mem_rdata),                        // outputs
 
     /* Memory signals */
@@ -68,5 +72,39 @@ l2_cache_datapath datapath
     .pmem_address, .pmem_wdata                       // outputs
 
 );
+
+// Synchronization between Arbiter and L2 cache
+register #(.width(1)) mem_read_reg
+(
+    .clk,
+    .load(1'b1),
+    .in(mem_read),
+    .out(mem_read_sync)
+);
+
+register #(.width(1)) mem_write_reg
+(
+    .clk,
+    .load(1'b1),
+    .in(mem_write),
+    .out(mem_write_sync)
+);
+
+register #(.width(16)) mem_address_reg
+(
+    .clk,
+    .load(1'b1),
+    .in(mem_address),
+    .out(mem_address_sync)
+);
+
+register #(.width(128)) mem_wdata_reg
+(
+    .clk,
+    .load(1'b1),
+    .in(mem_wdata),
+    .out(mem_wdata_sync)
+);
+
 
 endmodule : l2_cache
