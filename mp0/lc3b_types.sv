@@ -82,4 +82,41 @@ typedef struct packed {
 } lc3b_control_word;
 
 
+typedef struct packed {
+    logic load_d;
+    logic load_v;
+    logic load_TD;
+    logic d_in;
+    logic v_in;
+} lc3b_cWay_ctl;
+
+
+typedef struct packed {
+    logic load_lru;
+    lc3b_cWay_ctl way0;
+    lc3b_cWay_ctl way1;
+    lc3b_cWay_ctl way2;
+    lc3b_cWay_ctl way3;
+    lc3b_cWay_ctl way4;
+    lc3b_cWay_ctl way5;
+    lc3b_cWay_ctl way6;
+    lc3b_cWay_ctl way7;
+} lc3b_L2_ctl;
+
+typedef struct packed {
+    logic d_out;
+    logic hit;
+} lc3b_cWay_state;
+
+typedef struct packed {
+    lc3b_cWay_state way0;
+    lc3b_cWay_state way1;
+    lc3b_cWay_state way2;
+    lc3b_cWay_state way3;
+    lc3b_cWay_state way4;
+    lc3b_cWay_state way5;
+    lc3b_cWay_state way6;
+    lc3b_cWay_state way7;
+} lc3b_L2_state;
+
 endpackage : lc3b_types
