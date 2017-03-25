@@ -5,11 +5,11 @@ module l2_cache_control
 
     /* Control signals */
     input logic [6:0] lru_in,
-    input lc3b_L2_state state,
+    input lc3b_L2_state way_state,
     output lc3b_L2_ctl ctl,
-    output [6:0] lru_out,
-    output [2:0] pmemwdata_sel,
-    output [3:0] pmemaddr_sel,
+    output logic [6:0] lru_out,
+    output logic [2:0] pmemwdata_sel,
+    output logic [3:0] pmemaddr_sel,
 
     /* CPU signals */
     input mem_read, mem_write,
@@ -25,15 +25,15 @@ enum int unsigned {
     process_request, fetch_cline, write_back
 } state, next_state;
 
-logic [2:0] lru_sel, lru_hit;
+logic [2:0] lru_sel;
 logic [1:0] leafNode;
 logic hit, dirty_lru;
-assign hit = state.way0.hit | state.way1.hit | state.way2.hit | state.way3.hit
-            | state.way4.hit | state.way5.hit | state.way6.hit | state.way7.hit;
-assign dirty_lru = (state.way0.d_out == 1 && lru_sel == 0) || (state.way1.d_out == 1 && lru_sel == 1)
-                   (state.way2.d_out == 1 && lru_sel == 2) || (state.way3.d_out == 1 && lru_sel == 3)
-                   (state.way4.d_out == 1 && lru_sel == 4) || (state.way5.d_out == 1 && lru_sel == 5)
-                   (state.way6.d_out == 1 && lru_sel == 6) || (state.way7.d_out == 1 && lru_sel == 7);
+assign hit = way_state.way0.hit | way_state.way1.hit | way_state.way2.hit | way_state.way3.hit
+            | way_state.way4.hit | way_state.way5.hit | way_state.way6.hit | way_state.way7.hit;
+assign dirty_lru = (way_state.way0.d_out == 1 && lru_sel == 0) || (way_state.way1.d_out == 1 && lru_sel == 1) ||
+                   (way_state.way2.d_out == 1 && lru_sel == 2) || (way_state.way3.d_out == 1 && lru_sel == 3) ||
+                   (way_state.way4.d_out == 1 && lru_sel == 4) || (way_state.way5.d_out == 1 && lru_sel == 5) ||
+                   (way_state.way6.d_out == 1 && lru_sel == 6) || (way_state.way7.d_out == 1 && lru_sel == 7);
 always_comb
 begin : state_actions
     /* Default output assignments */
@@ -41,93 +41,94 @@ begin : state_actions
     pmemwdata_sel = 0;
     pmemaddr_sel = 4'h0;
     mem_resp = 0; pmem_read = 0; pmem_write = 0;
-
+	 lru_out = lru_in;
+	 
     case (state)
         process_request: begin
-            if(state.way0.hit & (mem_read ^ mem_write)) begin
+            if(way_state.way0.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
                     ctl.way0.d_in = 1;
                     ctl.way0.load_d = 1;
 	                ctl.way0.load_TD = 1;
                 end
-                lru_hit = 0;
+                lru_out = {lru_in[6], lru_in[5], lru_in[4], 1'b1, lru_in[2], 1'b1, 1'b1};
                 ctl.load_lru = 1;
                 mem_resp = 1;
 	            pmemwdata_sel = 0;
             end
-            if(state.way1.hit & (mem_read ^ mem_write)) begin
+            if(way_state.way1.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
                     ctl.way1.d_in = 1;
                     ctl.way1.load_d = 1;
 	                ctl.way1.load_TD = 1;
                 end
-                lru_hit = 1;
+                lru_out = {lru_in[6], lru_in[5], lru_in[4], 1'b0, lru_in[2], 1'b1, 1'b1};
                 ctl.load_lru = 1;
                 mem_resp = 1;
  	            pmemwdata_sel = 1;
             end
-            if(state.way2.hit & (mem_read ^ mem_write)) begin
+            if(way_state.way2.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
                     ctl.way2.d_in = 1;
                     ctl.way2.load_d = 1;
                     ctl.way2.load_TD = 1;
                 end
-                lru_hit = 2;
+                lru_out = {lru_in[6], lru_in[5], 1'b1, lru_in[3], lru_in[2], 1'b0, 1'b1};
                 ctl.load_lru = 1;
                 mem_resp = 1;
                 pmemwdata_sel = 1;
             end
-            if(state.way3.hit & (mem_read ^ mem_write)) begin
+            if(way_state.way3.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
                     ctl.way3.d_in = 1;
                     ctl.way3.load_d = 1;
                     ctl.way3.load_TD = 1;
                 end
-                lru_hit = 3;
+                lru_out = {lru_in[6], lru_in[5], 1'b0, lru_in[3], lru_in[2], 1'b0, 1'b1};
                 ctl.load_lru = 1;
                 mem_resp = 1;
                 pmemwdata_sel = 1;
             end
-            if(state.way4.hit & (mem_read ^ mem_write)) begin
+            if(way_state.way4.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
                     ctl.way4.d_in = 1;
                     ctl.way4.load_d = 1;
                     ctl.way4.load_TD = 1;
                 end
-                lru_hit = 4;
+                lru_out = {lru_in[6], 1'b1, lru_in[4], lru_in[3], 1'b1, lru_in[1], 1'b0};
                 ctl.load_lru = 1;
                 mem_resp = 1;
                 pmemwdata_sel = 1;
             end
-            if(state.way5.hit & (mem_read ^ mem_write)) begin
+            if(way_state.way5.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
                     ctl.way5.d_in = 1;
                     ctl.way5.load_d = 1;
                     ctl.way5.load_TD = 1;
                 end
-                lru_hit = 5;
+                lru_out = {lru_in[6], 1'b0, lru_in[4], lru_in[3], 1'b1, lru_in[1], 1'b0};
                 ctl.load_lru = 1;
                 mem_resp = 1;
                 pmemwdata_sel = 1;
             end
-            if(state.way6.hit & (mem_read ^ mem_write)) begin
+            if(way_state.way6.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
                     ctl.way6.d_in = 1;
                     ctl.way6.load_d = 1;
                     ctl.way6.load_TD = 1;
                 end
-                lru_hit = 6;
+                lru_out = {1'b1, lru_in[5], lru_in[4], lru_in[3], 1'b0, lru_in[1], 1'b0};
                 ctl.load_lru = 1;
                 mem_resp = 1;
                 pmemwdata_sel = 1;
             end
-            if(state.way7.hit & (mem_read ^ mem_write)) begin
+            if(way_state.way7.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
                     ctl.way7.d_in = 1;
                     ctl.way7.load_d = 1;
                     ctl.way7.load_TD = 1;
                 end
-                lru_hit = 7;
+                lru_out = {1'b0, lru_in[5], lru_in[4], lru_in[3], 1'b0, lru_in[1], 1'b0};
                 ctl.load_lru = 1;
                 mem_resp = 1;
                 pmemwdata_sel = 1;
@@ -205,7 +206,7 @@ begin : state_actions
         write_back: begin
             pmem_write = 1;
             pmemwdata_sel = lru_sel;
-            pmemaddr_sel = lru_sel+1;
+            pmemaddr_sel = {1'b0, lru_sel}+4'b0001;
         end
         default:;
     endcase
@@ -260,20 +261,6 @@ always_comb begin
     endcase
 
     lru_sel = {leafNode, lru_in[leafNode+3]};
-end
-
-always_comb begin
-    case(lru_hit)
-        3'b000: lru_out = {lru_in[6], lru_in[5], lru_in[4], 1, lru_in[2], 1, 1};
-        3'b001: lru_out = {lru_in[6], lru_in[5], lru_in[4], 0, lru_in[2], 1, 1};
-        3'b010: lru_out = {lru_in[6], lru_in[5], 1, lru_in[3], lru_in[2], 0, 1};
-        3'b011: lru_out = {lru_in[6], lru_in[5], 0, lru_in[3], lru_in[2], 0, 1};
-        3'b100: lru_out = {lru_in[6], 1, lru_in[4], lru_in[3], 1, lru_in[1], 0};
-        3'b101: lru_out = {lru_in[6], 0, lru_in[4], lru_in[3], 1, lru_in[1], 0};
-        3'b110: lru_out = {1, lru_in[5], lru_in[4], lru_in[3], 0, lru_in[1], 0};
-        3'b111: lru_out = {0, lru_in[5], lru_in[4], lru_in[3], 0, lru_in[1], 0};
-        default : ;
-    endcase
 end
 
 endmodule : l2_cache_control

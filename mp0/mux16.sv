@@ -1,7 +1,7 @@
 module mux16 #(parameter width = 16) // creates a modular module so that yo can have variable size inputs
 (
 	input [3:0] sel, 									// selection bit
-	input [width - 1:0] a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p      // the inputs to select from
+	input [width - 1:0] a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,     // the inputs to select from
 	output logic [width - 1:0] y 	            // selected output
 );
 

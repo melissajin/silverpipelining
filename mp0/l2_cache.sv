@@ -34,7 +34,7 @@ l2_cache_control control
 
     /* Control signals */
     // inputs
-    .lru_in(lru_cur), .state(cache_state),
+    .lru_in(lru_cur), .way_state(cache_state),
     // outputs
     .ctl(cache_ctl), .lru_out(lru_set), .pmemwdata_sel, .pmemaddr_sel,
 

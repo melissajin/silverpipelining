@@ -13,8 +13,9 @@ module l2_cache_datapath
     output lc3b_L2_state state,
 
     /* Arbiter signals */
-    input lc3b_word mem_address, l2_wdata,
-    output lc3b_word l2_mem_rdata,
+    input lc3b_word mem_address,
+	 input lc3b_cacheline l2_wdata,
+    output lc3b_cacheline l2_mem_rdata,
 
     /* Physical Memory signals */
     input pmem_read,
