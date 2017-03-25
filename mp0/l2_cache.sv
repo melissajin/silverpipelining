@@ -10,7 +10,7 @@ module l2_cache
     input lc3b_word mem_address, mem_wdata,                             // datapath
     // outputs
     output logic mem_resp,                                              // control
-    output lc3b_word mem_rdata,                                         // datapath
+    output lc3b_cacheline mem_rdata,                                         // datapath
 
     /******* Signals between L2 Cache and Physical Memory *******/
     // inputs

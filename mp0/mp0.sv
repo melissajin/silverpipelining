@@ -63,6 +63,14 @@ l2_cache l2_inst
     .pmem_wdata(pmem_wdata)                                    // datapath
 );
 
+// assign pmem_address = L2_address;
+// assign pmem_wdata = L2_wdata;
+// assign pmem_read = (L2_read);
+// assign pmem_write = (L2_write);
+// assign L2_resp = pmem_resp;
+// assign L2_rdata = pmem_rdata;
+
+
 arbiter arbiter_inst
 (
     .clk,

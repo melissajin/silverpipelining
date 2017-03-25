@@ -1,3 +1,4 @@
+import lc3b_types::*;
 
 module l2_cache_control
 (
@@ -42,7 +43,7 @@ begin : state_actions
     pmemaddr_sel = 4'h0;
     mem_resp = 0; pmem_read = 0; pmem_write = 0;
 	 lru_out = lru_in;
-	 
+
     case (state)
         process_request: begin
             if(way_state.way0.hit & (mem_read ^ mem_write)) begin
