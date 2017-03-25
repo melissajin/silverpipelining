@@ -36,7 +36,7 @@ l2_cache_control control
     // inputs
     .lru_in(lru_cur), .state(cache_state),
     // outputs
-    .ctl(cache_ctl), .lru_set, .pmemwdata_sel, .pmemaddr_sel,
+    .ctl(cache_ctl), .lru_out(lru_set), .pmemwdata_sel, .pmemaddr_sel,
 
 
     /* Arbiter signals */
