@@ -38,7 +38,7 @@
 
 set_global_assignment -name FAMILY "Stratix III"
 set_global_assignment -name DEVICE EP3SE50F780C2
-set_global_assignment -name TOP_LEVEL_ENTITY l2_cache
+set_global_assignment -name TOP_LEVEL_ENTITY mp0
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 13.1
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "00:00:00  AUGUST 25, 2014"
 set_global_assignment -name LAST_QUARTUS_VERSION 13.1
@@ -62,9 +62,6 @@ set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "200 ns" -section_id mp0_
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME mp0_tb -section_id mp0_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE mp0_tb.sv -section_id mp0_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id mp0_tb
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_global_assignment -name SYSTEMVERILOG_FILE mux16.sv
 set_global_assignment -name SYSTEMVERILOG_FILE l2_way.sv
 set_global_assignment -name SYSTEMVERILOG_FILE l2_cache_writelogic.sv
@@ -104,4 +101,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE cccomp.sv
 set_global_assignment -name SYSTEMVERILOG_FILE alu.sv
 set_global_assignment -name SYSTEMVERILOG_FILE adj.sv
 set_global_assignment -name SYSTEMVERILOG_FILE adder.sv
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

@@ -15,6 +15,12 @@ module mp0
     output lc3b_cacheline pmem_wdata
 );
 
+/******** Signals between arbiter and L2 cache ********/
+logic L2_read, L2_write, L2_resp;
+lc3b_word L2_address;
+lc3b_cacheline L2_wdata, L2_rdata;
+
+
 /******** Signals between split L1 cache and arbiter ********/
 /* Instruction Memory signals */
 logic resp_i, read_i, write_i;
@@ -35,6 +41,28 @@ logic d_mem_resp, d_mem_read, d_mem_write;
 lc3b_mem_wmask d_mem_byte_enable;
 lc3b_word d_mem_rdata, d_mem_address, d_mem_wdata;
 
+l2_cache l2_inst
+(
+    .clk,
+
+    /******* Signals between Arbiter and L2 Cache *******/
+    // inputs
+    .mem_read(L2_read), .mem_write(L2_write),                                          // control
+    .mem_address(L2_address), .mem_wdata(L2_wdata),                             // datapath
+    // outputs
+    .mem_resp(L2_resp),                                              // control
+    .mem_rdata(L2_rdata),                                         // datapath
+
+    /******* Signals between L2 Cache and Physical Memory *******/
+    // inputs
+    .pmem_resp(pmem_resp),                                                    // control
+    .pmem_rdata(pmem_rdata),                                    // datapath
+    // outputs
+    .pmem_read(pmem_read), .pmem_write(pmem_write),                                   // control
+    .pmem_address(pmem_address),                                      // datapath
+    .pmem_wdata(pmem_wdata)                                    // datapath
+);
+
 arbiter arbiter_inst
 (
     .clk,
@@ -46,13 +74,13 @@ arbiter arbiter_inst
     .i_cache_write_in(write_i), .d_cache_write_in(write_d),
 
     // Inputs from the L2 cache
-    .l2_rdata_in(pmem_rdata), // TODO: change to L2. using Pmem right now
-    .l2_resp_in(pmem_resp),
+    .l2_rdata_in(L2_rdata), // TODO: change to L2. using Pmem right now
+    .l2_resp_in(L2_resp),
 
     // Outputs to the L2 cache
-    .l2_address_out(pmem_address), // TODO: change to L2. using Pmem right now
-    .l2_wdata_out(pmem_wdata), .l2_read_out(pmem_read),
-    .l2_write_out(pmem_write),
+    .l2_address_out(L2_address), // TODO: change to L2. using Pmem right now
+    .l2_wdata_out(L2_wdata), .l2_read_out(L2_read),
+    .l2_write_out(L2_write),
 
     // Outputs to the split L1 cache
     .d_cache_resp_out(resp_d), .i_cache_resp_out(resp_i),
