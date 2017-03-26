@@ -12,13 +12,17 @@ module l2_cache_control
     output logic [2:0] pmemwdata_sel,
     output logic [3:0] pmemaddr_sel,
 
-    /* CPU signals */
+    /* Arbiter signals */
     input mem_read, mem_write,
     output logic mem_resp,
 
-    /* Memory signals */
+    /* Physical Memory signals */
     input pmem_resp,
-    output logic pmem_read, pmem_write
+    input lc3b_word pmem_address_inter,
+    input lc3b_cacheline pmem_wdata_inter,
+    output logic pmem_read, pmem_write,
+    output lc3b_word pmem_address,
+    output lc3b_cacheline pmem_wdata
 );
 
 /* List of states */
@@ -242,12 +246,6 @@ begin : next_state_logic
 
 end
 
-always_ff @(posedge clk)
-begin: next_state_assignment
-    /* Assignment of next state on clock edge */
-    state <= next_state;
-end
-
 always_comb begin
     case({lru_in[0], lru_in[1], lru_in[2]})
         3'b000: leafNode = 0;
@@ -262,6 +260,14 @@ always_comb begin
     endcase
 
     lru_sel = {leafNode, lru_in[leafNode+3]};
+end
+
+always_ff @(posedge clk)
+begin: next_state_assignment
+    /* Assignment of next state on clock edge */
+    state <= next_state;
+    pmem_wdata <= pmem_wdata_inter;
+    pmem_address <= pmem_address_inter;
 end
 
 endmodule : l2_cache_control
