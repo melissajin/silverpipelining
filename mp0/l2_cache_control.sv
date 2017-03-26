@@ -23,7 +23,7 @@ module l2_cache_control
 
 /* List of states */
 enum int unsigned {
-    process_request, fetch_cline, write_back, buffer
+    process_request, fetch_cline, write_back, buffer, buffer_2
 } state, next_state;
 
 logic [2:0] lru_sel;
@@ -239,6 +239,9 @@ begin : next_state_logic
                 next_state = fetch_cline;
         end
         buffer: begin
+            next_state = buffer_2;
+        end
+        buffer_2: begin
             next_state = process_request;
         end
         default: next_state = process_request;
