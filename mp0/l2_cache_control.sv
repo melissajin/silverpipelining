@@ -16,9 +16,13 @@ module l2_cache_control
     input mem_read, mem_write,
     output logic mem_resp,
 
-    /* Memory signals */
+    /* Physical Memory signals */
     input pmem_resp,
-    output logic pmem_read, pmem_write
+    input lc3b_word pmem_address_inter,
+    input lc3b_cacheline pmem_wdata_inter,
+    output logic pmem_read, pmem_write,
+    output lc3b_word pmem_address,
+    output lc3b_cacheline pmem_wdata
 );
 
 /* List of states */
@@ -174,6 +178,8 @@ always_ff @(posedge clk)
 begin: next_state_assignment
     /* Assignment of next state on clock edge */
     state <= next_state;
+    pmem_wdata <= pmem_wdata_inter;
+    pmem_address <= pmem_address_inter;
 end
 
 always_comb begin

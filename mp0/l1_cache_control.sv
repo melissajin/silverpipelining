@@ -1,3 +1,4 @@
+import lc3b_types::*;
 
 module l1_cache_control
 (
@@ -16,7 +17,11 @@ module l1_cache_control
 
     /* Memory signals */
     input l2_resp,
-    output logic l2_read, l2_write
+    input lc3b_word l2_address_inter,
+    input lc3b_cacheline l2_wdata_inter,
+    output logic l2_read, l2_write,
+    output lc3b_word l2_address,
+    output lc3b_cacheline l2_wdata
 );
 
 /* List of states */
@@ -123,6 +128,8 @@ always_ff @(posedge clk)
 begin: next_state_assignment
     /* Assignment of next state on clock edge */
     state <= next_state;
+    l2_address <= l2_address_inter;
+    l2_wdata <= l2_wdata_inter;
 end
 
 
