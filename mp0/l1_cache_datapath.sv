@@ -19,8 +19,8 @@ module l1_cache_datapath
     /* Memory signals */
     input l2_read,
     input lc3b_cacheline l2_rdata,
-    output lc3b_word l2_address,
-    output lc3b_cacheline l2_wdata
+    output lc3b_word l2_address_inter,
+    output lc3b_cacheline l2_wdata_inter
 );
 
 /* Internal Signals */
@@ -30,12 +30,12 @@ lc3b_c_tag tag0, tag1;
 
 assign hit0 = (v_out0 & (mem_address[15:7] == tag0));
 assign hit1 = (v_out1 & (mem_address[15:7] == tag1));
-assign l2_wdata = wayselector_out;
+assign l2_wdata_inter = wayselector_out;
 
 l1_cache_writelogic writelogic
 (
     .l2_read, .mem_byte_enable,
-    .offset(mem_address[3:1]), .mem_wdata, .l2_rdata, .cur_cacheline(l2_wdata),
+    .offset(mem_address[3:1]), .mem_wdata, .l2_rdata, .cur_cacheline(l2_wdata_inter),
     .output_cacheline(writelogic_out)
 );
 
@@ -105,7 +105,7 @@ mux4 #(16) l2addr_mux
     .b({tag0, mem_address[6:4], 4'h0}),
     .c({tag1, mem_address[6:4], 4'h0}),
     .d(16'h0000),
-    .f(l2_address)
+    .f(l2_address_inter)
 );
 
 

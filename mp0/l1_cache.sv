@@ -28,6 +28,8 @@ logic load_d0, load_v0, load_TD0, d_set0, v_set0;
 logic load_d1, load_v1, load_TD1, d_set1, v_set1;
 logic [1:0] l2addr_sel;
 logic lru, lru_set, dirty0, dirty1, hit0, hit1;
+lc3b_word l2_address_inter;
+lc3b_cacheline l2_wdata_inter;
 
 l1_cache_control control
 (
@@ -43,12 +45,12 @@ l1_cache_control control
     .l2addr_sel,
 
     /* CPU signals */
-    .mem_read, .mem_write,      // inputs
-    .mem_resp,                  // outputs
+    .mem_read, .mem_write,                              // inputs
+    .mem_resp,                                          // outputs
 
     /* Memory signals */
-    .l2_resp,                 // inputs
-    .l2_read, .l2_write     // outputs
+    .l2_resp, .l2_address_inter, .l2_wdata_inter,              // inputs
+    .l2_read, .l2_write, .l2_address, .l2_wdata                // outputs
 );
 
 
@@ -70,8 +72,8 @@ l1_cache_datapath datapath
     .mem_rdata,                                      // outputs
 
     /* Memory signals */
-    .l2_read, .l2_rdata,                         // inputs
-    .l2_address, .l2_wdata                       // outputs
+    .l2_read, .l2_rdata,                             // inputs
+    .l2_address_inter, .l2_wdata_inter               // outputs
 
 );
 

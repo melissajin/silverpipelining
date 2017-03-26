@@ -29,6 +29,9 @@ logic [2:0] pmemwdata_sel;
 logic [3:0] pmemaddr_sel;
 lc3b_L2_state cache_state;
 
+lc3b_word pmem_address_inter;
+lc3b_cacheline pmem_wdata_inter;
+
 logic mem_read_sync, mem_write_sync;
 lc3b_word mem_address_sync;
 lc3b_cacheline mem_wdata_sync;
@@ -49,8 +52,8 @@ l2_cache_control control
     .mem_resp,                  // outputs
 
     /* Memory signals */
-    .pmem_resp,                 // inputs
-    .pmem_read, .pmem_write     // outputs
+    .pmem_resp, .pmem_address_inter, .pmem_wdata_inter,    // inputs
+    .pmem_read, .pmem_write, .pmem_address, .pmem_wdata    // outputs
 );
 
 l2_cache_datapath datapath
@@ -69,7 +72,7 @@ l2_cache_datapath datapath
 
     /* Memory signals */
     .pmem_read, .pmem_rdata,                         // inputs
-    .pmem_address, .pmem_wdata                       // outputs
+    .pmem_address_inter, .pmem_wdata_inter           // outputs
 
 );
 

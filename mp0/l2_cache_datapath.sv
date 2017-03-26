@@ -20,8 +20,8 @@ module l2_cache_datapath
     /* Physical Memory signals */
     input pmem_read,
     input lc3b_cacheline pmem_rdata,
-    output lc3b_word pmem_address,
-    output lc3b_cacheline pmem_wdata
+    output lc3b_word pmem_address_inter,
+    output lc3b_cacheline pmem_wdata_inter
 );
 
 /* Internal Signals */
@@ -181,7 +181,7 @@ mux16 #(16) pmemaddr_mux
     .n(16'h0000),
     .o(16'h0000),
     .p(16'h0000),
-    .y(pmem_address)
+    .y(pmem_address_inter)
 );
 
 assign state.way0.hit = (v_out0 & (mem_address[15:7] == tag0));
@@ -193,7 +193,7 @@ assign state.way5.hit = (v_out5 & (mem_address[15:7] == tag5));
 assign state.way6.hit = (v_out6 & (mem_address[15:7] == tag6));
 assign state.way7.hit = (v_out7 & (mem_address[15:7] == tag7));
 
-assign pmem_wdata = wayselector_out;
+assign pmem_wdata_inter = wayselector_out;
 assign l2_mem_rdata = wayselector_out;
 
 endmodule : l2_cache_datapath
