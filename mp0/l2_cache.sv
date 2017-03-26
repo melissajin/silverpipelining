@@ -24,9 +24,9 @@ module l2_cache
 );
 
 lc3b_L2_ctl cache_ctl;
-logic [6:0] lru_cur, lru_set;
-logic [2:0] pmemwdata_sel;
-logic [3:0] pmemaddr_sel;
+lc3b_l2_lru lru_cur, lru_set;
+logic [1:0] pmemwdata_sel;
+logic [2:0] pmemaddr_sel;
 lc3b_L2_state cache_state;
 
 l2_cache_control control

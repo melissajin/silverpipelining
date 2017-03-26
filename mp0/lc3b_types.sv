@@ -5,6 +5,7 @@ typedef logic  [7:0] lc3b_byte;
 typedef logic [127:0] lc3b_cacheline;
 typedef logic [2:0] lc3b_c_index;
 typedef logic [8:0] lc3b_c_tag;
+typedef logic [2:0] lc3b_l2_lru;
 
 
 // IR output types
@@ -97,10 +98,6 @@ typedef struct packed {
     lc3b_cWay_ctl way1;
     lc3b_cWay_ctl way2;
     lc3b_cWay_ctl way3;
-    lc3b_cWay_ctl way4;
-    lc3b_cWay_ctl way5;
-    lc3b_cWay_ctl way6;
-    lc3b_cWay_ctl way7;
 } lc3b_L2_ctl;
 
 typedef struct packed {
@@ -113,10 +110,6 @@ typedef struct packed {
     lc3b_cWay_state way1;
     lc3b_cWay_state way2;
     lc3b_cWay_state way3;
-    lc3b_cWay_state way4;
-    lc3b_cWay_state way5;
-    lc3b_cWay_state way6;
-    lc3b_cWay_state way7;
 } lc3b_L2_state;
 
 endpackage : lc3b_types
