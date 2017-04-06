@@ -48,7 +48,8 @@ lc3b_nzp gencc_out, cc_out;
 
 // Stage 3
 logic init_EX_out;
-logic [1:0] mdrmux_EX_sel;
+logic [1:0] mdrmux_EX_sel, forward_a_sel, forward_b_sel;
+lc3b_word forward_a_out, forward_b_out;
 lc3b_control_word_ex ex_sig_3;
 lc3b_control_word_mem mem_sig_3;
 lc3b_control_word_wb wb_sig_3;
@@ -267,17 +268,52 @@ id_ex ID_EX
     .ex_sig_out(ex_sig_3), .mem_sig_out(mem_sig_3), .wb_sig_out(wb_sig_3),
 
     /* data inputs */
-    .dest_EX_in(dest_ID_out), .pc_EX_in(pc_ID_out),
+    .dest_EX_in(dest_ID_out), .src1_EX_in(src1),
+    .src2_EX_in(src2mux_out), .pc_EX_in(pc_ID_out),
     .src1_data_in(src1_data_out), .src2_data_in(src2_data_out),
     .ir_10_0_in(ir_10_0), .init_EX_in(init_ID_out),
 
     /* data outputs */
-    .dest_EX_out(dest_EX_out), .pc_EX_out(pc_EX_out),
+    .dest_EX_out(dest_EX_out), .src1_EX_out(src1_EX_out), 
+    .src2_EX_out(src2_EX_out), .pc_EX_out(pc_EX_out),
     .src1_data_EX(src1_data_EX), .src2_data_EX(src2_data_EX),
 
     .imm4_EX(imm4_EX), .imm5_EX(imm5_EX), .offset6_EX(offset6_EX),
     .trapVect8_EX(trapVect8_EX), .offset11_EX_out(PCoffset11_EX),
     .init_EX_out(init_EX_out)
+);
+
+forwarding_unit forwarding_inst
+(
+    .dest_mem(dest_MEM_out),
+    .dest_wb(dest_WB_out),
+    .src1_ex(src1_EX_out),
+    .src2_ex(src2_EX_out),
+    .load_regfile_mem(wb_sig_3.load_regfile),
+    .load_regfile_wb(wb_sig_5.load_regfile),
+    .forward_a_sel(forward_a_sel),
+    .forward_b_sel(forward_b_sel)
+
+);
+
+mux4 forward_a
+(
+    .sel(forward_a_sel),
+    .a(src1_data_EX),
+    .b(alu_WB_out),
+    .c(alu_MEM_out),
+    .d(),
+    .f(forward_a_out)
+);
+
+mux4 forward_b
+(
+    .sel(forward_b_sel),
+    .a(src2_data_EX),
+    .b(alu_WB_out),
+    .c(alu_MEM_out),
+    .d(),
+    .f(forward_b_out)
 );
 
 adj #(6) offset6_adjuster
@@ -290,7 +326,7 @@ adj #(6) offset6_adjuster
 mux4 alumux
 (
     .sel(ex_sig_3.alumux_sel),
-    .a(src2_data_EX),
+    .a(forward_b_out),
     .b({12'h000,imm4_EX}),
     .c({{11{imm5_EX[4]}},imm5_EX}),
     .d(adj6_offset),
@@ -300,7 +336,7 @@ mux4 alumux
 alu alu_inst
 (
     .aluop(ex_sig_3.aluop),
-    .a(src1_data_EX),
+    .a(forward_a_out),
     .b(alumux_out),
     .f(alu_EX_out)
 );
