@@ -2,15 +2,18 @@ ORIGIN 0
 SEGMENT
 CODE:
 	LEA R0, DATA
+	NOP
+	NOP
+	NOP
 	LDR R1, R0, LVAL1
-	# MEM -> EX forward_b
-	LDR R2, R0, LVAL2
+	LDR R2, R0, LVAL2				;WB -> EX forward_b
+	NOP
 	ADD R4, R1, R2
-	# MEM -> EX forward_a
-	LDR R3, R0, LVAL3
+	LDR R3, R0, LVAL3				;WB -> EX forward_a
+	NOP
 	ADD R5, R3, R1
-	# EX 
-	ADD R6, R1, R5
+	ADD R6, R1, R5					;MEM -> EX forward_b
+	ADD R7, R6, R1					;MEM -> EX forward_b
 
 SEGMENT
 DATA:
@@ -23,4 +26,3 @@ SVAL3:  DATA2 ?
 SVAL4:  DATA2 ?
 GOOD:   DATA2 4x600D
 BADD:   DATA2 4xBADD
-

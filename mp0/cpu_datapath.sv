@@ -53,7 +53,7 @@ lc3b_word forward_a_out, forward_b_out;
 lc3b_control_word_ex ex_sig_3;
 lc3b_control_word_mem mem_sig_3;
 lc3b_control_word_wb wb_sig_3;
-lc3b_reg dest_EX_out;
+lc3b_reg dest_EX_out, src1_EX_out, src2_EX_out;
 lc3b_word pc_EX_out, marmux_EX_out, mdrmux_EX_out, adj6_offset;
 lc3b_word src1_data_EX, src2_data_EX, alu_EX_out, alumux_out;
 lc3b_imm4 imm4_EX;
@@ -61,6 +61,9 @@ lc3b_imm5 imm5_EX;
 lc3b_offset6 offset6_EX;
 lc3b_trapvect8 trapVect8_EX;
 lc3b_offset11 PCoffset11_EX;
+lc3b_word wb_rem;
+lc3b_reg dest_wb_rem;
+logic load_wb_rem;
 
 // Stage 4
 logic init_MEM_out;
@@ -283,14 +286,40 @@ id_ex ID_EX
     .init_EX_out(init_EX_out)
 );
 
+register #(16) wb_old
+(
+    .clk,
+    .load,
+    .in(mdr_WB_out),
+    .out(wb_rem)
+);
+
+register #(3) dest_wb_old
+(
+    .clk,
+    .load,
+    .in(dest_WB_out),
+    .out(dest_wb_rem)
+);
+
+register #(1) load_wb_old
+(
+    .clk,
+    .load,
+    .in(wb_sig_5.load_regfile),
+    .out(load_wb_rem)
+);
+
 forwarding_unit forwarding_inst
 (
     .dest_mem(dest_MEM_out),
     .dest_wb(dest_WB_out),
-    .src1_ex(src1_EX_out),
-    .src2_ex(src2_EX_out),
-    .load_regfile_mem(wb_sig_3.load_regfile),
+	 .dest_wb_rem(dest_wb_rem),
+    .src1_ex(/*src1*/ src1_EX_out),
+    .src2_ex(/*src2mux_out*/ src2_EX_out),
+    .load_regfile_mem(wb_sig_4.load_regfile),
     .load_regfile_wb(wb_sig_5.load_regfile),
+	 .load_regfile_wb_rem(load_wb_rem),
     .forward_a_sel(forward_a_sel),
     .forward_b_sel(forward_b_sel)
 
@@ -300,9 +329,9 @@ mux4 forward_a
 (
     .sel(forward_a_sel),
     .a(src1_data_EX),
-    .b(alu_WB_out),
-    .c(alu_MEM_out),
-    .d(),
+    .b(mdr_WB_out /*alu_WB_out*/),
+    .c(d_mem_rdata),
+    .d(wb_rem),
     .f(forward_a_out)
 );
 
@@ -310,9 +339,9 @@ mux4 forward_b
 (
     .sel(forward_b_sel),
     .a(src2_data_EX),
-    .b(alu_WB_out),
-    .c(alu_MEM_out),
-    .d(),
+    .b(mdr_WB_out /*alu_WB_out*/),
+    .c(d_mem_rdata),
+    .d(wb_rem),
     .f(forward_b_out)
 );
 
