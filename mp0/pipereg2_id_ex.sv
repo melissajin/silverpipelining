@@ -16,6 +16,8 @@ module id_ex
 
     /* data inputs */
     input lc3b_reg dest_EX_in,
+    input lc3b_reg src1_EX_in,
+    input lc3b_reg src2_EX_in,
     input lc3b_word pc_EX_in,
     input lc3b_word src1_data_in, src2_data_in,
     input lc3b_ir_10_0 ir_10_0_in,
@@ -23,6 +25,8 @@ module id_ex
 
     /* data outputs */
     output lc3b_reg dest_EX_out,
+    output lc3b_reg src1_EX_out,
+    output lc3b_reg src2_EX_out,
     output lc3b_word pc_EX_out,
     output lc3b_word src1_data_EX, src2_data_EX,
 
@@ -74,6 +78,22 @@ register pc_ex
     .load,
     .in(pc_EX_in),
     .out(pc_EX_out)
+);
+
+register #(3) src1_ex
+(
+    .clk,
+    .load,
+    .in(src1_EX_in),
+    .out(src1_EX_out)
+);
+
+register #(3) src2_ex
+(
+    .clk,
+    .load,
+    .in(src2_EX_in),
+    .out(src2_EX_out)
 );
 
 register src1_data_reg

@@ -24,6 +24,7 @@ begin : state_actions
     // Stage 4 Signals
     cw.mem.d_mem_read = 1'b0;
     cw.mem.d_mem_write = 1'b0;
+    cw.mem.forward_MEM_sel = 2'b00;
 
     // Stage 5 Signals
     cw.wb.d_mem_read = 1'b0;
@@ -33,6 +34,7 @@ begin : state_actions
     cw.wb.regfilemux_sel = 2'b00;
     cw.wb.load_cc = 1'b0;
     cw.wb.load_regfile = 1'b0;
+    cw.wb.forward_WB_sel = 2'b00;
 
     case (opcode)
         op_add: begin
@@ -45,6 +47,10 @@ begin : state_actions
                 cw.ex.alumux_sel= 2'b10;        // selects imm5_EX
             else
                 cw.ex.alumux_sel= 2'b00;        // selects src2_EX
+
+            // forwarding signals
+            cw.mem.forward_MEM_sel = 2'b00;
+            cw.wb.forward_WB_sel = 2'b00;
         end
         op_and: begin
             cw.ex.aluop = alu_and;
@@ -56,6 +62,10 @@ begin : state_actions
                 cw.ex.alumux_sel= 2'b10;        // selects imm5_EX
             else
                 cw.ex.alumux_sel= 2'b00;        // selects src2_EX
+
+            // forwarding signals
+            cw.mem.forward_MEM_sel = 2'b00;
+            cw.wb.forward_WB_sel = 2'b00;
         end
         op_br: begin
             // Everything is combinational
@@ -80,6 +90,10 @@ begin : state_actions
             cw.wb.destmux_sel = 1'b0;           // selects DEST_WB
             cw.wb.load_regfile = 1'b1;
             cw.wb.load_cc = 1'b1;
+
+            // forwarding signals
+            cw.mem.forward_MEM_sel = 2'b11;
+            cw.wb.forward_WB_sel = 2'b11;
         end
         op_ldi: begin
             cw.ex.offset6_lsse = 1'b1;          // we want to left-shift/sign-extend the offset
@@ -94,6 +108,10 @@ begin : state_actions
             cw.wb.destmux_sel = 1'b0;           // selects DEST_WB
             cw.wb.load_regfile = 1'b1;
             cw.wb.load_cc = 1'b1;
+
+            // forwarding signals
+            cw.mem.forward_MEM_sel = 2'b11;
+            cw.wb.forward_WB_sel = 2'b11;
         end
         op_ldr: begin
             cw.ex.offset6_lsse = 1'b1;          // we want to left-shift/sign-extend the offset
@@ -107,12 +125,20 @@ begin : state_actions
             cw.wb.destmux_sel = 1'b0;           // selects DEST_WB
             cw.wb.load_regfile = 1'b1;
             cw.wb.load_cc = 1'b1;
+
+            // forwarding signals
+            cw.mem.forward_MEM_sel = 2'b11;
+            cw.wb.forward_WB_sel = 2'b11;
         end
         op_lea: begin
             cw.wb.regfilemux_sel = 2'b10;       // selects pc_plus_off
             cw.wb.destmux_sel = 1'b0;           // selects DEST_WB
             cw.wb.load_regfile = 1'b1;
             cw.wb.load_cc = 1'b1;
+
+            // forwarding signals
+            cw.mem.forward_MEM_sel = 2'b10;
+            cw.wb.forward_WB_sel = 2'b10;
         end
         op_not: begin
             cw.ex.aluop = alu_not;
@@ -120,6 +146,10 @@ begin : state_actions
             cw.wb.regfilemux_sel = 2'b00;       // selects alu_WB_out
             cw.wb.load_regfile = 1'b1;
             cw.wb.load_cc = 1'b1;
+
+            // forwarding signals
+            cw.mem.forward_MEM_sel = 2'b00;
+            cw.wb.forward_WB_sel = 2'b00;
         end
         op_shf: begin
             case ({ir_4,ir_5})
@@ -134,6 +164,10 @@ begin : state_actions
             cw.wb.regfilemux_sel = 2'b00;       // selects alu_WB_out
             cw.wb.load_regfile = 1'b1;
             cw.wb.load_cc = 1'b1;
+
+            // forwarding signals
+            cw.mem.forward_MEM_sel = 2'b00;
+            cw.wb.forward_WB_sel = 2'b00;
         end
         op_stb: begin
             cw.src2mux_sel = 1'b1;              // dest

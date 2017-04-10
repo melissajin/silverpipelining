@@ -1,11 +1,5 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate -color Yellow /mp0_tb/dut/l2_inst/control/mem_read
-add wave -noupdate -color Yellow /mp0_tb/dut/l2_inst/control/mem_write
-add wave -noupdate -color Yellow /mp0_tb/dut/l2_inst/control/mem_resp
-add wave -noupdate -color Yellow /mp0_tb/dut/l2_inst/control/state
-add wave -noupdate -color Magenta -radix hexadecimal /mp0_tb/dut/i_cache/control/state
-add wave -noupdate /mp0_tb/dut/d_cache/control/state
 add wave -noupdate -radix hexadecimal /mp0_tb/clk
 add wave -noupdate -radix hexadecimal /mp0_tb/pmem_resp
 add wave -noupdate -radix hexadecimal /mp0_tb/pmem_read
@@ -27,13 +21,9 @@ add wave -noupdate -color Magenta -radix hexadecimal /mp0_tb/dut/cpu_inst/datapa
 add wave -noupdate -color Magenta -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/d_mem_resp
 add wave -noupdate -color Magenta -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/d_mem_read
 add wave -noupdate -color Magenta -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/d_mem_write
-add wave -noupdate -color Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/judge/state
-add wave -noupdate -color Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/judge/i_cache_read_in
-add wave -noupdate -color Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/judge/d_cache_read_in
-add wave -noupdate -color Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/judge/i_cache_write_in
-add wave -noupdate -color Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/judge/d_cache_write_in
-add wave -noupdate -color Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/judge/l2_resp_in
-add wave -noupdate -color Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/judge/cache_arbiter_sel
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_a_EX_sel
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_b_EX_sel
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {303474 ps} 0}
 quietly wave cursor active 1

@@ -1,0 +1,24 @@
+
+;
+; Expected Values
+; R1 = 1
+; R2 = 2
+; R3 = 3
+;
+
+ORIGIN 0
+SEGMENT
+CODE:
+	ADD R1, R0, 1
+	ADD R2, R1, R1
+	ADD R3, R1, R2
+	NOP
+	NOP
+	NOP
+	NOP
+DONE:
+	BR DONE
+	NOP
+	NOP
+	NOP
+	NOP
