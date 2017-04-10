@@ -119,4 +119,41 @@ typedef struct packed {
     lc3b_cWay_state way7;
 } lc3b_L2_state;
 
+
+typedef struct packed {
+    lc3b_reg sr1;
+    lc3b_reg sr2;
+    
+
+
+
+
+    // lc3b_word pc_plus_off;
+} lc3b_forwarding;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 endpackage : lc3b_types

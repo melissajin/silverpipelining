@@ -22,7 +22,7 @@ begin
     end
 end
 
-always_ff @(posedge clk)
+always_ff @(negedge clk) // TODO: Fix if this breaks things
 begin
     if (load == 1)
     begin
