@@ -24,9 +24,9 @@ module l2_cache
 );
 
 lc3b_L2_ctl cache_ctl;
-lc3b_l2_lru lru_cur, lru_set;
-logic [1:0] pmemwdata_sel;
-logic [2:0] pmemaddr_sel;
+logic [6:0] lru_cur, lru_set;
+logic [2:0] pmemwdata_sel;
+logic [3:0] pmemaddr_sel;
 lc3b_L2_state cache_state;
 
 lc3b_word pmem_address_inter;
@@ -72,11 +72,7 @@ l2_cache_datapath datapath
 
     /* Memory signals */
     .pmem_read, .pmem_rdata,                         // inputs
-<<<<<<< HEAD
     .pmem_address_inter, .pmem_wdata_inter           // outputs
-=======
-    .pmem_address_inter, .pmem_wdata_inter           // outputsts
->>>>>>> master
 
 );
 
@@ -88,7 +84,6 @@ register #(.width(1)) mem_read_reg
     .in(mem_read),
     .out(mem_read_sync)
 );
-<<<<<<< HEAD
 
 register #(.width(1)) mem_write_reg
 (
@@ -96,31 +91,6 @@ register #(.width(1)) mem_write_reg
     .load(1'b1),
     .in(mem_write),
     .out(mem_write_sync)
-=======
-
-register #(.width(1)) mem_write_reg
-(
-    .clk,
-    .load(1'b1),
-    .in(mem_write),
-    .out(mem_write_sync)
-);
-
-register #(.width(16)) mem_address_reg
-(
-    .clk,
-    .load(1'b1),
-    .in(mem_address),
-    .out(mem_address_sync)
-);
-
-register #(.width(128)) mem_wdata_reg
-(
-    .clk,
-    .load(1'b1),
-    .in(mem_wdata),
-    .out(mem_wdata_sync)
->>>>>>> master
 );
 
 register #(.width(16)) mem_address_reg

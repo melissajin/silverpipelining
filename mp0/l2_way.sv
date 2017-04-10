@@ -6,18 +6,18 @@ module l2_way
 
     /* Way Input Signals */
     input load_d, load_v, load_TD,
-    input lc3b_l2_index index,
+    input lc3b_c_index index,
     input d_in, v_in,
-    input lc3b_l2_tag tag_in,
+    input lc3b_c_tag tag_in,
     input lc3b_cacheline data_in,
 
     /* Way Output Signals */
     output logic d_out, v_out,
-    output lc3b_l2_tag tag_out,
+    output lc3b_c_tag tag_out,
     output lc3b_cacheline data_out
 );
 
-l2_array #(1) dirty
+array #(1) dirty
 (
     .clk,
     .write(load_d),
@@ -26,7 +26,7 @@ l2_array #(1) dirty
     .dataout(d_out)
 );
 
-l2_array #(1) valid
+array #(1) valid
 (
     .clk,
     .write(load_v),
@@ -35,7 +35,7 @@ l2_array #(1) valid
     .dataout(v_out)
 );
 
-l2_array #(8) tag
+array #(9) tag
 (
     .clk,
     .write(load_TD),
@@ -44,7 +44,7 @@ l2_array #(8) tag
     .dataout(tag_out)
 );
 
-l2_array #(128) data
+array #(128) data
 (
     .clk,
     .write(load_TD),
