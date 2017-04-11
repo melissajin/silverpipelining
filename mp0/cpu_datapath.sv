@@ -98,6 +98,7 @@ lc3b_word mdr_MEM_out, mdr_WB_out, mdr_WB_mod, alu_WB_out;
 // WB -> EX
 lc3b_word forward_WB_out;
 logic [1:0] forward_WB_sel;
+lc3b_forward_save forward_save_in, forward_save_out;
 
 
 /************************* Hazard Detection *************************/
@@ -119,10 +120,11 @@ forwarding_unit forwarding
 (
     .forward_EX(forward_EX_sigs),
     .forward_MEM(forward_MEM_sigs),
+    .forward_save(forward_save_out),
 	.forward_a_EX_sel(forward_a_EX_sel),
 	.forward_b_EX_sel(forward_b_EX_sel),
-    .forward_MEM_data_sel(),
-    .forward_MEM_addr_sel()
+    .forward_MEM_data_sel(forward_MEM_data_sel),
+    .forward_MEM_addr_sel(forward_MEM_addr_sel)
 );
 
 /************************* Stage 1 *************************/
@@ -285,7 +287,7 @@ mux4 forward_sr1_mux
     .a(src1_data_EX),
     .b(forward_MEM_out),
     .c(forward_WB_out),
-    .d(16'h0000),
+    .d(forward_save_out.forward_val),
     .f(forward_sr1_out)
 );
 
@@ -295,7 +297,7 @@ mux4 forward_sr2_mux
     .a(src2_data_EX),
     .b(forward_MEM_out),
     .c(forward_WB_out),
-    .d(16'h0000),
+    .d(forward_save_out.forward_val),
     .f(forward_sr2_out)
 );
 
@@ -487,6 +489,15 @@ mux4 forward_wb_mux
     .f(forward_WB_out)
 );
 
+/* Control Signal Registers */
+register #($bits(lc3b_forward_save)) forward_wb_save
+(
+    .clk,
+    .load(load_mem_wb^load),
+    .in(forward_save_in),
+    .out(forward_save_out)
+);
+
 // Data Memory Signals
 assign d_mem_address =  d_mem_address_out;
 assign d_mem_read = ({wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} == 2'b00) ? mem_sig_4.d_mem_read : wb_sig_5.d_mem_read;
@@ -526,6 +537,10 @@ assign forward_MEM_sigs.dest_wb = dest_WB_out;
 assign forward_MEM_sigs.sourceR_mem = dest_MEM_out;
 assign forward_MEM_sigs.baseR_mem = src1_MEM_out;
 
+// save wb for LDI and STI
+assign forward_save_in.load_regfile_wb = wb_sig_5.load_regfile;
+assign forward_save_in.forward_val = forward_WB_out;
+assign forward_save_in.dest_wb = dest_WB_out;
 /***** pcmux_sel logic *****/
 always_comb begin
     pcmux_sel = 2'b00;

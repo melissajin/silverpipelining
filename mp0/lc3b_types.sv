@@ -140,7 +140,11 @@ typedef struct packed {
     lc3b_reg baseR_mem;
 } lc3b_forward_mem;
 
-
+typedef struct packed {
+    logic load_regfile_wb;
+    lc3b_word forward_val;
+    lc3b_reg dest_wb;
+} lc3b_forward_save;
 
 
 
