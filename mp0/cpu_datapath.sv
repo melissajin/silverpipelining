@@ -82,7 +82,7 @@ logic [1:0] forward_MEM_sel;
 // WB -> MEM
 lc3b_forward_mem forward_MEM_sigs;
 lc3b_word forward_MEM_address, adj6_offset_MEM;
-logic forward_MEM_data_sel;
+logic [1:0] forward_MEM_data_sel;
 logic forward_MEM_addr_sel;
 
 /**** Stage 5 ****/
@@ -121,6 +121,7 @@ forwarding_unit forwarding
     .forward_EX(forward_EX_sigs),
     .forward_MEM(forward_MEM_sigs),
     .forward_save(forward_save_out),
+    .indirectmux_sel(indirectmux_sel),
 	.forward_a_EX_sel(forward_a_EX_sel),
 	.forward_b_EX_sel(forward_b_EX_sel),
     .forward_MEM_data_sel(forward_MEM_data_sel),
@@ -412,11 +413,14 @@ mux4 forward_mem_mux
     .f(forward_MEM_out)
 );
 
-mux2 dmem_data_mux
+
+mux4 dmem_data_mux
 (
     .sel(forward_MEM_data_sel),
     .a(mdr_MEM_out),
     .b(forward_WB_out),
+    .c(forward_save_out.forward_val),
+    .d(16'h0000),
     .f(d_mem_wdata)
 );
 
