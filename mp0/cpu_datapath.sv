@@ -29,6 +29,7 @@ module cpu_datapath
 /********** Internal Signals **********/
 logic load, load_mem_wb;
 logic load_pc, load_pcbak;
+logic control_instruc_ident, control_instruc_ident_wb;
 
 /**** Stage 1 ****/
 lc3b_word pcmux_out, pc_out, pcbak_out, pcPlus2mux_out;
@@ -109,11 +110,14 @@ hazard_detection hazard_detection_inst
     .i_mem_resp, .d_mem_resp,
     .d_mem_read, .d_mem_write,
     .MEM_inter_read(wb_sig_4_inter.d_mem_read), .MEM_inter_write(wb_sig_4_inter.d_mem_write),
+    .op_ID(opcode), .op_EX(wb_sig_3.opcode),
     .op_MEM(wb_sig_4.opcode), .op_MEM_inter(wb_sig_4_inter.opcode),
     .op_WB(wb_sig_5.opcode),
+    .nzp_ID(dest_ID_out), .nzp_EX(dest_EX_out), .nzp_MEM(dest_MEM_out), .nzp_WB(dest_WB_out),
 
     /* outputs */
-    .load, .load_pc, .load_pcbak
+    .load, .load_pc, .load_pcbak,
+    .control_instruc_ident, .control_instruc_ident_wb
 );
 
 forwarding_unit forwarding
@@ -173,7 +177,7 @@ plus2 pcPlus2
 
 mux2 irmux
 (
-    .sel(i_mem_resp),
+    .sel(i_mem_resp & (~control_instruc_ident)),
     .a(16'h0000),
     .b(i_mem_rdata),
     .f(irmux_out)
@@ -184,7 +188,7 @@ mux2 irmux
 /***** IF_ID Pipeline Register *****/
 if_id IF_ID
 (
-    .clk, .load(load),
+    .clk, .load(load & (~control_instruc_ident_wb)),
 
     /* data inputs */
     .pc_ID_in(pc_plus2_out), .ir_in(irmux_out),
@@ -545,6 +549,7 @@ assign forward_MEM_sigs.baseR_mem = src1_MEM_out;
 assign forward_save_in.load_regfile_wb = wb_sig_5.load_regfile;
 assign forward_save_in.forward_val = forward_WB_out;
 assign forward_save_in.dest_wb = dest_WB_out;
+
 /***** pcmux_sel logic *****/
 always_comb begin
     pcmux_sel = 2'b00;

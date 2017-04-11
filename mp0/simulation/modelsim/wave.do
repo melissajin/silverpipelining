@@ -2,14 +2,22 @@ onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -radix hexadecimal /mp0_tb/clk
 add wave -noupdate -color Orange -radix hexadecimal -childformat {{{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[7]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[6]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[5]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[4]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[3]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[2]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[1]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[0]} -radix hexadecimal}} -expand -subitemconfig {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[7]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[6]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[5]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[4]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[3]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[2]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[1]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[0]} {-color Orange -height 15 -radix hexadecimal}} /mp0_tb/dut/cpu_inst/datapath/regfile_inst/data
-add wave -noupdate -color Orange -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pc_out
+add wave -noupdate /mp0_tb/dut/cpu_inst/datapath/control_instruc_ident
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pc/load
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcbak/load
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pc/out
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcbak/out
 add wave -noupdate -color Orange -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/cw.wb
 add wave -noupdate -color Orange -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/wb_sig_3
 add wave -noupdate -color Orange -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/wb_sig_4
 add wave -noupdate -color Orange -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/wb_sig_5
-add wave -noupdate /mp0_tb/dut/cpu_inst/datapath/load
-add wave -noupdate /mp0_tb/dut/cpu_inst/datapath/load_mem_wb
-add wave -noupdate /mp0_tb/dut/cpu_inst/datapath/load_pc
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/nzp_ID
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/nzp_EX
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/nzp_MEM
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/nzp_WB
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/load
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/load_mem_wb
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/load_pc
 add wave -noupdate -color Magenta -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/i_mem_resp
 add wave -noupdate -color Magenta -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/d_mem_resp
 add wave -noupdate -color Magenta -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/d_mem_read
@@ -32,10 +40,10 @@ add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mar_MEM_out
 add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forward_WB_out
 add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/d_mem_address
 add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/d_mem_wdata
-add wave -noupdate /mp0_tb/dut/cpu_inst/datapath/indirectmux_sel
+add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/indirectmux_sel
 add wave -noupdate -radix hexadecimal -childformat {{/mp0_tb/dut/cpu_inst/datapath/forward_save_out.load_regfile_wb -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/forward_save_out.forward_val -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/forward_save_out.dest_wb -radix hexadecimal}} -expand -subitemconfig {/mp0_tb/dut/cpu_inst/datapath/forward_save_out.load_regfile_wb {-height 15 -radix hexadecimal} /mp0_tb/dut/cpu_inst/datapath/forward_save_out.forward_val {-height 15 -radix hexadecimal} /mp0_tb/dut/cpu_inst/datapath/forward_save_out.dest_wb {-height 15 -radix hexadecimal}} /mp0_tb/dut/cpu_inst/datapath/forward_save_out
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {931420 ps} 0}
+WaveRestoreCursors {{Cursor 1} {1022122 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 339
 configure wave -valuecolwidth 100
@@ -51,4 +59,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {924215 ps} {958679 ps}
+WaveRestoreZoom {1005940 ps} {1077268 ps}
