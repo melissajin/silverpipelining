@@ -14,16 +14,22 @@ module ex_mem
 
     /* data inputs */
     input lc3b_reg dest_MEM_in,
+    input lc3b_reg src1_MEM_in,
+    input lc3b_reg src2_MEM_in,
     input lc3b_word pc_MEM_in, alu_MEM_in,
     input lc3b_word pcp_off_MEM_in,
     input lc3b_word mar_MEM_in, mdr_MEM_in,
+    input lc3b_offset11 offset11_MEM_in,
     input logic [1:0] mem_byte_enable_in,
 
     /* data outputs */
     output lc3b_reg dest_MEM_out,
+    output lc3b_reg src1_MEM_out,
+    output lc3b_reg src2_MEM_out,
     output lc3b_word pc_MEM_out, alu_MEM_out,
     output lc3b_word pcp_off_MEM_out,
     output lc3b_word mar_MEM_out, mdr_MEM_out,
+    output lc3b_offset11 offset11_MEM_out,
     output logic [1:0] mem_byte_enable_out
 );
 
@@ -53,6 +59,22 @@ register #(3) dest_mem
     .out(dest_MEM_out)
 );
 
+register #(3) src1_mem
+(
+    .clk,
+    .load,
+    .in(src1_MEM_in),
+    .out(src1_MEM_out)
+);
+
+register #(3) src2_mem
+(
+    .clk,
+    .load,
+    .in(src2_MEM_in),
+    .out(src2_MEM_out)
+);
+
 register alu_mem
 (
     .clk,
@@ -75,6 +97,14 @@ register pc_plus_off_mem
     .load,
     .in(pcp_off_MEM_in),
     .out(pcp_off_MEM_out)
+);
+
+register #(11) offset11_mem
+(
+    .clk,
+    .load,
+    .in(offset11_MEM_in),
+    .out(offset11_MEM_out)
 );
 
 register mar_mem

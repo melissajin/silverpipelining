@@ -24,6 +24,7 @@ begin : state_actions
     // Stage 4 Signals
     cw.mem.d_mem_read = 1'b0;
     cw.mem.d_mem_write = 1'b0;
+    cw.mem.offset6_lsse = 1'b1;
     cw.mem.forward_MEM_sel = 2'b00;
 
     // Stage 5 Signals
@@ -80,6 +81,7 @@ begin : state_actions
         end
         op_ldb: begin
             cw.ex.offset6_lsse = 1'b0;          // we want to sign-extend the offset
+            cw.mem.offset6_lsse = 1'b0;
             cw.ex.alumux_sel= 2'b11;            // ADJ6 output
             cw.ex.aluop = alu_add;
             cw.ex.marmux_EX_sel = 1'b0;         // alu_out
@@ -97,6 +99,7 @@ begin : state_actions
         end
         op_ldi: begin
             cw.ex.offset6_lsse = 1'b1;          // we want to left-shift/sign-extend the offset
+            cw.mem.offset6_lsse = 1'b1;
             cw.ex.alumux_sel= 2'b11;            // ADJ6 output
             cw.ex.aluop = alu_add;
             cw.ex.marmux_EX_sel = 1'b0;         // alu_out
@@ -115,6 +118,7 @@ begin : state_actions
         end
         op_ldr: begin
             cw.ex.offset6_lsse = 1'b1;          // we want to left-shift/sign-extend the offset
+            cw.mem.offset6_lsse = 1'b1;
             cw.ex.alumux_sel= 2'b11;            // ADJ6 output
             cw.ex.aluop = alu_add;
             cw.ex.marmux_EX_sel = 1'b0;         // alu_out
@@ -173,6 +177,7 @@ begin : state_actions
             cw.src2mux_sel = 1'b1;              // dest
 
             cw.ex.offset6_lsse = 1'b0;          // we want to sign-extend the offset
+            cw.mem.offset6_lsse = 1'b0;
             cw.ex.alumux_sel= 2'b11;            // ADJ6 output
             cw.ex.aluop = alu_add;
             cw.ex.marmux_EX_sel = 1'b0;         // alu_out
@@ -183,6 +188,7 @@ begin : state_actions
             cw.src2mux_sel = 1'b1;              // dest
 
             cw.ex.offset6_lsse = 1'b1;          // we want to left-shift/sign-extend the offset
+            cw.mem.offset6_lsse = 1'b1;
             cw.ex.alumux_sel= 2'b11;            // ADJ6 output
             cw.ex.aluop = alu_add;
             cw.ex.marmux_EX_sel = 1'b0;         // alu_out
@@ -195,6 +201,7 @@ begin : state_actions
             cw.src2mux_sel = 1'b1;              // dest
 
             cw.ex.offset6_lsse = 1'b1;          // we want to left-shift/sign-extend the offset
+            cw.mem.offset6_lsse = 1'b1;
             cw.ex.alumux_sel= 2'b11;            // ADJ6 output
             cw.ex.aluop = alu_add;
             cw.ex.marmux_EX_sel = 1'b0;         // alu_out

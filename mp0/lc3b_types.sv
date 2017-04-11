@@ -60,6 +60,7 @@ typedef struct packed {
 typedef struct packed {
     logic d_mem_read;
     logic d_mem_write;
+    logic offset6_lsse;
     logic [1:0] forward_MEM_sel;
 } lc3b_control_word_mem;
 
@@ -132,7 +133,12 @@ typedef struct packed {
 	logic load_regfile_wb;
 } lc3b_forward_ex;
 
-
+typedef struct packed {
+    logic load_regfile_wb;
+    lc3b_reg dest_wb;
+    lc3b_reg sourceR_mem;
+    lc3b_reg baseR_mem;
+} lc3b_forward_mem;
 
 
 
