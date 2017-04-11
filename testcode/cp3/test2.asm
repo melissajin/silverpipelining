@@ -18,9 +18,7 @@ ORIGIN 0
 SEGMENT
 CODE:
 	LEA R0, DATA
-	NOP
-	NOP
-	NOP
+	ADD R1, R0, 1
 	LDR R1, R0, LVAL1
 	LDR R2, R0, LVAL2				;WB -> EX forward_b
 	ADD R3, R1, R2
@@ -28,6 +26,15 @@ CODE:
 	ADD R5, R4, R1
 	ADD R6, R1, R5					;MEM -> EX forward_b
 	ADD R7, R6, R1					;MEM -> EX forward_b
+
+DONE:
+	BR DONE
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
 
 SEGMENT
 DATA:

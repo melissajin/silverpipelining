@@ -21,7 +21,6 @@ module id_ex
     input lc3b_word pc_EX_in,
     input lc3b_word src1_data_in, src2_data_in,
     input lc3b_ir_10_0 ir_10_0_in,
-    input logic init_EX_in,
 
     /* data outputs */
     output lc3b_reg dest_EX_out,
@@ -34,8 +33,7 @@ module id_ex
     output lc3b_imm5 imm5_EX,
     output lc3b_offset6 offset6_EX,
     output lc3b_trapvect8 trapVect8_EX,
-    output lc3b_offset11 offset11_EX_out,
-    output logic init_EX_out
+    output lc3b_offset11 offset11_EX_out
 );
 
 
@@ -119,14 +117,6 @@ ir_ex_reg ir_ex_reg_inst
     .imm4(imm4_EX), .imm5(imm5_EX),
     .offset6(offset6_EX), .trapVect8(trapVect8_EX),
     .offset11(offset11_EX_out)
-);
-
-register #(1) init_ex
-(
-    .clk,
-    .load(1'b1),
-    .in(init_EX_in),
-    .out(init_EX_out)
 );
 
 endmodule : id_ex

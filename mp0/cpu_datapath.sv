@@ -32,12 +32,11 @@ logic load_pc, load_pcbak;
 
 /**** Stage 1 ****/
 lc3b_word pcmux_out, pc_out, pcbak_out, pcPlus2mux_out;
-lc3b_word pc_plus_off, pc_plus2_out, addrmux_out;
+lc3b_word pc_plus2_out, addrmux_out;
 lc3b_word adj11_offset, adj9_offset;
 lc3b_word irmux_out;
 
 /**** Stage 2 ****/
-logic init_ID_out;
 lc3b_word pc_ID_out;
 lc3b_ir_10_0 ir_10_0;
 lc3b_reg dest_ID_out, src1, src2;
@@ -47,13 +46,12 @@ lc3b_word regfilemux_out;
 lc3b_nzp gencc_out, cc_out;
 
 /**** Stage 3 ****/
-logic init_EX_out;
 logic [1:0] mdrmux_EX_sel;
 lc3b_control_word_ex ex_sig_3;
 lc3b_control_word_mem mem_sig_3;
 lc3b_control_word_wb wb_sig_3;
 lc3b_reg dest_EX_out;
-lc3b_word pc_EX_out, marmux_EX_out, mdrmux_EX_out, adj6_offset;
+lc3b_word pc_EX_out, pc_plus_off_EX, marmux_EX_out, mdrmux_EX_out, adj6_offset;
 lc3b_word src1_data_EX, src2_data_EX, alu_EX_out, alumux_out;
 lc3b_imm4 imm4_EX;
 lc3b_imm5 imm5_EX;
@@ -68,13 +66,11 @@ lc3b_forward_ex forward_EX_sigs;
 logic [1:0] forward_a_EX_sel, forward_b_EX_sel;
 
 /**** Stage 4 ****/
-logic init_MEM_out;
 lc3b_control_word_mem mem_sig_4;
 lc3b_control_word_wb wb_sig_4;
 lc3b_control_word_wb wb_sig_4_inter;
 lc3b_reg dest_MEM_out;
-lc3b_word pc_MEM_out, mar_MEM_out, alu_MEM_out, indirectmux_out;
-lc3b_offset11 PCoffset11_MEM;
+lc3b_word pc_MEM_out, pc_plus_off_MEM, mar_MEM_out, alu_MEM_out, indirectmux_out;
 
 // forwarding signals
 lc3b_word forward_MEM_out;
@@ -82,15 +78,12 @@ lc3b_word forward_MEM_out;
 logic [1:0] forward_MEM_sel;
 
 /**** Stage 5 ****/
-logic init_WB_out;
 logic addrmux_sel, indirectmux_sel, mar_WB_lsb;
 logic [1:0] pcmux_sel, mdrmux_WB_sel;
 logic br_enable;
 lc3b_control_word_wb wb_sig_5;
 lc3b_reg dest_WB_out;
-lc3b_word pc_WB_out, mdr_WB_out, mdr_WB_mod, alu_WB_out;
-lc3b_offset9 PCoffset9_WB;
-lc3b_offset11 PCoffset11_WB;
+lc3b_word pc_WB_out, pc_plus_off_WB, mdr_WB_out, mdr_WB_mod, alu_WB_out;
 
 // forwarding signals
 lc3b_word forward_WB_out;
@@ -126,7 +119,7 @@ mux4 pcmux
 (
     .sel(pcmux_sel),
     .a(pc_plus2_out),
-    .b(pc_plus_off),
+    .b(pc_plus_off_WB),
     .c(alu_WB_out),
     .d(mdr_WB_mod),
     .f(pcmux_out)
@@ -163,35 +156,6 @@ plus2 pcPlus2
     .out(pc_plus2_out)
 );
 
-adder pc_plus_off_adder
-(
-    .a(pc_WB_out),
-    .b(addrmux_out),
-    .c(pc_plus_off)
-);
-
-mux2 addrmux
-(
-    .sel(addrmux_sel),
-    .a(adj9_offset),
-    .b(adj11_offset),
-    .f(addrmux_out)
-);
-
-adj #(9) offset9_adjuster
-(
-    .lsse(1'b1),
-    .in(PCoffset9_WB),
-    .out(adj9_offset)
-);
-
-adj #(11) offset11_adjuster
-(
-    .lsse(1'b1),
-    .in(PCoffset11_WB),
-    .out(adj11_offset)
-);
-
 mux2 irmux
 (
     .sel(i_mem_resp),
@@ -212,7 +176,7 @@ if_id IF_ID
 
     /* data outputs */
     .pc_ID_out(pc_ID_out), .opcode(opcode), .dest_ID_out(dest_ID_out),
-    .src1(src1), .src2(src2), .ir_10_0(ir_10_0), .init_ID_out(init_ID_out)
+    .src1(src1), .src2(src2), .ir_10_0(ir_10_0)
 );
 
 mux2 #(3) destmux
@@ -249,7 +213,7 @@ mux4 regfilemux
     .sel(wb_sig_5.regfilemux_sel),
     .a(alu_WB_out),
     .b(mdr_WB_mod),
-    .c(pc_plus_off),
+    .c(pc_plus_off_WB),
     .d(pc_WB_out),
     .f(regfilemux_out)
 );
@@ -292,7 +256,7 @@ id_ex ID_EX
     .dest_EX_in(dest_ID_out), .pc_EX_in(pc_ID_out),
     .src1_EX_in(src1), .src2_EX_in(src2mux_out),
     .src1_data_in(src1_data_out), .src2_data_in(src2_data_out),
-    .ir_10_0_in(ir_10_0), .init_EX_in(init_ID_out),
+    .ir_10_0_in(ir_10_0),
 
     /* data outputs */
     .dest_EX_out(dest_EX_out), .pc_EX_out(pc_EX_out),
@@ -300,8 +264,7 @@ id_ex ID_EX
     .src1_data_EX(src1_data_EX), .src2_data_EX(src2_data_EX),
 
     .imm4_EX(imm4_EX), .imm5_EX(imm5_EX), .offset6_EX(offset6_EX),
-    .trapVect8_EX(trapVect8_EX), .offset11_EX_out(PCoffset11_EX),
-    .init_EX_out(init_EX_out)
+    .trapVect8_EX(trapVect8_EX), .offset11_EX_out(PCoffset11_EX)
 );
 
 mux4 forward_sr1_mux
@@ -367,6 +330,35 @@ mux4 mdrmux_ex
     .f(mdrmux_EX_out)
 );
 
+adder pc_plus_off_adder
+(
+    .a(pc_EX_out),
+    .b(addrmux_out),
+    .c(pc_plus_off_EX)
+);
+
+mux2 addrmux
+(
+    .sel(addrmux_sel),
+    .a(adj9_offset),
+    .b(adj11_offset),
+    .f(addrmux_out)
+);
+
+adj #(9) offset9_adjuster
+(
+    .lsse(1'b1),
+    .in(PCoffset11_EX[8:0]),        // pc offset 9
+    .out(adj9_offset)
+);
+
+adj #(11) offset11_adjuster
+(
+    .lsse(1'b1),
+    .in(PCoffset11_EX),
+    .out(adj11_offset)
+);
+
 
 /************************* Stage 4 *************************/
 /***** EX_MEM Pipeline Register *****/
@@ -382,17 +374,15 @@ ex_mem EX_MEM
 
     /* data inputs */
     .dest_MEM_in(dest_EX_out), .pc_MEM_in(pc_EX_out),
+    .pcp_off_MEM_in(pc_plus_off_EX),
     .alu_MEM_in(alu_EX_out), .mar_MEM_in(marmux_EX_out),
-    .mdr_MEM_in(mdrmux_EX_out), .offset11_MEM_in(PCoffset11_EX),
-	 .mem_byte_enable_in(mdrmux_EX_sel),
-    .init_MEM_in(init_EX_out),
+    .mdr_MEM_in(mdrmux_EX_out), .mem_byte_enable_in(mdrmux_EX_sel),
 
     /* data outputs */
     .dest_MEM_out(dest_MEM_out), .pc_MEM_out(pc_MEM_out),
+    .pcp_off_MEM_out(pc_plus_off_MEM),
     .alu_MEM_out(alu_MEM_out), .mar_MEM_out(mar_MEM_out),
-    .mdr_MEM_out(d_mem_wdata), .offset11_MEM_out(PCoffset11_MEM),
- 	 .mem_byte_enable_out(d_mem_byte_enable),
-    .init_MEM_out(init_MEM_out)
+    .mdr_MEM_out(d_mem_wdata), .mem_byte_enable_out(d_mem_byte_enable)
 );
 
 mux4 forward_mem_mux
@@ -400,7 +390,7 @@ mux4 forward_mem_mux
     .sel(mem_sig_4.forward_MEM_sel),
     .a(alu_MEM_out),
     .b(pc_MEM_out),
-    .c(16'h0000),                   // pc_plus_off
+    .c(pc_plus_off_MEM),
     .d(d_mem_rdata),
     .f(forward_MEM_out)
 );
@@ -428,14 +418,14 @@ mem_wb MEM_WB
     /* data inputs */
     .dest_WB_in(dest_MEM_out),
     .pc_WB_in(pc_MEM_out), .alu_WB_in(alu_MEM_out),
-    .mdr_WB_in(d_mem_rdata), .offset11_WB_in(PCoffset11_MEM),
-    .init_WB_in(init_MEM_out), .mar_wb_lsb_in(indirectmux_out[0]),
+    .pcp_off_WB_in(pc_plus_off_MEM),
+    .mdr_WB_in(d_mem_rdata), .mar_wb_lsb_in(indirectmux_out[0]),
 
     /* data outputs */
     .dest_WB_out(dest_WB_out), .pc_WB_out(pc_WB_out),
+    .pcp_off_WB_out(pc_plus_off_WB),
     .alu_WB_out(alu_WB_out), .mdr_WB_out(mdr_WB_out),
-    .offset9_WB_out(PCoffset9_WB), .offset11_WB_out(PCoffset11_WB),
-    .init_WB_out(init_WB_out), .mar_wb_lsb_out(mar_WB_lsb)
+    .mar_wb_lsb_out(mar_WB_lsb)
 );
 
 mux4 mdrmux_wb
@@ -453,7 +443,7 @@ mux4 forward_wb_mux
     .sel(wb_sig_5.forward_WB_sel),
     .a(alu_WB_out),
     .b(pc_WB_out),
-    .c(16'h0000),                   // pc_plus_off
+    .c(pc_plus_off_WB),
     .d(mdr_WB_mod),
     .f(forward_WB_out)
 );
@@ -492,10 +482,9 @@ assign forward_EX_sigs.load_regfile_mem = wb_sig_4.load_regfile;
 assign forward_EX_sigs.load_regfile_wb = wb_sig_5.load_regfile;
 
 
-/***** pcmux_sel and addrmux_sel logic *****/
+/***** pcmux_sel logic *****/
 always_comb begin
     pcmux_sel = 2'b00;
-    addrmux_sel = 1'b0;
     case (wb_sig_5.opcode)
         op_br: begin
             if(br_enable)
@@ -505,7 +494,6 @@ always_comb begin
             pcmux_sel = 2'b10;
         end
         op_jsr: begin
-            addrmux_sel = 1'b1;
             if(ir_11)
                 pcmux_sel = 2'b01;
             else
@@ -516,6 +504,13 @@ always_comb begin
         end
         default: pcmux_sel = 2'b00;
     endcase
+end
+
+/***** addrmux_sel logic *****/
+always_comb begin
+    addrmux_sel = 1'b0;
+    if(wb_sig_3.opcode == op_jsr)
+        addrmux_sel = 1'b1;
 end
 
 /***** mdrmux_WB_sel and mdrmux_EX_sel logic *****/
