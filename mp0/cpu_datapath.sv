@@ -129,8 +129,8 @@ forwarding_unit forwarding
     .forward_MEM(forward_MEM_sigs),
     .forward_save(forward_save_out),
     .indirectmux_sel(indirectmux_sel),
-    .lc3b_word address_MEM(d_mem_address_out),
-    .lc3b_word address_WB(mar_WB_out),
+    .address_MEM(d_mem_address_out),
+    .address_WB(mar_WB_out),
 	.forward_a_EX_sel(forward_a_EX_sel),
 	.forward_b_EX_sel(forward_b_EX_sel),
     .forward_MEM_data_sel(forward_MEM_data_sel),
@@ -450,6 +450,14 @@ adj #(6) offset6_adjuster_MEM
     .out(adj6_offset_MEM)
 );
 
+mux2 mdr_wb_in_mux
+(
+    .sel(mdr_wb_in_mux_sel),
+    .a(d_mem_rdata),
+    .b(wdata_forward_out),
+    .f(mdr_wb_in_mux_out)
+);
+
 /************************* Stage 5 *************************/
 /***** MEM_WB Pipeline Register *****/
 mem_wb MEM_WB
@@ -466,23 +474,15 @@ mem_wb MEM_WB
     .dest_WB_in(dest_MEM_out),
     .pc_WB_in(pc_MEM_out), .alu_WB_in(alu_MEM_out),
     .pcp_off_WB_in(pc_plus_off_MEM),
-    .mdr_WB_in(mdr_wb_in_mux_out), .mar_wb_in(d_mem_address_out),
+    .mdr_WB_in(mdr_wb_in_mux_out), .mar_WB_in(d_mem_address_out),
     .wdata_mem(d_mem_wdata),
 
     /* data outputs */
     .dest_WB_out(dest_WB_out), .pc_WB_out(pc_WB_out),
     .pcp_off_WB_out(pc_plus_off_WB),
     .alu_WB_out(alu_WB_out), .mdr_WB_out(mdr_WB_out),
-    .mar_wb_out(mar_WB_out),
+    .mar_WB_out(mar_WB_out),
     .wdata_forward_out(wdata_forward_out)
-);
-
-mux2 mdr_wb_in_mux
-(
-    .sel(mdr_wb_in_mux_sel),
-    .a(d_mem_rdata),
-    .b(wdata_forward_out),
-    .f(mdr_wb_in_mux_out)
 );
 
 mux4 mdrmux_wb
