@@ -80,7 +80,7 @@ begin : state_actions
                 lru_out = {lru_in[6], lru_in[5], 1'b1, lru_in[3], lru_in[2], 1'b0, 1'b1};
                 ctl.load_lru = 1;
                 mem_resp = 1;
-                pmemwdata_sel = 1;
+                pmemwdata_sel = 2;
             end
             if(way_state.way3.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -91,7 +91,7 @@ begin : state_actions
                 lru_out = {lru_in[6], lru_in[5], 1'b0, lru_in[3], lru_in[2], 1'b0, 1'b1};
                 ctl.load_lru = 1;
                 mem_resp = 1;
-                pmemwdata_sel = 1;
+                pmemwdata_sel = 3;
             end
             if(way_state.way4.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -102,7 +102,7 @@ begin : state_actions
                 lru_out = {lru_in[6], 1'b1, lru_in[4], lru_in[3], 1'b1, lru_in[1], 1'b0};
                 ctl.load_lru = 1;
                 mem_resp = 1;
-                pmemwdata_sel = 1;
+                pmemwdata_sel = 4;
             end
             if(way_state.way5.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -113,7 +113,7 @@ begin : state_actions
                 lru_out = {lru_in[6], 1'b0, lru_in[4], lru_in[3], 1'b1, lru_in[1], 1'b0};
                 ctl.load_lru = 1;
                 mem_resp = 1;
-                pmemwdata_sel = 1;
+                pmemwdata_sel = 5;
             end
             if(way_state.way6.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -124,7 +124,7 @@ begin : state_actions
                 lru_out = {1'b1, lru_in[5], lru_in[4], lru_in[3], 1'b0, lru_in[1], 1'b0};
                 ctl.load_lru = 1;
                 mem_resp = 1;
-                pmemwdata_sel = 1;
+                pmemwdata_sel = 6;
             end
             if(way_state.way7.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -135,7 +135,7 @@ begin : state_actions
                 lru_out = {1'b0, lru_in[5], lru_in[4], lru_in[3], 1'b0, lru_in[1], 1'b0};
                 ctl.load_lru = 1;
                 mem_resp = 1;
-                pmemwdata_sel = 1;
+                pmemwdata_sel = 7;
             end
         end
         fetch_cline: begin
@@ -258,7 +258,7 @@ begin: next_state_assignment
     /* Assignment of next state on clock edge */
     state <= next_state;
     pmem_wdata <= pmem_wdata_inter;
-    pmem_address <= pmem_address_inter; 
+    pmem_address <= pmem_address_inter;
 end
 
 always_comb begin
