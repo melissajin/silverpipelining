@@ -9,6 +9,7 @@ module forwarding_unit
     input logic indirectmux_sel,
     input lc3b_word address_MEM,
     input lc3b_word address_WB,
+    input logic d_mem_write_WB,
 	output logic [1:0] forward_a_EX_sel,
 	output logic [1:0] forward_b_EX_sel,
     output logic [1:0] forward_MEM_data_sel,
@@ -58,7 +59,7 @@ begin
 		forward_MEM_addr_sel = 1'b1;
 
     // STR/LDR hazard
-    if(address_MEM == address_WB)
+    if(address_MEM == address_WB && d_mem_write_WB)
         mdr_WB_in_mux_sel = 1'b1;
 end
 

@@ -126,16 +126,12 @@ hazard_detection hazard_detection_inst
 
 forwarding_unit forwarding
 (
-    .forward_EX(forward_EX_sigs),
-    .forward_MEM(forward_MEM_sigs),
-    .forward_save(forward_save_out),
-    .indirectmux_sel(indirectmux_sel),
-    .address_MEM(d_mem_address_out),
-    .address_WB(mar_WB_out),
-	.forward_a_EX_sel(forward_a_EX_sel),
-	.forward_b_EX_sel(forward_b_EX_sel),
-    .forward_MEM_data_sel(forward_MEM_data_sel),
-    .forward_MEM_addr_sel(forward_MEM_addr_sel),
+    .forward_EX(forward_EX_sigs), .forward_MEM(forward_MEM_sigs),
+    .forward_save(forward_save_out), .indirectmux_sel(indirectmux_sel),
+    .address_MEM(d_mem_address_out), .address_WB(mar_WB_out),
+    .d_mem_write_WB(wb_sig_5.d_mem_write),
+	.forward_a_EX_sel(forward_a_EX_sel), .forward_b_EX_sel(forward_b_EX_sel),
+    .forward_MEM_data_sel(forward_MEM_data_sel), .forward_MEM_addr_sel(forward_MEM_addr_sel),
     .mdr_WB_in_mux_sel(mdr_WB_in_mux_sel)
 );
 
