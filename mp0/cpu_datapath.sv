@@ -96,12 +96,13 @@ lc3b_word mar_WB_out;
 lc3b_word pc_WB_out, pc_plus_off_WB;
 lc3b_word mdr_MEM_out, mdr_WB_out, mdr_WB_mod, alu_WB_out;
 lc3b_word wdata_forward_out;
-lc3b_word mdr_wb_in_mux_out;
+lc3b_word mdr_WB_in_mux_out;
 
 // forwarding signals
 // WB -> EX
 lc3b_word forward_WB_out;
 logic [1:0] forward_WB_sel;
+logic mdr_WB_in_mux_sel;
 lc3b_forward_save forward_save_in, forward_save_out;
 
 
@@ -135,7 +136,7 @@ forwarding_unit forwarding
 	.forward_b_EX_sel(forward_b_EX_sel),
     .forward_MEM_data_sel(forward_MEM_data_sel),
     .forward_MEM_addr_sel(forward_MEM_addr_sel),
-    .mdr_wb_in_mux_sel(mdr_wb_in_mux_sel)
+    .mdr_WB_in_mux_sel(mdr_WB_in_mux_sel)
 );
 
 /************************* Stage 1 *************************/
@@ -341,9 +342,9 @@ mux4 mdrmux_ex
 (
     .sel(mdrmux_EX_sel),
     .a(16'h0000),
-    .b({8'h00, src2_data_EX[7:0]}),
-    .c({src2_data_EX[7:0], 8'h00}),
-    .d(src2_data_EX),
+    .b({8'h00, forward_sr2_out[7:0]}),
+    .c({forward_sr2_out[7:0], 8'h00}),
+    .d(forward_sr2_out),
     .f(mdrmux_EX_out)
 );
 
@@ -411,7 +412,7 @@ mux4 forward_mem_mux
     .a(alu_MEM_out),
     .b(pc_MEM_out),
     .c(pc_plus_off_MEM),
-    .d(d_mem_rdata),
+    .d(mdr_WB_in_mux_out),
     .f(forward_MEM_out)
 );
 
@@ -452,10 +453,10 @@ adj #(6) offset6_adjuster_MEM
 
 mux2 mdr_wb_in_mux
 (
-    .sel(mdr_wb_in_mux_sel),
+    .sel(mdr_WB_in_mux_sel),
     .a(d_mem_rdata),
     .b(wdata_forward_out),
-    .f(mdr_wb_in_mux_out)
+    .f(mdr_WB_in_mux_out)
 );
 
 /************************* Stage 5 *************************/
@@ -474,8 +475,8 @@ mem_wb MEM_WB
     .dest_WB_in(dest_MEM_out),
     .pc_WB_in(pc_MEM_out), .alu_WB_in(alu_MEM_out),
     .pcp_off_WB_in(pc_plus_off_MEM),
-    .mdr_WB_in(mdr_wb_in_mux_out), .mar_WB_in(d_mem_address_out),
-    .wdata_mem(d_mem_wdata),
+    .mdr_WB_in(mdr_WB_in_mux_out), .mar_WB_in(d_mem_address_out),
+    .wdata_forward_in(d_mem_wdata),
 
     /* data outputs */
     .dest_WB_out(dest_WB_out), .pc_WB_out(pc_WB_out),

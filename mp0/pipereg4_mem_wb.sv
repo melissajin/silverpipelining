@@ -16,7 +16,7 @@ module mem_wb
     input lc3b_word pcp_off_WB_in,
     input lc3b_word mdr_WB_in,
     input lc3b_word mar_WB_in,
-    input lc3b_word wdata_mem,
+    input lc3b_word wdata_forward_in,
 
     /* data outputs */
     output lc3b_reg dest_WB_out,
@@ -80,7 +80,7 @@ register wdata_forward
 (
     .clk,
     .load,
-    .in(wdata_mem),
+    .in(wdata_forward_in),
     .out(wdata_forward_out)
 );
 
