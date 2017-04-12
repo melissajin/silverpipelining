@@ -87,13 +87,16 @@ logic [1:0] forward_MEM_data_sel;
 logic forward_MEM_addr_sel;
 
 /**** Stage 5 ****/
-logic addrmux_sel, indirectmux_sel, mar_WB_lsb;
+logic addrmux_sel, indirectmux_sel;
 logic [1:0] pcmux_sel, mdrmux_WB_sel;
 logic br_enable;
 lc3b_control_word_wb wb_sig_5;
 lc3b_reg dest_WB_out;
+lc3b_word mar_WB_out;
 lc3b_word pc_WB_out, pc_plus_off_WB;
 lc3b_word mdr_MEM_out, mdr_WB_out, mdr_WB_mod, alu_WB_out;
+lc3b_word wdata_forward_out;
+lc3b_word mdr_wb_in_mux_out;
 
 // forwarding signals
 // WB -> EX
@@ -126,10 +129,13 @@ forwarding_unit forwarding
     .forward_MEM(forward_MEM_sigs),
     .forward_save(forward_save_out),
     .indirectmux_sel(indirectmux_sel),
+    .lc3b_word address_MEM(d_mem_address_out),
+    .lc3b_word address_WB(mar_WB_out),
 	.forward_a_EX_sel(forward_a_EX_sel),
 	.forward_b_EX_sel(forward_b_EX_sel),
     .forward_MEM_data_sel(forward_MEM_data_sel),
-    .forward_MEM_addr_sel(forward_MEM_addr_sel)
+    .forward_MEM_addr_sel(forward_MEM_addr_sel),
+    .mdr_wb_in_mux_sel(mdr_wb_in_mux_sel)
 );
 
 /************************* Stage 1 *************************/
@@ -460,13 +466,23 @@ mem_wb MEM_WB
     .dest_WB_in(dest_MEM_out),
     .pc_WB_in(pc_MEM_out), .alu_WB_in(alu_MEM_out),
     .pcp_off_WB_in(pc_plus_off_MEM),
-    .mdr_WB_in(d_mem_rdata), .mar_wb_lsb_in(d_mem_address_out[0]),
+    .mdr_WB_in(mdr_wb_in_mux_out), .mar_wb_in(d_mem_address_out),
+    .wdata_mem(d_mem_wdata),
 
     /* data outputs */
     .dest_WB_out(dest_WB_out), .pc_WB_out(pc_WB_out),
     .pcp_off_WB_out(pc_plus_off_WB),
     .alu_WB_out(alu_WB_out), .mdr_WB_out(mdr_WB_out),
-    .mar_wb_lsb_out(mar_WB_lsb)
+    .mar_wb_out(mar_WB_out),
+    .wdata_forward_out(wdata_forward_out)
+);
+
+mux2 mdr_wb_in_mux
+(
+    .sel(mdr_wb_in_mux_sel),
+    .a(d_mem_rdata),
+    .b(wdata_forward_out),
+    .f(mdr_wb_in_mux_out)
 );
 
 mux4 mdrmux_wb
@@ -584,7 +600,7 @@ always_comb begin
 
     mdrmux_WB_sel = 2'b00;
     if(wb_sig_5.opcode == op_ldb) begin
-        if(mar_WB_lsb == 1)
+        if(mar_WB_out[0] == 1)
             mdrmux_WB_sel = 2'b10;
         else
             mdrmux_WB_sel = 2'b01;

@@ -7,10 +7,13 @@ module forwarding_unit
     input lc3b_forward_mem forward_MEM,
     input lc3b_forward_save forward_save,
     input logic indirectmux_sel,
+    input lc3b_word address_MEM,
+    input lc3b_word address_WB,
 	output logic [1:0] forward_a_EX_sel,
 	output logic [1:0] forward_b_EX_sel,
     output logic [1:0] forward_MEM_data_sel,
-    output logic forward_MEM_addr_sel
+    output logic forward_MEM_addr_sel,
+    output logic mdr_wb_in_mux_sel
 );
 
 always_comb
@@ -41,6 +44,7 @@ always_comb
 begin
 	forward_MEM_data_sel = 2'b00;
     forward_MEM_addr_sel = 1'b0;
+    mdr_wb_in_mux_sel = 1'b0;
 
     // LDI/STI hazard
     if(forward_save.dest_wb == forward_MEM.sourceR_mem)
@@ -52,6 +56,10 @@ begin
 
     if(forward_MEM.load_regfile_wb && (forward_MEM.dest_wb == forward_MEM.baseR_mem))
 		forward_MEM_addr_sel = 1'b1;
+
+    // STR/LDR hazard
+    if(address_MEM == address_WB)
+        mdr_wb_in_mux_sel = 1'b1;
 end
 
 endmodule : forwarding_unit
