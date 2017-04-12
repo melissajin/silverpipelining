@@ -117,7 +117,7 @@ hazard_detection hazard_detection_inst
 
     /* outputs */
     .load, .load_pc, .load_pcbak,
-    .control_instruc_ident, .control_instruc_ident_wb
+    .control_instruc_ident_wb, .i_mem_read(i_mem_read)
 );
 
 forwarding_unit forwarding
@@ -160,24 +160,16 @@ register pcbak
     .out(pcbak_out)
 );
 
-mux2 pcPlus2mux
-(
-    .sel(pc_out != pcbak_out),
-    .a(pc_out),
-    .b(pcbak_out),
-    .f(pcPlus2mux_out)
-);
-
 // increments PC value to access next instruction
 plus2 pcPlus2
 (
-    .in(pcPlus2mux_out),
+    .in(pc_out),
     .out(pc_plus2_out)
 );
 
 mux2 irmux
 (
-    .sel(i_mem_resp & (~control_instruc_ident)),
+    .sel(i_mem_resp),
     .a(16'h0000),
     .b(i_mem_rdata),
     .f(irmux_out)
@@ -513,7 +505,6 @@ assign d_mem_write = ({wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} == 2'b00) ? me
 
 // Instruction Memory Signals
 assign i_mem_address = pc_out;
-assign i_mem_read = 1'b1;
 
 // Control Signals
 assign ir_4 = ir_10_0[4];

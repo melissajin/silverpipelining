@@ -12,11 +12,13 @@ module hazard_detection
 
     /* outputs */
     output logic load, load_pc, load_pcbak,
-    output logic control_instruc_ident,
-    output logic control_instruc_ident_wb
+    output logic control_instruc_ident_wb,
+    output logic i_mem_read
 );
 
 logic mem_op;
+
+assign load_pcbak = 1'b0;
 
 assign mem_op = (d_mem_read | d_mem_write);
 
@@ -73,75 +75,78 @@ always_comb begin
             load_pc = 1'b0;
     end
 
-    if(control_instruc_ident == 1'b1)
+    case (op_WB)
+        op_br: begin
+            if(br_enable)
+                load_pc = 1'b1;
+        end
+        op_jmp: load_pc = 1'b1;
+        op_jsr: load_pc = 1'b1;
+        op_trap: load_pc = 1'b1;
+        default: ;
+    endcase
+
+    if(i_mem_read == 1'b0 && control_instruc_ident_wb != 1'b1)
         load_pc = 1'b0;
 
 end
 
 always_comb begin
-    // Needed to handle JMP followed by LDI/STI
-    // Since PC will get stalled, it will not be loaded with the value of JMP.
-
-    load_pcbak = load_pc;
-    case (op_WB)
-        op_br: begin
-            if(br_enable)
-                load_pcbak = 1'b1;
-        end
-        op_jmp: load_pcbak = 1'b1;
-        op_jsr: load_pcbak = 1'b1;
-        op_trap: load_pcbak = 1'b1;
-        default: ;
-    endcase
-end
-
-always_comb begin
-    control_instruc_ident = 1'b0;
+    i_mem_read = 1'b1;
+    control_instruc_ident_wb = 1'b0;
 
     case (op_ID)
         op_br: begin
             if(nzp_ID != 3'b000)
-                control_instruc_ident = 1'b1;
+                i_mem_read = 1'b0;
         end
-        op_jmp: control_instruc_ident = 1'b1;
-        op_jsr: control_instruc_ident = 1'b1;
-        op_trap: control_instruc_ident = 1'b1;
+        op_jmp: i_mem_read = 1'b0;
+        op_jsr: i_mem_read = 1'b0;
+        op_trap: i_mem_read = 1'b0;
         default: ;
     endcase
 
     case (op_EX)
         op_br: begin
             if(nzp_EX != 3'b000)
-                control_instruc_ident = 1'b1;
+                i_mem_read = 1'b0;
         end
-        op_jmp: control_instruc_ident = 1'b1;
-        op_jsr: control_instruc_ident = 1'b1;
-        op_trap: control_instruc_ident = 1'b1;
+        op_jmp: i_mem_read = 1'b0;
+        op_jsr: i_mem_read = 1'b0;
+        op_trap: i_mem_read = 1'b0;
         default: ;
     endcase
 
     case (op_MEM)
         op_br: begin
             if(nzp_MEM != 3'b000)
-                control_instruc_ident = 1'b1;
+                i_mem_read = 1'b0;
         end
-        op_jmp: control_instruc_ident = 1'b1;
-        op_jsr: control_instruc_ident = 1'b1;
-        op_trap: control_instruc_ident = 1'b1;
+        op_jmp: i_mem_read = 1'b0;
+        op_jsr: i_mem_read = 1'b0;
+        op_trap: i_mem_read = 1'b0;
         default: ;
     endcase
-end
 
-always_comb begin
-    control_instruc_ident_wb = 1'b0;
     case (op_WB)
         op_br: begin
-            if(nzp_WB != 3'b000)
+            if(nzp_WB != 3'b000) begin
+                i_mem_read = 1'b0;
                 control_instruc_ident_wb = 1'b1;
+            end
         end
-        op_jmp: control_instruc_ident_wb = 1'b1;
-        op_jsr: control_instruc_ident_wb = 1'b1;
-        op_trap: control_instruc_ident_wb = 1'b1;
+        op_jmp:begin
+            i_mem_read = 1'b0;
+            control_instruc_ident_wb = 1'b1;
+        end
+        op_jsr: begin
+            i_mem_read = 1'b0;
+            control_instruc_ident_wb = 1'b1;
+        end
+        op_trap: begin
+            i_mem_read = 1'b0;
+            control_instruc_ident_wb = 1'b1;
+        end
         default: ;
     endcase
 end
