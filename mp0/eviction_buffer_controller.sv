@@ -19,7 +19,6 @@ module eviction_buffer_controller
 
     // signals to lower level memory
     input buf_mem_read, buf_mem_write,
-    input lc3b_word buf_mem_address,
     output logic buf_mem_resp,
 
     // signals to higher level memory
@@ -150,7 +149,7 @@ begin : state_actions
             if(data_array[7].dirty) begin
                 index_sel = 7;
             end
-            smemaddr_sel = {0, index_sel};
+            smemaddr_sel = {1'b0, index_sel};
             write_sel = 0;
             load_d = 1;
             valid = 1;

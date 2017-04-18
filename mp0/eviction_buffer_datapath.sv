@@ -24,7 +24,6 @@ module eviction_buffer_datapath
 
     // signals to higher level memory
     input lc3b_cacheline super_mem_rdata,
-    input logic super_mem_read,
     output lc3b_word super_mem_address,
     output lc3b_cacheline super_mem_wdata
 );
