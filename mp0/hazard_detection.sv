@@ -13,6 +13,7 @@ module hazard_detection
     /* outputs */
     output logic load, load_pc, load_pcbak,
     output logic control_instruc_ident_wb,
+    output logic flush,
     output logic i_mem_read
 );
 
@@ -94,12 +95,13 @@ end
 always_comb begin
     i_mem_read = 1'b1;
     control_instruc_ident_wb = 1'b0;
+    flush = 1'b0;
 
     case (op_ID)
-        op_br: begin
-            if(nzp_ID != 3'b000)
-                i_mem_read = 1'b0;
-        end
+        // op_br: begin
+        //     if(nzp_ID != 3'b000)
+        //         i_mem_read = 1'b0;
+        // end
         op_jmp: i_mem_read = 1'b0;
         op_jsr: i_mem_read = 1'b0;
         op_trap: i_mem_read = 1'b0;
@@ -107,10 +109,10 @@ always_comb begin
     endcase
 
     case (op_EX)
-        op_br: begin
-            if(nzp_EX != 3'b000)
-                i_mem_read = 1'b0;
-        end
+        // op_br: begin
+        //     if(nzp_EX != 3'b000)
+        //         i_mem_read = 1'b0;
+        // end
         op_jmp: i_mem_read = 1'b0;
         op_jsr: i_mem_read = 1'b0;
         op_trap: i_mem_read = 1'b0;
@@ -118,10 +120,10 @@ always_comb begin
     endcase
 
     case (op_MEM)
-        op_br: begin
-            if(nzp_MEM != 3'b000)
-                i_mem_read = 1'b0;
-        end
+        // op_br: begin
+        //     if(nzp_MEM != 3'b000)
+        //         i_mem_read = 1'b0;
+        // end
         op_jmp: i_mem_read = 1'b0;
         op_jsr: i_mem_read = 1'b0;
         op_trap: i_mem_read = 1'b0;
@@ -132,6 +134,7 @@ always_comb begin
         op_br: begin
             if(nzp_WB != 3'b000) begin
                 i_mem_read = 1'b0;
+                flush = 1'b1;
                 control_instruc_ident_wb = 1'b1;
             end
         end
