@@ -5,12 +5,14 @@ module eviction_buffer_datapath
     input clk,
 
     // control signals
-    input load,
+    input load_d,
+    input load_lru,
     input lc3b_7b_plru lru_in,
     input valid,
     input dirty,
-    input [3:0] index,
-    input read_src_sel,
+    input [2:0] index_sel,
+    input read_src_sel, write_sel,
+    input [3:0] smemaddr_sel,
     output lc3b_7b_plru lru_out,
     output lc3b_eviction_array_entry d_out [7:0],
     output logic hits [7:0],
@@ -30,20 +32,37 @@ module eviction_buffer_datapath
 /* Internal connections */
 lc3b_cacheline wayselector_out;
 lc3b_eviction_array_entry d_in;
+lc3b_cacheline read_data, write_data;
+lc3b_word write_address;
 
 assign d_in.valid = valid;
 assign d_in.dirty = dirty;
 assign d_in.addr = buf_mem_address;
 assign d_in.data = buf_mem_wdata;
 
-assign buf_mem_rdata = wayselector_out;
 assign super_mem_wdata = wayselector_out;
+
+mux2 #(128) write_data_mux
+(
+    .sel(write_sel),
+    .a(wayselector_out),
+    .b(buf_mem_wdata),
+    .f(write_data)
+);
+
+mux2 #(16) write_addr_mux
+(
+    .sel(write_sel),
+    .a(super_mem_address),
+    .b(buf_mem_address),
+    .f(write_address)
+);
 
 array_fully_associative data
 (
     .clk,
-    .write(load),
-    .index(index[2:0]),
+    .write(load_d),
+    .index(index_sel),
     .datain(d_in),
     .dataout(d_out)
 );
@@ -51,14 +70,14 @@ array_fully_associative data
 register #(7) lru
 (
     .clk,
-    .load(load),
+    .load(load_lru),
     .in(lru_in),
     .out(lru_out)
 );
 
 mux8 #(128) wayselector_mux
 (
-    .sel(index[2:0]),
+    .sel(index_sel),
     .a(d_out[0].data),
     .b(d_out[1].data),
     .c(d_out[2].data),
@@ -70,9 +89,9 @@ mux8 #(128) wayselector_mux
     .y(wayselector_out)
 );
 
-mux16 #(16) pmemaddr_mux
+mux16 #(16) smemaddr_mux
 (
-    .sel(index),
+    .sel(smemaddr_sel),
     .a(d_out[0].addr),
     .b(d_out[1].addr),
     .c(d_out[2].addr),
@@ -80,7 +99,7 @@ mux16 #(16) pmemaddr_mux
     .e(d_out[4].addr),
     .f(d_out[5].addr),
     .g(d_out[6].addr),
-    .h(d_out[7].addr)
+    .h(d_out[7].addr),
     .i(buf_mem_address),
     .j(16'h0000),
     .k(16'h0000),
@@ -96,8 +115,16 @@ mux2 #(128) read_mux
 (
     .sel(read_src_sel),
     .a(wayselector_out),
-    .b(super_mem_rdata),
-    .y(buf_mem_rdata)
+    .b(read_data),
+    .f(buf_mem_rdata)
+);
+
+register #(128) read_miss_reg
+(
+    .clk,
+    .load(1'b1),
+    .in(super_mem_rdata),
+    .out(read_data)
 );
 
 assign hits[0] = (d_out[0].valid & (buf_mem_address == d_out[0].addr));
