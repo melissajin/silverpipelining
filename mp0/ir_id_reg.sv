@@ -4,6 +4,7 @@ module ir_id_reg
 (
     input clk,
     input load,
+    input clear,
     input lc3b_word in,
     output lc3b_opcode opcode,
     output lc3b_reg dest, src1, src2,
@@ -14,6 +15,11 @@ lc3b_word data;
 
 always_ff @(posedge clk)
 begin
+    if(clear == 1)
+      begin
+        data = 0;
+      end
+
     if (load == 1)
     begin
         data = in;

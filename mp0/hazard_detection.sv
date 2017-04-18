@@ -34,8 +34,8 @@ always_comb begin
             load_pc = 1'b0;
         end
         3'b010: begin
-            load = 1'b0;
-            load_pc = 1'b0;
+            load = 1'b1;
+            load_pc = 1'b1;
         end
         3'b011: begin
             load = 1'b1;
@@ -50,8 +50,8 @@ always_comb begin
             load_pc = 1'b0;
         end
         3'b110: begin
-            load = 1'b0;
-            load_pc = 1'b0;
+            load = 1'b1;
+            load_pc = 1'b1;
         end
         3'b111: begin
             load = 1'b1;

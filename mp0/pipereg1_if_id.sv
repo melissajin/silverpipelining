@@ -27,7 +27,7 @@ register_with_clear pc_id
 ir_id_reg ir_id
 (
     // inputs
-    .clk, .load, .in(ir_in),
+    .clk, .load, .clear, .in(ir_in),
 
     // outputs
     .opcode(opcode), .dest(dest_ID_out), .src1(src1),

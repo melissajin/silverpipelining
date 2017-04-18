@@ -122,7 +122,7 @@ register_with_clear src2_data_reg
 /* IR[10:0] */
 ir_ex_reg ir_ex_reg_inst
 (
-    .clk, .load, .in(ir_10_0_in),
+    .clk, .load, .clear, .in(ir_10_0_in),
     .imm4(imm4_EX), .imm5(imm5_EX),
     .offset6(offset6_EX), .trapVect8(trapVect8_EX),
     .offset11(offset11_EX_out)
