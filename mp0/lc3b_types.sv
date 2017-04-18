@@ -5,7 +5,7 @@ typedef logic  [7:0] lc3b_byte;
 typedef logic [127:0] lc3b_cacheline;
 typedef logic [2:0] lc3b_c_index;
 typedef logic [8:0] lc3b_c_tag;
-
+typedef logic [6:0] lc3b_7b_plru;
 
 // IR output types
 typedef logic [8:0]  lc3b_offset9;
@@ -146,25 +146,11 @@ typedef struct packed {
     lc3b_reg dest_wb;
 } lc3b_forward_save;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+typedef struct packed {
+    logic valid;
+    logic dirty;
+    lc3b_word addr;
+    lc3b_cacheline data;
+} lc3b_eviction_array_entry;
 
 endpackage : lc3b_types
