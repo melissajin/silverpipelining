@@ -48,7 +48,14 @@ logic d_mem_resp, d_mem_read, d_mem_write;
 lc3b_mem_wmask d_mem_byte_enable;
 lc3b_word d_mem_rdata, d_mem_address, d_mem_wdata;
 
-eviction_buffer eviction_buffer_inst
+/********  Signals between Lower Eviction Write Buffer and L1 D Cache ********/
+logic buf_mem_read_low, buf_mem_write_low;
+lc3b_word buf_mem_address_low;
+lc3b_cacheline buf_mem_wdata_low;
+logic buf_mem_resp_low;
+lc3b_cacheline buf_mem_rdata_low;
+
+eviction_buffer eviction_buffer_inst_high
 (
     .clk,
 
@@ -102,26 +109,44 @@ arbiter arbiter_inst
     .clk,
 
     // Inputs from split L1 cache
-    .i_cache_address_in(address_i), .d_cache_address_in(address_d),
-    .i_cache_wdata_in(wdata_i), .d_cache_wdata_in(wdata_d),
-    .i_cache_read_in(read_i), .d_cache_read_in(read_d),
-    .i_cache_write_in(write_i), .d_cache_write_in(write_d),
+    .i_cache_address_in(address_i), .d_cache_address_in(buf_mem_address_low),
+    .i_cache_wdata_in(wdata_i), .d_cache_wdata_in(buf_mem_wdata_low),
+    .i_cache_read_in(read_i), .d_cache_read_in(buf_mem_read_low),
+    .i_cache_write_in(write_i), .d_cache_write_in(buf_mem_write_low),
 
     // Inputs from the L2 cache
-    .l2_rdata_in(L2_rdata), // TODO: change to L2. using Pmem right now
+    .l2_rdata_in(L2_rdata),
     .l2_resp_in(L2_resp),
 
     // Outputs to the L2 cache
-    .l2_address_out(L2_address), // TODO: change to L2. using Pmem right now
+    .l2_address_out(L2_address),
     .l2_wdata_out(L2_wdata), .l2_read_out(L2_read),
     .l2_write_out(L2_write),
 
     // Outputs to the split L1 cache
-    .d_cache_resp_out(resp_d), .i_cache_resp_out(resp_i),
-    .d_cache_rdata_out(rdata_d), .i_cache_rdata_out(rdata_i)
+    .d_cache_resp_out(buf_mem_resp_low), .i_cache_resp_out(resp_i),
+    .d_cache_rdata_out(buf_mem_rdata_low), .i_cache_rdata_out(rdata_i)
 
 );
 
+eviction_buffer eviction_buffer_inst_low
+(
+    .clk,
+
+    /******* Signals between Eviction Buffer and L1 Data Cache *******/
+    .buf_mem_read(read_d), .buf_mem_write(write_d),
+    .buf_mem_address(address_d),
+    .buf_mem_wdata(wdata_d),
+    .buf_mem_resp(resp_d),
+    .buf_mem_rdata(rdata_d),
+
+    /******* Signals between Eviction Buffer and Arbiter *******/
+    .super_mem_resp(buf_mem_resp_low),
+    .super_mem_rdata(buf_mem_rdata_low),
+    .super_mem_read(buf_mem_read_low), .super_mem_write(buf_mem_write_low),
+    .super_mem_address(buf_mem_address_low),
+    .super_mem_wdata(buf_mem_wdata_low)
+);
 
 l1_cache d_cache
 (
@@ -134,7 +159,7 @@ l1_cache d_cache
     // outputs
     .mem_resp(d_mem_resp), .mem_rdata(d_mem_rdata),
 
-    /******* Signals between Cache and Arbiter *******/
+    /******* Signals between Cache and Lower Eviction Write Buffer *******/
     .l2_resp(resp_d), .l2_rdata(rdata_d),                                                     // inputs
     .l2_read(read_d), .l2_write(write_d), .l2_address(address_d), .l2_wdata(wdata_d)          // outputs
 );
