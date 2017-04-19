@@ -15,6 +15,13 @@ module mp0
     output lc3b_cacheline pmem_wdata
 );
 
+/******* Signals between Eviction Buffer and L2 Cache *******/
+logic buf_mem_read, buf_mem_write;
+lc3b_word buf_mem_address;
+lc3b_cacheline buf_mem_wdata;
+logic buf_mem_resp;
+lc3b_cacheline buf_mem_rdata;
+
 /******** Signals between arbiter and L2 cache ********/
 logic L2_read, L2_write, L2_resp;
 lc3b_word L2_address;
@@ -41,6 +48,25 @@ logic d_mem_resp, d_mem_read, d_mem_write;
 lc3b_mem_wmask d_mem_byte_enable;
 lc3b_word d_mem_rdata, d_mem_address, d_mem_wdata;
 
+eviction_buffer eviction_buffer_inst
+(
+    .clk,
+
+    /******* Signals between Eviction Buffer and L2 Cache *******/
+    .buf_mem_read(buf_mem_read), .buf_mem_write(buf_mem_write),
+    .buf_mem_address(buf_mem_address),
+    .buf_mem_wdata(buf_mem_wdata),
+    .buf_mem_resp(buf_mem_resp),
+    .buf_mem_rdata(buf_mem_rdata),
+
+    /******* Signals between Eviction Buffer and Physical Memory *******/
+    .super_mem_resp(pmem_resp),
+    .super_mem_rdata(pmem_rdata),
+    .super_mem_read(pmem_read), .super_mem_write(pmem_write),
+    .super_mem_address(pmem_address),
+    .super_mem_wdata(pmem_wdata)
+);
+
 l2_cache l2_inst
 (
     .clk,
@@ -53,14 +79,14 @@ l2_cache l2_inst
     .mem_resp(L2_resp),                                              // control
     .mem_rdata(L2_rdata),                                         // datapath
 
-    /******* Signals between L2 Cache and Physical Memory *******/
+    /******* Signals between L2 Cache and Eviction Write Buffer  *******/
     // inputs
-    .pmem_resp(pmem_resp),                                                    // control
-    .pmem_rdata(pmem_rdata),                                    // datapath
+    .pmem_resp(buf_mem_resp),                                                    // control
+    .pmem_rdata(buf_mem_rdata),                                    // datapath
     // outputs
-    .pmem_read(pmem_read), .pmem_write(pmem_write),                                   // control
-    .pmem_address(pmem_address),                                      // datapath
-    .pmem_wdata(pmem_wdata)                                    // datapath
+    .pmem_read(buf_mem_read), .pmem_write(buf_mem_write),                                   // control
+    .pmem_address(buf_mem_address),                                      // datapath
+    .pmem_wdata(buf_mem_wdata)                                    // datapath
 );
 
 // assign pmem_address = L2_address;
