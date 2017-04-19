@@ -30,7 +30,7 @@ module cpu_datapath
 logic load, load_mem_wb;
 logic load_pc, load_pcbak;
 logic control_instruc_ident, control_instruc_ident_wb;
-logic flush;
+logic flush, flush_mem_op, d_mem_read_loc, d_mem_write_loc;
 
 /**** Stage 1 ****/
 lc3b_word pcmux_out, pc_out, pcbak_out, pcPlus2mux_out;
@@ -122,7 +122,7 @@ hazard_detection hazard_detection_inst
 
     /* outputs */
     .load, .load_pc, .load_pcbak,
-    .control_instruc_ident_wb, .flush, .i_mem_read(i_mem_read)
+    .control_instruc_ident_wb, .flush, .flush_mem_op, .i_mem_read(i_mem_read)
 );
 
 forwarding_unit forwarding
@@ -514,8 +514,10 @@ register #($bits(lc3b_forward_save)) forward_wb_save
 
 // Data Memory Signals
 assign d_mem_address =  d_mem_address_out;
-assign d_mem_read = ({wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} == 2'b00) ? mem_sig_4.d_mem_read : wb_sig_5.d_mem_read;
-assign d_mem_write = ({wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} == 2'b00) ? mem_sig_4.d_mem_write : wb_sig_5.d_mem_write;
+assign d_mem_read_loc = ({wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} == 2'b00) ? mem_sig_4.d_mem_read : wb_sig_5.d_mem_read;
+assign d_mem_write_loc = ({wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} == 2'b00) ? mem_sig_4.d_mem_write : wb_sig_5.d_mem_write;
+assign d_mem_read = d_mem_read_loc & ~flush_mem_op;
+assign d_mem_write = d_mem_write_loc & ~flush_mem_op;
 
 // Instruction Memory Signals
 assign i_mem_address = pc_out;

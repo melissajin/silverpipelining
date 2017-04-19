@@ -13,7 +13,7 @@ module hazard_detection
     /* outputs */
     output logic load, load_pc, load_pcbak,
     output logic control_instruc_ident_wb,
-    output logic flush,
+    output logic flush, flush_mem_op,
     output logic i_mem_read
 );
 
@@ -77,11 +77,13 @@ always_comb begin
     end
 
     flush = 1'b0;
+    flush_mem_op = 1'b0;
     case (op_WB)
         op_br: begin
             if(br_enable) begin
                 load_pc = 1'b1;
                 flush = 1'b1;
+                flush_mem_op = 1'b1;
               end
         end
         op_jmp: load_pc = 1'b1;
@@ -93,12 +95,18 @@ always_comb begin
     if(i_mem_read == 1'b0 && control_instruc_ident_wb != 1'b1)
         load_pc = 1'b0;
 
+    if(i_mem_resp == 1'b0 && ((op_ID == op_br && nzp_ID != 3'b000) || (op_EX == op_br && nzp_EX != 3'b000) || (op_MEM == op_br && nzp_MEM != 3'b000))) begin
+        load = 1'b0;
+        load_pc = 1'b0;
+    end
+
 end
 
 always_comb begin
     i_mem_read = 1'b1;
     control_instruc_ident_wb = 1'b0;
 
+    // Remove the special case on BR to implement static branch prediction (predict not taken)
     case (op_ID)
         // op_br: begin
         //     if(nzp_ID != 3'b000)
@@ -134,7 +142,7 @@ always_comb begin
 
     case (op_WB)
         op_br: begin
-            if(nzp_WB != 3'b000) begin
+            if(br_enable) begin
                 i_mem_read = 1'b0;
                 control_instruc_ident_wb = 1'b1;
             end
