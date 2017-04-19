@@ -35,16 +35,16 @@ logic hit_any, dirty_any;
 logic [2:0] lru_sel;
 
 assign hit_any = hits[0] | hits[1] | hits[2] | hits[3] | hits[4] | hits[5] | hits[6] | hits[7];
-assign dirty_any = data_array[0].dirty | data_array[1].dirty | data_array[2].dirty
-        | data_array[3].dirty | data_array[4].dirty | data_array[5].dirty | data_array[6].dirty | data_array[7].dirty;
-
 
 always_comb
 begin : state_actions
     /* Default output assignments */
     index_sel = 0; smemaddr_sel = 8; read_src_sel = 0; write_sel = 0;
     buf_mem_resp = 0; super_mem_read = 0; super_mem_write = 0;
-	lru_out = lru_in; valid = 0; dirty = 0; load_d = 0; load_lru = 0;
+	lru_out = lru_in; load_d = 0; load_lru = 0;
+
+    valid = data_array[0].valid;
+    dirty = data_array[0].dirty;
 
     case (state)
         process_request: begin
@@ -53,56 +53,81 @@ begin : state_actions
                 load_lru = 1;
                 buf_mem_resp = 1;
 	            index_sel = 0;
+                valid = 0;
+                dirty = 0;
+                load_d = 1;
             end
             if(hits[1] & (buf_mem_read)) begin
                 lru_out = {lru_in[6], lru_in[5], lru_in[4], 1'b0, lru_in[2], 1'b1, 1'b1};
                 load_lru = 1;
                 buf_mem_resp = 1;
  	            index_sel = 1;
+                valid = 0;
+                dirty = 0;
+                load_d = 1;
             end
             if(hits[2] & (buf_mem_read)) begin
                 lru_out = {lru_in[6], lru_in[5], 1'b1, lru_in[3], lru_in[2], 1'b0, 1'b1};
                 load_lru = 1;
                 buf_mem_resp = 1;
                 index_sel = 2;
+                valid = 0;
+                dirty = 0;
+                load_d = 1;
             end
             if(hits[3] & (buf_mem_read)) begin
                 lru_out = {lru_in[6], lru_in[5], 1'b0, lru_in[3], lru_in[2], 1'b0, 1'b1};
                 load_lru = 1;
                 buf_mem_resp = 1;
                 index_sel = 3;
+                valid = 0;
+                dirty = 0;
+                load_d = 1;
             end
             if(hits[4] & (buf_mem_read)) begin
                 lru_out = {lru_in[6], 1'b1, lru_in[4], lru_in[3], 1'b1, lru_in[1], 1'b0};
                 load_lru = 1;
                 buf_mem_resp = 1;
                 index_sel = 4;
+                valid = 0;
+                dirty = 0;
+                load_d = 1;
             end
             if(hits[5] & (buf_mem_read)) begin
                 lru_out = {lru_in[6], 1'b0, lru_in[4], lru_in[3], 1'b1, lru_in[1], 1'b0};
                 load_lru = 1;
                 buf_mem_resp = 1;
                 index_sel = 5;
+                valid = 0;
+                dirty = 0;
+                load_d = 1;
             end
             if(hits[6] & (buf_mem_read)) begin
                 lru_out = {1'b1, lru_in[5], lru_in[4], lru_in[3], 1'b0, lru_in[1], 1'b0};
                 load_lru = 1;
                 buf_mem_resp = 1;
                 index_sel = 6;
+                valid = 0;
+                dirty = 0;
+                load_d = 1;
             end
             if(hits[7] & (buf_mem_read)) begin
                 lru_out = {1'b0, lru_in[5], lru_in[4], lru_in[3], 1'b0, lru_in[1], 1'b0};
                 load_lru = 1;
                 buf_mem_resp = 1;
                 index_sel = 7;
+                valid = 0;
+                dirty = 0;
+                load_d = 1;
             end
             if(buf_mem_write) begin
+                buf_mem_resp = 1;
                 index_sel = lru_sel;
                 write_sel = 1;
+                load_lru = 1;
+                load_d = 1;
                 dirty = 1;
                 valid = 1;
-                load_d = 1;
-                load_lru = 1;
                 case(lru_sel)
                     3'b000: lru_out = {lru_in[6], lru_in[5], lru_in[4], 1'b1, lru_in[2], 1'b1, 1'b1};
                     3'b001: lru_out = {lru_in[6], lru_in[5], lru_in[4], 1'b0, lru_in[2], 1'b1, 1'b1};
@@ -151,9 +176,11 @@ begin : state_actions
             end
             smemaddr_sel = {1'b0, index_sel};
             write_sel = 0;
-            load_d = 1;
-            valid = 1;
-            dirty = 0;
+            if(super_mem_resp) begin
+                load_d = 1;
+                valid = 1;
+                dirty = 0;
+            end
         end
         default:;
     endcase
@@ -185,6 +212,49 @@ begin : next_state_logic
             next_state = buffer_2;
         end
         default: next_state = process_request;
+    endcase
+end
+
+always_ff @(posedge clk)
+begin: next_state_assignment
+    /* Assignment of next state on clock edge */
+    state <= next_state;
+end
+
+always_comb begin
+    case(index_sel)
+        3'b000: begin
+            dirty_any = dirty | data_array[1].dirty | data_array[2].dirty
+                | data_array[3].dirty | data_array[4].dirty | data_array[5].dirty | data_array[6].dirty | data_array[7].dirty;
+        end
+        3'b001: begin
+            dirty_any = data_array[0].dirty | dirty | data_array[2].dirty
+                | data_array[3].dirty | data_array[4].dirty | data_array[5].dirty | data_array[6].dirty | data_array[7].dirty;
+        end
+        3'b010: begin
+            dirty_any = data_array[0].dirty | data_array[1].dirty | dirty
+                | data_array[3].dirty | data_array[4].dirty | data_array[5].dirty | data_array[6].dirty | data_array[7].dirty;
+        end
+        3'b011: begin
+            dirty_any = data_array[0].dirty | data_array[1].dirty | data_array[2].dirty
+                | dirty | data_array[4].dirty | data_array[5].dirty | data_array[6].dirty | data_array[7].dirty;
+        end
+        3'b100: begin
+            dirty_any = data_array[0].dirty | data_array[1].dirty | data_array[2].dirty
+                | data_array[3].dirty | dirty | data_array[5].dirty | data_array[6].dirty | data_array[7].dirty;
+        end
+        3'b101: begin
+            dirty_any = data_array[0].dirty | data_array[1].dirty | data_array[2].dirty
+                | data_array[3].dirty | data_array[4].dirty | dirty | data_array[6].dirty | data_array[7].dirty;
+        end
+        3'b110: begin
+            dirty_any = data_array[0].dirty | data_array[1].dirty | data_array[2].dirty
+                | data_array[3].dirty | data_array[4].dirty | data_array[5].dirty | dirty | data_array[7].dirty;
+        end
+        3'b111: begin
+            dirty_any = data_array[0].dirty | data_array[1].dirty | data_array[2].dirty
+                | data_array[3].dirty | data_array[4].dirty | data_array[5].dirty | data_array[6].dirty | dirty;
+        end
     endcase
 end
 

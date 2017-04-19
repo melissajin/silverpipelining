@@ -1,86 +1,29 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate -radix hexadecimal /mp0_tb/clk
-add wave -noupdate -color Orange -radix hexadecimal -childformat {{{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[7]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[6]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[5]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[4]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[3]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[2]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[1]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[0]} -radix hexadecimal}} -expand -subitemconfig {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[7]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[6]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[5]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[4]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[3]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[2]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[1]} {-color Orange -height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[0]} {-color Orange -height 15 -radix hexadecimal}} /mp0_tb/dut/cpu_inst/datapath/regfile_inst/data
-add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/MEM_WB/wdata_forward_in
-add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/MEM_WB/wdata_forward_out
-add wave -noupdate -color {Slate Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdr_wb_in_mux/a
-add wave -noupdate -color {Slate Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdr_wb_in_mux/b
-add wave -noupdate -color {Slate Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdr_wb_in_mux/f
-add wave -noupdate -color {Slate Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdr_wb_in_mux/sel
-add wave -noupdate -expand -group meme_signals -color {Sky Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/i_mem_resp
-add wave -noupdate -expand -group meme_signals -color {Sky Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/i_mem_read
-add wave -noupdate -expand -group meme_signals -color {Sky Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/i_mem_rdata
-add wave -noupdate -expand -group meme_signals -color {Sky Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/i_mem_address
-add wave -noupdate -expand -group meme_signals -color {Sky Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/d_mem_resp
-add wave -noupdate -expand -group meme_signals -color {Sky Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/d_mem_read
-add wave -noupdate -expand -group meme_signals -color {Sky Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/d_mem_write
-add wave -noupdate -expand -group meme_signals -color {Sky Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/d_mem_rdata
-add wave -noupdate -expand -group meme_signals -color {Sky Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/d_mem_address
-add wave -noupdate -expand -group meme_signals -color {Sky Blue} -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/d_mem_wdata
-add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pc/out
-add wave -noupdate -color Orange -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/cw.wb
-add wave -noupdate -color Orange -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/wb_sig_3
-add wave -noupdate -color Orange -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/wb_sig_4
-add wave -noupdate -color Orange -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/wb_sig_5
-add wave -noupdate -expand -group dest-nzp -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/nzp_ID
-add wave -noupdate -expand -group dest-nzp -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/nzp_EX
-add wave -noupdate -expand -group dest-nzp -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/nzp_MEM
-add wave -noupdate -expand -group dest-nzp -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/nzp_WB
-add wave -noupdate -group d_mem_address_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/dmem_address_mux/sel
-add wave -noupdate -group d_mem_address_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/dmem_address_mux/a
-add wave -noupdate -group d_mem_address_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/dmem_address_mux/b
-add wave -noupdate -group d_mem_address_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/dmem_address_mux/c
-add wave -noupdate -group d_mem_address_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/dmem_address_mux/d
-add wave -noupdate -group d_mem_address_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/dmem_address_mux/f
-add wave -noupdate -expand -group alu -color Magenta -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/alu_inst/aluop
-add wave -noupdate -expand -group alu -color Magenta -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/alu_inst/a
-add wave -noupdate -expand -group alu -color Magenta -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/alu_inst/b
-add wave -noupdate -expand -group alu -color Magenta -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/alu_inst/f
-add wave -noupdate -group d_mem_data_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/dmem_data_mux/sel
-add wave -noupdate -group d_mem_data_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/dmem_data_mux/a
-add wave -noupdate -group d_mem_data_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/dmem_data_mux/b
-add wave -noupdate -group d_mem_data_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/dmem_data_mux/c
-add wave -noupdate -group d_mem_data_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/dmem_data_mux/d
-add wave -noupdate -group d_mem_data_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/dmem_data_mux/f
-add wave -noupdate -group forward_sr1 -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forward_sr1_mux/sel
-add wave -noupdate -group forward_sr1 -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forward_sr1_mux/a
-add wave -noupdate -group forward_sr1 -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forward_sr1_mux/b
-add wave -noupdate -group forward_sr1 -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forward_sr1_mux/c
-add wave -noupdate -group forward_sr1 -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forward_sr1_mux/d
-add wave -noupdate -group forward_sr1 -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forward_sr1_mux/f
-add wave -noupdate -group forward_src2 -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forward_sr2_mux/sel
-add wave -noupdate -group forward_src2 -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forward_sr2_mux/a
-add wave -noupdate -group forward_src2 -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forward_sr2_mux/b
-add wave -noupdate -group forward_src2 -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forward_sr2_mux/c
-add wave -noupdate -group forward_src2 -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forward_sr2_mux/d
-add wave -noupdate -group forward_src2 -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forward_sr2_mux/f
-add wave -noupdate -group mdr_mux_ex -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdrmux_ex/sel
-add wave -noupdate -group mdr_mux_ex -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdrmux_ex/a
-add wave -noupdate -group mdr_mux_ex -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdrmux_ex/b
-add wave -noupdate -group mdr_mux_ex -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdrmux_ex/c
-add wave -noupdate -group mdr_mux_ex -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdrmux_ex/d
-add wave -noupdate -group mdr_mux_ex -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdrmux_ex/f
-add wave -noupdate -group regfile_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/regfilemux/sel
-add wave -noupdate -group regfile_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/regfilemux/a
-add wave -noupdate -group regfile_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/regfilemux/b
-add wave -noupdate -group regfile_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/regfilemux/c
-add wave -noupdate -group regfile_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/regfilemux/d
-add wave -noupdate -group regfile_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/regfilemux/f
-add wave -noupdate -group mdr_wb_in_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdr_wb_in_mux/sel
-add wave -noupdate -group mdr_wb_in_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdr_wb_in_mux/a
-add wave -noupdate -group mdr_wb_in_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdr_wb_in_mux/b
-add wave -noupdate -group mdr_wb_in_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdr_wb_in_mux/f
-add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/mdr_MEM_out
-add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/MEM_WB/mar_WB_in
-add wave -noupdate -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/MEM_WB/mar_WB_out
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/clk
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/buf_mem_read
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/buf_mem_write
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/buf_mem_address
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/buf_mem_wdata
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/buf_mem_resp
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/buf_mem_rdata
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/super_mem_resp
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/super_mem_rdata
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/super_mem_read
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/super_mem_write
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/super_mem_address
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/super_mem_wdata
+add wave -noupdate -radix hexadecimal /eviction_buffer_tb/DUT/controller/state
+add wave -noupdate -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[7]} -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[7].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[7].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[7].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[7].data} -radix hexadecimal}}} {{/eviction_buffer_tb/DUT/controller/data_array[6]} -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[6].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[6].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[6].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[6].data} -radix hexadecimal}}} {{/eviction_buffer_tb/DUT/controller/data_array[5]} -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[5].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[5].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[5].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[5].data} -radix hexadecimal}}} {{/eviction_buffer_tb/DUT/controller/data_array[4]} -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[4].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[4].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[4].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[4].data} -radix hexadecimal}}} {{/eviction_buffer_tb/DUT/controller/data_array[3]} -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[3].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[3].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[3].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[3].data} -radix hexadecimal}}} {{/eviction_buffer_tb/DUT/controller/data_array[2]} -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[2].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[2].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[2].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[2].data} -radix hexadecimal}}} {{/eviction_buffer_tb/DUT/controller/data_array[1]} -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[1].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[1].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[1].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[1].data} -radix hexadecimal}}} {{/eviction_buffer_tb/DUT/controller/data_array[0]} -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[0].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[0].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[0].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[0].data} -radix hexadecimal}}}} -expand -subitemconfig {{/eviction_buffer_tb/DUT/controller/data_array[7]} {-height 15 -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[7].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[7].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[7].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[7].data} -radix hexadecimal}}} {/eviction_buffer_tb/DUT/controller/data_array[7].valid} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[7].dirty} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[7].addr} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[7].data} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[6]} {-height 15 -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[6].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[6].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[6].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[6].data} -radix hexadecimal}}} {/eviction_buffer_tb/DUT/controller/data_array[6].valid} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[6].dirty} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[6].addr} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[6].data} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[5]} {-height 15 -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[5].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[5].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[5].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[5].data} -radix hexadecimal}}} {/eviction_buffer_tb/DUT/controller/data_array[5].valid} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[5].dirty} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[5].addr} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[5].data} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[4]} {-height 15 -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[4].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[4].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[4].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[4].data} -radix hexadecimal}}} {/eviction_buffer_tb/DUT/controller/data_array[4].valid} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[4].dirty} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[4].addr} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[4].data} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[3]} {-height 15 -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[3].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[3].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[3].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[3].data} -radix hexadecimal}}} {/eviction_buffer_tb/DUT/controller/data_array[3].valid} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[3].dirty} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[3].addr} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[3].data} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[2]} {-height 15 -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[2].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[2].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[2].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[2].data} -radix hexadecimal}}} {/eviction_buffer_tb/DUT/controller/data_array[2].valid} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[2].dirty} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[2].addr} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[2].data} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[1]} {-height 15 -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[1].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[1].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[1].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[1].data} -radix hexadecimal}}} {/eviction_buffer_tb/DUT/controller/data_array[1].valid} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[1].dirty} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[1].addr} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[1].data} {-height 14 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[0]} {-height 15 -radix hexadecimal -childformat {{{/eviction_buffer_tb/DUT/controller/data_array[0].valid} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[0].dirty} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[0].addr} -radix hexadecimal} {{/eviction_buffer_tb/DUT/controller/data_array[0].data} -radix hexadecimal}}} {/eviction_buffer_tb/DUT/controller/data_array[0].valid} {-height 15 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[0].dirty} {-height 15 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[0].addr} {-height 15 -radix hexadecimal} {/eviction_buffer_tb/DUT/controller/data_array[0].data} {-height 15 -radix hexadecimal}} /eviction_buffer_tb/DUT/controller/data_array
+add wave -noupdate /eviction_buffer_tb/DUT/controller/state
+add wave -noupdate -expand /eviction_buffer_tb/DUT/hits
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {670743 ps} 0}
+WaveRestoreCursors {{Cursor 1} {1128664 ps} 0}
 quietly wave cursor active 1
-configure wave -namecolwidth 354
+configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
-configure wave -signalnamewidth 0
+configure wave -signalnamewidth 1
 configure wave -snapdistance 10
 configure wave -datasetprefix 0
 configure wave -rowmargin 4
@@ -91,4 +34,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {658730 ps} {761270 ps}
+WaveRestoreZoom {0 ps} {5250 ns}

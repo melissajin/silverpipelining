@@ -36,8 +36,8 @@ lc3b_word write_address;
 
 assign d_in.valid = valid;
 assign d_in.dirty = dirty;
-assign d_in.addr = buf_mem_address;
-assign d_in.data = buf_mem_wdata;
+assign d_in.addr = write_address;
+assign d_in.data = write_data;
 
 assign super_mem_wdata = wayselector_out;
 
