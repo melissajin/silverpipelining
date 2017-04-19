@@ -20,14 +20,15 @@ module l1_cache
     // outputs
     output logic l2_read, l2_write,                                   // control
     output lc3b_word l2_address,                                      // datapath
-    output lc3b_cacheline l2_wdata                                    // datapath
+    output lc3b_cacheline l2_wdata,                                    // datapath
+    output logic eviction
 );
 
 logic load_lru, l2wdata_sel;
 logic load_d0, load_v0, load_TD0, d_set0, v_set0;
 logic load_d1, load_v1, load_TD1, d_set1, v_set1;
 logic [1:0] l2addr_sel;
-logic lru, lru_set, dirty0, dirty1, hit0, hit1;
+logic lru, lru_set, dirty0, dirty1, valid0, valid1, hit0, hit1;
 lc3b_word l2_address_inter;
 lc3b_cacheline l2_wdata_inter;
 
@@ -37,7 +38,9 @@ l1_cache_control control
 
     /* Datapath controls */
     // inputs
-    .lru_in(lru), .d_in0(dirty0), .d_in1(dirty1), .hit0, .hit1,
+    .lru_in(lru), .d_in0(dirty0), .d_in1(dirty1),
+    .v_in0(valid0), .v_in1(valid1), .hit0, .hit1,
+
     // outputs
     .load_lru, .lru_set, .l2wdata_sel,
     .load_d0, .load_v0, .load_TD0, .d_set0(d_set0), .v_set0(v_set0),
@@ -50,7 +53,8 @@ l1_cache_control control
 
     /* Memory signals */
     .l2_resp, .l2_address_inter, .l2_wdata_inter,              // inputs
-    .l2_read, .l2_write, .l2_address, .l2_wdata                // outputs
+    .l2_read, .l2_write, .l2_address, .l2_wdata,                // outputs
+    .eviction
 );
 
 
@@ -66,6 +70,7 @@ l1_cache_datapath datapath
     .l2addr_sel,
     // outputs
     .lru_out(lru), .d_out0(dirty0), .d_out1(dirty1), .hit0, .hit1,
+    .v_out0(valid0), .v_out1(valid1),    
 
     /* CPU signals */
     .mem_byte_enable, .mem_address, .mem_wdata,      // inputs

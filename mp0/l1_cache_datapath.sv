@@ -10,6 +10,7 @@ module l1_cache_datapath
     input load_d1, load_v1, load_TD1, d_in1, v_in1,
     input [1:0] l2addr_sel,
     output logic lru_out, d_out0, d_out1, hit0, hit1,
+    output logic v_out0, v_out1,
 
     /* CPU signals */
     input lc3b_mem_wmask mem_byte_enable,
@@ -24,7 +25,6 @@ module l1_cache_datapath
 );
 
 /* Internal Signals */
-logic v_out0, v_out1;
 lc3b_cacheline writelogic_out, data_out0, data_out1, wayselector_out;
 lc3b_c_tag tag0, tag1;
 

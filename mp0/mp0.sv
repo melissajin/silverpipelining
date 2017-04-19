@@ -21,6 +21,7 @@ lc3b_word buf_mem_address;
 lc3b_cacheline buf_mem_wdata;
 logic buf_mem_resp;
 lc3b_cacheline buf_mem_rdata;
+logic eviction_l2;
 
 /******** Signals between arbiter and L2 cache ********/
 logic L2_read, L2_write, L2_resp;
@@ -47,6 +48,7 @@ lc3b_word i_mem_rdata, i_mem_address, i_mem_wdata;
 logic d_mem_resp, d_mem_read, d_mem_write;
 lc3b_mem_wmask d_mem_byte_enable;
 lc3b_word d_mem_rdata, d_mem_address, d_mem_wdata;
+logic eviction_l1;
 
 /********  Signals between Lower Eviction Write Buffer and L1 D Cache ********/
 logic buf_mem_read_low, buf_mem_write_low;
@@ -161,7 +163,8 @@ l1_cache d_cache
 
     /******* Signals between Cache and Lower Eviction Write Buffer *******/
     .l2_resp(resp_d), .l2_rdata(rdata_d),                                                     // inputs
-    .l2_read(read_d), .l2_write(write_d), .l2_address(address_d), .l2_wdata(wdata_d)          // outputs
+    .l2_read(read_d), .l2_write(write_d), .l2_address(address_d), .l2_wdata(wdata_d),          // outputs
+    .eviction(eviction_l1)
 );
 
 l1_cache i_cache

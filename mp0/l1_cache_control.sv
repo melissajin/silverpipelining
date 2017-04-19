@@ -5,7 +5,7 @@ module l1_cache_control
     input clk,
 
     /* Datapath controls */
-    input lru_in, d_in0, d_in1, hit0, hit1,
+    input lru_in, d_in0, d_in1, v_in0, v_in1, hit0, hit1,
     output logic load_lru, lru_set, l2wdata_sel,
     output logic load_d0, load_v0, load_TD0, d_set0, v_set0,
     output logic load_d1, load_v1, load_TD1, d_set1, v_set1,
@@ -21,12 +21,13 @@ module l1_cache_control
     input lc3b_cacheline l2_wdata_inter,
     output logic l2_read, l2_write,
     output lc3b_word l2_address,
-    output lc3b_cacheline l2_wdata
+    output lc3b_cacheline l2_wdata,
+    output logic eviction
 );
 
 /* List of states */
 enum int unsigned {
-    process_request, fetch_cline, write_back
+    process_request, fetch_cline, write_back, evict_cline
 } state, next_state;
 
 always_comb
@@ -40,7 +41,7 @@ begin : state_actions
     d_set1 = 0; v_set1 = 0;
     l2addr_sel = 2'b00;
     mem_resp = 0; l2_read = 0; l2_write = 0;
-
+    eviction = 0;
 
     case (state)
         process_request: begin
@@ -67,6 +68,14 @@ begin : state_actions
  	             l2wdata_sel = 1;
             end
         end
+        evict_cline: begin
+            eviction = 1;
+            l2wdata_sel = lru_in;
+            if(lru_in == 0)
+                l2addr_sel = 2'b01;
+            else
+                l2addr_sel = 2'b10;
+        end
         fetch_cline: begin
             l2_read = 1;
             if(lru_in == 0) begin
@@ -84,6 +93,7 @@ begin : state_actions
             end
         end
         write_back: begin
+            eviction = 1;
             l2_write = 1;
             l2wdata_sel = lru_in;
             if(lru_in == 0)
@@ -106,9 +116,14 @@ begin : next_state_logic
             if(~(hit1 | hit0) & (mem_read ^ mem_write)) begin
                 if((d_in0 == 1 && lru_in == 0) || (d_in1 == 1 && lru_in == 1))
                     next_state = write_back;
+                else if((v_in0 == 1 && lru_in == 0) || (v_in1 == 1 && lru_in == 1))
+                    next_state = evict_cline;
                 else
                     next_state = fetch_cline;
             end
+        end
+        evict_cline: begin
+            next_state = fetch_cline;
         end
         fetch_cline: begin
             if(l2_resp == 1)
