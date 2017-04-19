@@ -76,10 +76,13 @@ always_comb begin
             load_pc = 1'b0;
     end
 
+    flush = 1'b0;
     case (op_WB)
         op_br: begin
-            if(br_enable)
+            if(br_enable) begin
                 load_pc = 1'b1;
+                flush = 1'b1;
+              end
         end
         op_jmp: load_pc = 1'b1;
         op_jsr: load_pc = 1'b1;
@@ -95,7 +98,6 @@ end
 always_comb begin
     i_mem_read = 1'b1;
     control_instruc_ident_wb = 1'b0;
-    flush = 1'b0;
 
     case (op_ID)
         // op_br: begin
@@ -134,7 +136,6 @@ always_comb begin
         op_br: begin
             if(nzp_WB != 3'b000) begin
                 i_mem_read = 1'b0;
-                flush = 1'b1;
                 control_instruc_ident_wb = 1'b1;
             end
         end
