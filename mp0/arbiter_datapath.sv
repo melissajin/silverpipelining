@@ -68,12 +68,11 @@ mux2 #(.width(1)) writemux
 	.f(l2_write_out)
 );
 
-always_comb
-	begin
-		d_cache_resp_out = cache_arbiter_sel & l2_resp_in; // Output memory response signals
-		i_cache_resp_out = ~cache_arbiter_sel & l2_resp_in;
-		d_cache_rdata_out = l2_rdata_in;
-		i_cache_rdata_out = l2_rdata_in;
-	end
+always_comb begin
+	d_cache_resp_out = cache_arbiter_sel & l2_resp_in; // Output memory response signals
+	i_cache_resp_out = ~cache_arbiter_sel & l2_resp_in;
+	d_cache_rdata_out = l2_rdata_in;
+	i_cache_rdata_out = l2_rdata_in;
+end
 
  endmodule : arbiter_datapath

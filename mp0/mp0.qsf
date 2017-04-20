@@ -55,7 +55,7 @@ set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "SYSTEMVERILOG HDL" -section_
 
 set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
 set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
-set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH physical_memory_tb -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH mp0_tb -section_id eda_simulation
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name EDA_TEST_BENCH_NAME eviction_buffer_tb -section_id eda_simulation
@@ -114,14 +114,14 @@ set_global_assignment -name SYSTEMVERILOG_FILE cccomp.sv
 set_global_assignment -name SYSTEMVERILOG_FILE alu.sv
 set_global_assignment -name SYSTEMVERILOG_FILE adj.sv
 set_global_assignment -name SYSTEMVERILOG_FILE adder.sv
-set_global_assignment -name EDA_TEST_BENCH_FILE eviction_buffer_tb.sv -section_id eviction_buffer_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id eviction_buffer_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE mp0_tb.sv -section_id mp0_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id mp0_tb
 set_global_assignment -name EDA_TEST_BENCH_NAME physical_memory_tb -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id physical_memory_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "2000 ns" -section_id physical_memory_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME physical_memory_tb -section_id physical_memory_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE eviction_buffer_tb.sv -section_id eviction_buffer_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id eviction_buffer_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE mp0_tb.sv -section_id mp0_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id mp0_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory_tb.sv -section_id physical_memory_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id physical_memory_tb
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
