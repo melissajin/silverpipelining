@@ -69,6 +69,19 @@ set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME mp0_tb -section_id mp0_tb
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name EDA_TEST_BENCH_NAME physical_memory_tb -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id physical_memory_tb
+set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "2000 ns" -section_id physical_memory_tb
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME physical_memory_tb -section_id physical_memory_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE eviction_buffer_tb.sv -section_id eviction_buffer_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id eviction_buffer_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE mp0_tb.sv -section_id mp0_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id mp0_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory_tb.sv -section_id physical_memory_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id physical_memory_tb
+set_global_assignment -name SYSTEMVERILOG_FILE hardware_prefetcher_datapath.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hardware_prefetcher_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hardware_prefetcher.sv
 set_global_assignment -name SYSTEMVERILOG_FILE victim_cache_datapath.sv
 set_global_assignment -name SYSTEMVERILOG_FILE victim_cache_controller.sv
 set_global_assignment -name SYSTEMVERILOG_FILE victim_cache.sv
@@ -114,14 +127,4 @@ set_global_assignment -name SYSTEMVERILOG_FILE cccomp.sv
 set_global_assignment -name SYSTEMVERILOG_FILE alu.sv
 set_global_assignment -name SYSTEMVERILOG_FILE adj.sv
 set_global_assignment -name SYSTEMVERILOG_FILE adder.sv
-set_global_assignment -name EDA_TEST_BENCH_NAME physical_memory_tb -section_id eda_simulation
-set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id physical_memory_tb
-set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "2000 ns" -section_id physical_memory_tb
-set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME physical_memory_tb -section_id physical_memory_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE eviction_buffer_tb.sv -section_id eviction_buffer_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id eviction_buffer_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE mp0_tb.sv -section_id mp0_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id mp0_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory_tb.sv -section_id physical_memory_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id physical_memory_tb
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

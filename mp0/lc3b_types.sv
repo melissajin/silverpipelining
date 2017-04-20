@@ -154,10 +154,4 @@ typedef struct packed {
     lc3b_cacheline data;
 } lc3b_eviction_array_entry;
 
-typedef struct packed {
-    logic valid;
-    lc3b_word addr;
-    lc3b_cacheline i_cline;
-} lc3b_prefetch_entry;
-
 endpackage : lc3b_types

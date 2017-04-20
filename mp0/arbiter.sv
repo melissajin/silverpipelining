@@ -9,69 +9,69 @@ module arbiter
     input clk,
 
     // Inputs from split L1 cache
-    input lc3b_word i_cache_address_in, d_cache_address_in,
-    input lc3b_cacheline i_cache_wdata_in, d_cache_wdata_in,
-    input i_cache_read_in, d_cache_read_in,
-    input i_cache_write_in, d_cache_write_in,
+    input lc3b_word priority2_address_in, priority1_address_in,
+    input lc3b_cacheline priority2_wdata_in, priority1_wdata_in,
+    input priority2_read_in, priority1_read_in,
+    input priority2_write_in, priority1_write_in,
 
     // Outputs to the split L1 cache
-    output d_cache_resp_out, i_cache_resp_out,
-    output lc3b_cacheline d_cache_rdata_out, i_cache_rdata_out,
+    output priority1_resp_out, priority2_resp_out,
+    output lc3b_cacheline priority1_rdata_out, priority2_rdata_out,
 
     // Inputs from the L2 cache
-    input lc3b_cacheline l2_rdata_in,
-    input l2_resp_in,
+    input lc3b_cacheline s_rdata_in,
+    input s_resp_in,
 
     // Outputs to the L2 cache
-    output lc3b_word l2_address_out,
-    output lc3b_cacheline l2_wdata_out,
-    output l2_read_out, l2_write_out
+    output lc3b_word s_address_out,
+    output lc3b_cacheline s_wdata_out,
+    output s_read_out, s_write_out
 );
 
 // Internal signal, to be passed between datapath and control
 logic cache_arbiter_sel, access;
-lc3b_cacheline i_cache_wdata_in_sync, d_cache_wdata_in_sync;
-logic i_cache_read_in_sync, d_cache_read_in_sync;
-logic i_cache_write_in_sync, d_cache_write_in_sync;
-lc3b_word i_cache_address_in_sync, d_cache_address_in_sync;
+lc3b_cacheline priority2_wdata_in_sync, priority1_wdata_in_sync;
+logic priority2_read_in_sync, priority1_read_in_sync;
+logic priority2_write_in_sync, priority1_write_in_sync;
+lc3b_word priority2_address_in_sync, priority1_address_in_sync;
 
 
  // Datapath inst
-arbiter_datapath gavel
+arbiter_datapath datapath
 (
-    .i_cache_address_in(i_cache_address_in_sync), .d_cache_address_in(d_cache_address_in_sync),
-    .i_cache_wdata_in(i_cache_wdata_in_sync), .d_cache_wdata_in(d_cache_wdata_in_sync),
-    .i_cache_read_in(i_cache_read_in_sync), .d_cache_read_in(d_cache_read_in_sync),
-    .i_cache_write_in(i_cache_write_in_sync), .d_cache_write_in(d_cache_write_in_sync),
-    .l2_rdata_in(l2_rdata_in), .l2_resp_in(l2_resp_in),
+    .priority2_address_in(priority2_address_in_sync), .priority1_address_in(priority1_address_in_sync),
+    .priority2_wdata_in(priority2_wdata_in_sync), .priority1_wdata_in(priority1_wdata_in_sync),
+    .priority2_read_in(priority2_read_in_sync), .priority1_read_in(priority1_read_in_sync),
+    .priority2_write_in(priority2_write_in_sync), .priority1_write_in(priority1_write_in_sync),
+    .s_rdata_in(s_rdata_in), .s_resp_in(s_resp_in),
     .cache_arbiter_sel,
-    .l2_address_out(l2_address_out), .l2_wdata_out(l2_wdata_out),
-    .l2_read_out(l2_read_out), .l2_write_out(l2_write_out),
-    .i_cache_resp_out, .d_cache_resp_out,
-    .i_cache_rdata_out, .d_cache_rdata_out
+    .s_address_out(s_address_out), .s_wdata_out(s_wdata_out),
+    .s_read_out(s_read_out), .s_write_out(s_write_out),
+    .priority2_resp_out, .priority1_resp_out,
+    .priority2_rdata_out, .priority1_rdata_out
 );
 
 // Control unit inst
-arbiter_control judge
+arbiter_control control
 (
     .clk,
-    .i_cache_read_in(i_cache_read_in_sync), .d_cache_read_in(d_cache_read_in_sync),
-    .i_cache_write_in(i_cache_write_in_sync), .d_cache_write_in(d_cache_write_in_sync),
-    .l2_resp_in(l2_resp_in),
+    .priority2_read_in(priority2_read_in_sync), .priority1_read_in(priority1_read_in_sync),
+    .priority2_write_in(priority2_write_in_sync), .priority1_write_in(priority1_write_in_sync),
+    .s_resp_in(s_resp_in),
     .cache_arbiter_sel, .access
 );
 
  // Synchronize between L1 and the arbiter
 always_ff @ (posedge clk) begin
-    d_cache_read_in_sync <= d_cache_read_in & access;
-    d_cache_write_in_sync <= d_cache_write_in & access;
-    d_cache_address_in_sync <= d_cache_address_in;
-    d_cache_wdata_in_sync <= d_cache_wdata_in;
+    priority1_read_in_sync <= priority1_read_in & access;
+    priority1_write_in_sync <= priority1_write_in & access;
+    priority1_address_in_sync <= priority1_address_in;
+    priority1_wdata_in_sync <= priority1_wdata_in;
 
-    i_cache_read_in_sync <= i_cache_read_in & access;
-    i_cache_write_in_sync <= i_cache_write_in & access;
-    i_cache_wdata_in_sync <= i_cache_wdata_in;
-    i_cache_address_in_sync <= i_cache_address_in;
+    priority2_read_in_sync <= priority2_read_in & access;
+    priority2_write_in_sync <= priority2_write_in & access;
+    priority2_wdata_in_sync <= priority2_wdata_in;
+    priority2_address_in_sync <= priority2_address_in;
 end
 
 endmodule : arbiter
