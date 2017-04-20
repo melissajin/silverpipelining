@@ -48,7 +48,7 @@ lc3b_word i_mem_rdata, i_mem_address, i_mem_wdata;
 logic d_mem_resp, d_mem_read, d_mem_write;
 lc3b_mem_wmask d_mem_byte_enable;
 lc3b_word d_mem_rdata, d_mem_address, d_mem_wdata;
-logic eviction_l1;
+logic eviction_l1_d, eviction_l1_i;
 
 /********  Signals between Lower Eviction Write Buffer and L1 D Cache ********/
 logic buf_mem_read_low, buf_mem_write_low;
@@ -57,7 +57,7 @@ lc3b_cacheline buf_mem_wdata_low;
 logic buf_mem_resp_low;
 lc3b_cacheline buf_mem_rdata_low;
 
-eviction_buffer eviction_buffer_inst_high
+victim_cache victim_cache_l2
 (
     .clk,
 
@@ -69,11 +69,11 @@ eviction_buffer eviction_buffer_inst_high
     .buf_mem_rdata(buf_mem_rdata),
 
     /******* Signals between Eviction Buffer and Physical Memory *******/
-    .super_mem_resp(pmem_resp),
-    .super_mem_rdata(pmem_rdata),
-    .super_mem_read(pmem_read), .super_mem_write(pmem_write),
-    .super_mem_address(pmem_address),
-    .super_mem_wdata(pmem_wdata)
+    .s_mem_resp(pmem_resp),
+    .s_mem_rdata(pmem_rdata),
+    .s_mem_read(pmem_read), .s_mem_write(pmem_write),
+    .s_mem_address(pmem_address),
+    .s_mem_wdata(pmem_wdata)
 );
 
 l2_cache l2_inst
@@ -95,7 +95,8 @@ l2_cache l2_inst
     // outputs
     .pmem_read(buf_mem_read), .pmem_write(buf_mem_write),                                   // control
     .pmem_address(buf_mem_address),                                      // datapath
-    .pmem_wdata(buf_mem_wdata)                                    // datapath
+    .pmem_wdata(buf_mem_wdata),                                    // datapath
+    .eviction(eviction_l2)
 );
 
 // assign pmem_address = L2_address;
@@ -131,7 +132,7 @@ arbiter arbiter_inst
 
 );
 
-eviction_buffer eviction_buffer_inst_low
+victim_cache victim_cache_l1_d
 (
     .clk,
 
@@ -143,11 +144,11 @@ eviction_buffer eviction_buffer_inst_low
     .buf_mem_rdata(rdata_d),
 
     /******* Signals between Eviction Buffer and Arbiter *******/
-    .super_mem_resp(buf_mem_resp_low),
-    .super_mem_rdata(buf_mem_rdata_low),
-    .super_mem_read(buf_mem_read_low), .super_mem_write(buf_mem_write_low),
-    .super_mem_address(buf_mem_address_low),
-    .super_mem_wdata(buf_mem_wdata_low)
+    .s_mem_resp(buf_mem_resp_low),
+    .s_mem_rdata(buf_mem_rdata_low),
+    .s_mem_read(buf_mem_read_low), .s_mem_write(buf_mem_write_low),
+    .s_mem_address(buf_mem_address_low),
+    .s_mem_wdata(buf_mem_wdata_low)
 );
 
 l1_cache d_cache
@@ -164,7 +165,7 @@ l1_cache d_cache
     /******* Signals between Cache and Lower Eviction Write Buffer *******/
     .l2_resp(resp_d), .l2_rdata(rdata_d),                                                     // inputs
     .l2_read(read_d), .l2_write(write_d), .l2_address(address_d), .l2_wdata(wdata_d),          // outputs
-    .eviction(eviction_l1)
+    .eviction(eviction_l1_d)
 );
 
 l1_cache i_cache
@@ -180,8 +181,8 @@ l1_cache i_cache
 
     /******* Signals between Cache and Arbiter *******/
     .l2_resp(resp_i), .l2_rdata(rdata_i),                                                     // inputs
-    .l2_read(read_i), .l2_write(write_i), .l2_address(address_i), .l2_wdata(wdata_i)          // outputs
-
+    .l2_read(read_i), .l2_write(write_i), .l2_address(address_i), .l2_wdata(wdata_i),          // outputs
+    .eviction(eviction_l1_i)
 );
 
 cpu cpu_inst

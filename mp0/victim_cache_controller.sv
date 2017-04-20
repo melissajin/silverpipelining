@@ -1,6 +1,6 @@
 import lc3b_types::*;
 
-module eviction_buffer_controller
+module victim_cache_controller
 (
     input clk,
 
@@ -22,8 +22,8 @@ module eviction_buffer_controller
     output logic buf_mem_resp,
 
     // signals to higher level memory
-    input super_mem_resp,
-    output logic super_mem_read, super_mem_write
+    input s_mem_resp,
+    output logic s_mem_read, s_mem_write
 );
 
 /* List of states */
@@ -40,7 +40,7 @@ always_comb
 begin : state_actions
     /* Default output assignments */
     index_sel = 0; smemaddr_sel = 8; read_src_sel = 0; write_sel = 0;
-    buf_mem_resp = 0; super_mem_read = 0; super_mem_write = 0;
+    buf_mem_resp = 0; s_mem_read = 0; s_mem_write = 0;
 	lru_out = lru_in; load_d = 0; load_lru = 0;
 
     valid = data_array[0].valid;
@@ -141,7 +141,7 @@ begin : state_actions
             end
         end
         fetch_cline: begin
-            super_mem_read = 1;
+            s_mem_read = 1;
             smemaddr_sel = 8;
         end
         return_cline: begin
@@ -149,7 +149,7 @@ begin : state_actions
             read_src_sel = 1;
         end
         write_back: begin
-            super_mem_write = 1;
+            s_mem_write = 1;
             if(data_array[0].dirty) begin
                 index_sel = 0;
             end
@@ -176,7 +176,7 @@ begin : state_actions
             end
             smemaddr_sel = {1'b0, index_sel};
             write_sel = 0;
-            if(super_mem_resp) begin
+            if(s_mem_resp) begin
                 load_d = 1;
                 valid = 1;
                 dirty = 0;
@@ -201,11 +201,11 @@ begin : next_state_logic
             end
         end
         fetch_cline: begin
-            if(super_mem_resp == 1)
+            if(s_mem_resp == 1)
                 next_state = return_cline;
         end
         write_back: begin
-            if(super_mem_resp == 1)
+            if(s_mem_resp == 1)
                 next_state = process_request;
         end
         buffer: begin
@@ -392,4 +392,4 @@ always_comb begin
     endcase
 end
 
-endmodule : eviction_buffer_controller
+endmodule : victim_cache_controller

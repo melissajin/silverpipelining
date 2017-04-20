@@ -1,6 +1,6 @@
 import lc3b_types::*;
 
-module eviction_buffer_datapath
+module victim_cache_datapath
 (
     input clk,
 
@@ -23,9 +23,9 @@ module eviction_buffer_datapath
     output lc3b_cacheline buf_mem_rdata,
 
     // signals to higher level memory
-    input lc3b_cacheline super_mem_rdata,
-    output lc3b_word super_mem_address,
-    output lc3b_cacheline super_mem_wdata
+    input lc3b_cacheline s_mem_rdata,
+    output lc3b_word s_mem_address,
+    output lc3b_cacheline s_mem_wdata
 );
 
 /* Internal connections */
@@ -39,7 +39,7 @@ assign d_in.dirty = dirty;
 assign d_in.addr = write_address;
 assign d_in.data = write_data;
 
-assign super_mem_wdata = wayselector_out;
+assign s_mem_wdata = wayselector_out;
 
 mux2 #(128) write_data_mux
 (
@@ -52,7 +52,7 @@ mux2 #(128) write_data_mux
 mux2 #(16) write_addr_mux
 (
     .sel(write_sel),
-    .a(super_mem_address),
+    .a(s_mem_address),
     .b(buf_mem_address),
     .f(write_address)
 );
@@ -107,7 +107,7 @@ mux16 #(16) smemaddr_mux
     .n(16'h0000),
     .o(16'h0000),
     .p(16'h0000),
-    .y(super_mem_address)
+    .y(s_mem_address)
 );
 
 mux2 #(128) read_mux
@@ -122,7 +122,7 @@ register #(128) read_miss_reg
 (
     .clk,
     .load(1'b1),
-    .in(super_mem_rdata),
+    .in(s_mem_rdata),
     .out(read_data)
 );
 
@@ -135,4 +135,4 @@ assign hits[5] = (d_out[5].valid & (buf_mem_address == d_out[5].addr));
 assign hits[6] = (d_out[6].valid & (buf_mem_address == d_out[6].addr));
 assign hits[7] = (d_out[7].valid & (buf_mem_address == d_out[7].addr));
 
-endmodule : eviction_buffer_datapath
+endmodule : victim_cache_datapath

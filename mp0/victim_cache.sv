@@ -1,6 +1,6 @@
 import lc3b_types::*;
 
-module eviction_buffer
+module victim_cache
 (
     input clk,
 
@@ -12,12 +12,12 @@ module eviction_buffer
     output lc3b_cacheline buf_mem_rdata,
 
     // inputs
-    input super_mem_resp,
-    input lc3b_cacheline super_mem_rdata,
+    input s_mem_resp,
+    input lc3b_cacheline s_mem_rdata,
     // outputs
-    output logic super_mem_read, super_mem_write,
-    output lc3b_word super_mem_address,
-    output lc3b_cacheline super_mem_wdata
+    output logic s_mem_read, s_mem_write,
+    output lc3b_word s_mem_address,
+    output lc3b_cacheline s_mem_wdata
 );
 
 
@@ -30,7 +30,7 @@ logic [3:0] smemaddr_sel;
 lc3b_eviction_array_entry d_out [7:0];
 logic hits [7:0];
 
-eviction_buffer_controller controller
+victim_cache_controller controller
 (
     .clk,
 
@@ -42,10 +42,10 @@ eviction_buffer_controller controller
     .buf_mem_read, .buf_mem_write, .buf_mem_resp,
 
     // signals to higher level memory
-    .super_mem_resp, .super_mem_read, .super_mem_write
+    .s_mem_resp, .s_mem_read, .s_mem_write
 );
 
-eviction_buffer_datapath datapath
+victim_cache_datapath datapath
 (
     .clk,
 
@@ -57,8 +57,8 @@ eviction_buffer_datapath datapath
     .buf_mem_address, .buf_mem_wdata, .buf_mem_rdata,
 
     // signals to higher level memory
-    .super_mem_address, .super_mem_wdata, .super_mem_rdata
+    .s_mem_address, .s_mem_wdata, .s_mem_rdata
 );
 
 
-endmodule : eviction_buffer
+endmodule : victim_cache

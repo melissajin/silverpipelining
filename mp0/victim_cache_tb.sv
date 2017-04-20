@@ -1,6 +1,6 @@
 import lc3b_types::*;
 
-module eviction_buffer_tb;
+module victim_cache_tb;
 
 timeunit 1ns;
 timeprecision 1ns;
@@ -11,11 +11,11 @@ lc3b_word buf_mem_address;
 lc3b_cacheline buf_mem_wdata;
 logic buf_mem_resp;
 lc3b_cacheline buf_mem_rdata;
-logic super_mem_resp;
-lc3b_cacheline super_mem_rdata;
-logic super_mem_read, super_mem_write;
-lc3b_word super_mem_address;
-lc3b_cacheline super_mem_wdata;
+logic s_mem_resp;
+lc3b_cacheline s_mem_rdata;
+logic s_mem_read, s_mem_write;
+lc3b_word s_mem_address;
+lc3b_cacheline s_mem_wdata;
 
 /* Clock generator */
 initial clk = 0;
@@ -114,7 +114,7 @@ begin: TEST_SIGNALS
 
 end
 
-eviction_buffer DUT
+victim_cache DUT
 (
 	.*
 );
@@ -122,13 +122,13 @@ eviction_buffer DUT
 physical_memory memory
 (
     .clk,
-    .read(super_mem_read),
-    .write(super_mem_write),
-    .address(super_mem_address),
-    .wdata(super_mem_wdata),
-    .resp(super_mem_resp),
-    .rdata(super_mem_rdata)
+    .read(s_mem_read),
+    .write(s_mem_write),
+    .address(s_mem_address),
+    .wdata(s_mem_wdata),
+    .resp(s_mem_resp),
+    .rdata(s_mem_rdata)
 );
 
 
-endmodule : eviction_buffer_tb
+endmodule : victim_cache_tb
