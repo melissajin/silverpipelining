@@ -1,5 +1,6 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
+add wave -noupdate -radix hexadecimal /mp0_tb/clk
 add wave -noupdate -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/cw.wb.opcode
 add wave -noupdate -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/wb_sig_3.opcode
 add wave -noupdate -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/wb_sig_4.opcode
@@ -215,34 +216,49 @@ add wave -noupdate -group CPU -group {frw_wb_save - LDI/STI} /mp0_tb/dut/cpu_ins
 add wave -noupdate -group CPU -group {frw_wb_save - LDI/STI} /mp0_tb/dut/cpu_inst/datapath/forward_wb_save/in
 add wave -noupdate -group CPU -group {frw_wb_save - LDI/STI} /mp0_tb/dut/cpu_inst/datapath/forward_wb_save/out
 add wave -noupdate -group CPU -group {frw_wb_save - LDI/STI} /mp0_tb/dut/cpu_inst/datapath/forward_wb_save/data
-add wave -noupdate -expand -group Arbiter_L2 -itemcolor Cyan /mp0_tb/dut/arbiter_inst/judge/state
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_resp_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_address_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_read_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_rdata_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_wdata_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_read_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_write_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_address_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_resp_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_address_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_wdata_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_read_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_write_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_rdata_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_wdata_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_read_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_write_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_address_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_rdata_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_resp_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_address_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_wdata_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_read_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_write_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/cache_arbiter_sel
+add wave -noupdate -group Arbiter_L2 -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/judge/state
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_resp_out
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_address_in
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_read_in
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_rdata_out
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_wdata_in_sync
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_read_in_sync
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_write_in_sync
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_address_in_sync
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_resp_out
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_address_in
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_wdata_in
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_read_in
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_write_in
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_rdata_out
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_wdata_in_sync
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_read_in_sync
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_write_in_sync
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_address_in_sync
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_rdata_in
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_resp_in
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_address_out
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_wdata_out
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_read_out
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_write_out
+add wave -noupdate -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/cache_arbiter_sel
+add wave -noupdate -expand -group L2 -radix hexadecimal /mp0_tb/dut/l2_inst/control/state
+add wave -noupdate -expand -group L2 -radix hexadecimal /mp0_tb/dut/l2_inst/datapath/ctl
+add wave -noupdate -expand -group L2 -radix hexadecimal /mp0_tb/dut/l2_inst/datapath/state
+add wave -noupdate -expand -group L2 -expand -group mem_sigs -radix hexadecimal /mp0_tb/dut/l2_inst/mem_read
+add wave -noupdate -expand -group L2 -expand -group mem_sigs -radix hexadecimal /mp0_tb/dut/l2_inst/mem_write
+add wave -noupdate -expand -group L2 -expand -group mem_sigs -radix hexadecimal /mp0_tb/dut/l2_inst/mem_address
+add wave -noupdate -expand -group L2 -expand -group mem_sigs -radix hexadecimal /mp0_tb/dut/l2_inst/mem_wdata
+add wave -noupdate -expand -group L2 -expand -group mem_sigs -radix hexadecimal /mp0_tb/dut/l2_inst/mem_resp
+add wave -noupdate -expand -group L2 -expand -group mem_sigs -radix hexadecimal /mp0_tb/dut/l2_inst/mem_rdata
+add wave -noupdate -expand -group L2 -expand -group mem_sigs -radix hexadecimal /mp0_tb/dut/l2_inst/pmem_resp
+add wave -noupdate -expand -group L2 -expand -group mem_sigs -radix hexadecimal /mp0_tb/dut/l2_inst/pmem_rdata
+add wave -noupdate -expand -group L2 -expand -group mem_sigs -radix hexadecimal /mp0_tb/dut/l2_inst/pmem_read
+add wave -noupdate -expand -group L2 -expand -group mem_sigs -radix hexadecimal /mp0_tb/dut/l2_inst/pmem_write
+add wave -noupdate -expand -group L2 -expand -group mem_sigs -radix hexadecimal /mp0_tb/dut/l2_inst/pmem_address
+add wave -noupdate -expand -group L2 -expand -group mem_sigs -radix hexadecimal /mp0_tb/dut/l2_inst/pmem_wdata
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {2473571 ps} 0}
+WaveRestoreCursors {{Cursor 1} {37582 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 217
 configure wave -valuecolwidth 202
@@ -258,4 +274,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {2469614 ps} {2520046 ps}
+WaveRestoreZoom {0 ps} {163364 ps}
