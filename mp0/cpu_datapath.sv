@@ -506,7 +506,7 @@ mux4 forward_wb_mux
 register #($bits(lc3b_forward_save)) forward_wb_save
 (
     .clk,
-    .load(d_mem_resp^load),
+    .load(1'b1),
     .in(forward_save_in),
     .out(forward_save_out)
 );
@@ -550,7 +550,7 @@ assign forward_MEM_sigs.sourceR_mem = dest_MEM_out;
 assign forward_MEM_sigs.baseR_mem = src1_MEM_out;
 
 // save wb for LDI and STI
-assign forward_save_in.load_regfile_wb = wb_sig_5.load_regfile;
+assign forward_save_in.load_regfile_wb = ((wb_sig_4_inter.opcode == op_ldi || wb_sig_4_inter.opcode == op_sti) && ({wb_sig_4_inter.d_mem_read, wb_sig_4_inter.d_mem_write} != 2'b00))? wb_sig_5.load_regfile : 1'b0;
 assign forward_save_in.forward_val = forward_WB_out;
 assign forward_save_in.dest_wb = dest_WB_out;
 
