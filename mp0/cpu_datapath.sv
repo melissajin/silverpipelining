@@ -31,6 +31,8 @@ logic load, load_mem_wb;
 logic load_pc, load_pcbak;
 logic control_instruc_ident, control_instruc_ident_wb;
 logic flush, flush_mem_op, d_mem_read_loc, d_mem_write_loc;
+logic [3:0] performance_counter_mux_sel;
+logic [8:0] counter_clear_vec;
 
 /**** Stage 1 ****/
 lc3b_word pcmux_out, pc_out, pcbak_out, pcPlus2mux_out;
@@ -460,7 +462,7 @@ mux2 mdr_wb_in_mux
 // current performance counter values
 mux16 performance_counter_mux
 (
-    .sel
+    .sel(performance_counter_mux_sel),
     .a
     .b
     .c
@@ -478,6 +480,23 @@ mux16 performance_counter_mux
     .o
     .p
     .y
+);
+
+// Address decoding for performance counter purposes
+address_decode address_decode_inst
+(
+    .mem_address(d_mem_address_out),
+    .opcode(wb_sig_4.opcode),
+    .mux_sel(performance_counter_mux_sel),
+    .clear_counter_0(counter_clear_vec[0]),
+    .clear_counter_1(counter_clear_vec[1]),
+    .clear_counter_2(counter_clear_vec[2]),
+    .clear_counter_3(counter_clear_vec[3]),
+    .clear_counter_4(counter_clear_vec[4]),
+    .clear_counter_5(counter_clear_vec[5]),
+    .clear_counter_6(counter_clear_vec[6]),
+    .clear_counter_7(counter_clear_vec[7]),
+    .clear_counter_8(counter_clear_vec[8])
 );
 
 /************************* Stage 5 *************************/
