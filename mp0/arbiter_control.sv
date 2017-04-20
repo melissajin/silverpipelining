@@ -17,7 +17,7 @@
 	input l2_resp_in,
 
 	// Output to datapath
-	output logic cache_arbiter_sel
+	output logic cache_arbiter_sel, access
  );
 
  /* List of states */
@@ -31,6 +31,11 @@ begin : state_actions
 	cache_arbiter_sel = 1'b0;
     if(state == d_cache)
         cache_arbiter_sel = 1'b1;
+
+    // Getting rid of buffering of resp signal issue
+    access = 1'b1;
+    if(l2_resp_in)
+        access = 1'b0;
 end
 
 always_comb

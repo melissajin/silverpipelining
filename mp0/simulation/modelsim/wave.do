@@ -5,7 +5,7 @@ add wave -noupdate -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/w
 add wave -noupdate -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/wb_sig_4.opcode
 add wave -noupdate -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/wb_sig_5.opcode
 add wave -noupdate -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/cccomp_inst/br_enable
-add wave -noupdate -group CPU -radix hexadecimal -childformat {{{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[7]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[6]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[5]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[4]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[3]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[2]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[1]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[0]} -radix hexadecimal}} -subitemconfig {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[7]} {-height 14 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[6]} {-height 14 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[5]} {-height 14 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[4]} {-height 14 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[3]} {-height 14 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[2]} {-height 14 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[1]} {-height 14 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[0]} {-height 14 -radix hexadecimal}} /mp0_tb/dut/cpu_inst/datapath/regfile_inst/data
+add wave -noupdate -group CPU -radix hexadecimal -childformat {{{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[7]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[6]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[5]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[4]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[3]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[2]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[1]} -radix hexadecimal} {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[0]} -radix hexadecimal}} -expand -subitemconfig {{/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[7]} {-height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[6]} {-height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[5]} {-height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[4]} {-height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[3]} {-height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[2]} {-height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[1]} {-height 15 -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/regfile_inst/data[0]} {-height 15 -radix hexadecimal}} /mp0_tb/dut/cpu_inst/datapath/regfile_inst/data
 add wave -noupdate -group CPU -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/br_enable
 add wave -noupdate -group CPU -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/i_mem_resp
 add wave -noupdate -group CPU -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/d_mem_resp
@@ -215,39 +215,39 @@ add wave -noupdate -group CPU -group {frw_wb_save - LDI/STI} /mp0_tb/dut/cpu_ins
 add wave -noupdate -group CPU -group {frw_wb_save - LDI/STI} /mp0_tb/dut/cpu_inst/datapath/forward_wb_save/in
 add wave -noupdate -group CPU -group {frw_wb_save - LDI/STI} /mp0_tb/dut/cpu_inst/datapath/forward_wb_save/out
 add wave -noupdate -group CPU -group {frw_wb_save - LDI/STI} /mp0_tb/dut/cpu_inst/datapath/forward_wb_save/data
-add wave -noupdate -expand -group Arbiter_L2 /mp0_tb/dut/arbiter_inst/judge/state
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_address_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_read_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_rdata_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_resp_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_address_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_wdata_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_read_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_write_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_resp_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_rdata_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_rdata_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_resp_in
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_address_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_wdata_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_read_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_write_out
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/cache_arbiter_sel
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_wdata_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_read_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_write_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_address_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_wdata_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_read_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_write_in_sync
-add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_address_in_sync
+add wave -noupdate -expand -group Arbiter_L2 -itemcolor Cyan /mp0_tb/dut/arbiter_inst/judge/state
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_resp_out
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_address_in
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_read_in
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_rdata_out
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_wdata_in_sync
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_read_in_sync
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_write_in_sync
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/i_cache_address_in_sync
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_resp_out
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_address_in
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_wdata_in
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_read_in
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_write_in
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_rdata_out
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_wdata_in_sync
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_read_in_sync
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_write_in_sync
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/d_cache_address_in_sync
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_rdata_in
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_resp_in
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_address_out
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_wdata_out
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_read_out
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/l2_write_out
+add wave -noupdate -expand -group Arbiter_L2 -expand -group datapath -itemcolor Cyan -radix hexadecimal /mp0_tb/dut/arbiter_inst/cache_arbiter_sel
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {576416510 ps} 0}
+WaveRestoreCursors {{Cursor 1} {2473571 ps} 0}
 quietly wave cursor active 1
-configure wave -namecolwidth 436
+configure wave -namecolwidth 217
 configure wave -valuecolwidth 202
 configure wave -justifyvalue left
-configure wave -signalnamewidth 0
+configure wave -signalnamewidth 1
 configure wave -snapdistance 10
 configure wave -datasetprefix 0
 configure wave -rowmargin 4
@@ -258,4 +258,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ps} {1155 us}
+WaveRestoreZoom {2469614 ps} {2520046 ps}
