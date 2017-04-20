@@ -23,7 +23,13 @@ module cpu_datapath
     output lc3b_word d_mem_address,
     output lc3b_word d_mem_wdata,
     output logic d_mem_read, d_mem_write,
-    output lc3b_mem_wmask d_mem_byte_enable
+    output lc3b_mem_wmask d_mem_byte_enable,
+
+    /* Performance counter signals */
+    input lc3b_word l2hits_out, l2misses_out, dl1hits_out,
+    input lc3b_word dl1misses_out, il1hits_out, il1misses_out,
+    input lc3b_word bpredicts_out, bmispredicts_out, stalls_out,
+    output logic [8:0] counter_clear_vec
 );
 
 /********** Internal Signals **********/
@@ -33,6 +39,7 @@ logic control_instruc_ident, control_instruc_ident_wb;
 logic flush, flush_mem_op, d_mem_read_loc, d_mem_write_loc;
 logic [3:0] performance_counter_mux_sel;
 logic [8:0] counter_clear_vec;
+lc3b_word performance_counter_mux_out;
 
 /**** Stage 1 ****/
 lc3b_word pcmux_out, pc_out, pcbak_out, pcPlus2mux_out;
@@ -411,7 +418,7 @@ mux4 forward_mem_mux
     .a(alu_MEM_out),
     .b(pc_MEM_out),
     .c(pc_plus_off_MEM),
-    .d(mdr_WB_in_mux_out),
+    .d(performance_counter_mux_out),
     .f(forward_MEM_out)
 );
 
@@ -463,23 +470,23 @@ mux2 mdr_wb_in_mux
 mux16 performance_counter_mux
 (
     .sel(performance_counter_mux_sel),
-    .a
-    .b
-    .c
-    .d
-    .e
-    .f
-    .g
-    .h
-    .i
-    .j
-    .k
-    .l
-    .m
-    .n
-    .o
-    .p
-    .y
+    .a(mdr_WB_in_mux_out),
+    .b(l2hits_out),
+    .c(l2misses_out),
+    .d(dl1hits_out),
+    .e(dl1misses_out),
+    .f(il1hits_out),
+    .g(il1misses_out),
+    .h(bpredicts_out),
+    .i(bmispredicts_out),
+    .j(stalls_out),
+    .k(16'h0),
+    .l(16'h0),
+    .m(16'h0),
+    .n(16'h0),
+    .o(16'h0),
+    .p(16'h0),
+    .y(performance_counter_mux_out)
 );
 
 // Address decoding for performance counter purposes
@@ -515,7 +522,7 @@ mem_wb MEM_WB
     .dest_WB_in(dest_MEM_out),
     .pc_WB_in(pc_MEM_out), .alu_WB_in(alu_MEM_out),
     .pcp_off_WB_in(pc_plus_off_MEM),
-    .mdr_WB_in(mdr_WB_in_mux_out), .mar_WB_in(d_mem_address_out),
+    .mdr_WB_in(performance_counter_mux_out), .mar_WB_in(d_mem_address_out),
     .wdata_forward_in(d_mem_wdata),
 
     /* data outputs */

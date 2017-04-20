@@ -17,7 +17,13 @@ module cpu
     output logic d_mem_write,
     output lc3b_mem_wmask d_mem_byte_enable,
     output lc3b_word d_mem_address,
-    output lc3b_word d_mem_wdata
+    output lc3b_word d_mem_wdata,
+
+    /* Performance counter signals */
+    input lc3b_word l2hits_out, l2misses_out, dl1hits_out,
+    input lc3b_word dl1misses_out, il1hits_out, il1misses_out,
+    input lc3b_word bpredicts_out, bmispredicts_out, stalls_out,
+    output logic [8:0] counter_clear_vec
 );
 
 /* Internal connections */
@@ -42,7 +48,12 @@ cpu_datapath datapath
 
     /* Data Memory signals */
     .d_mem_resp, .d_mem_rdata, .d_mem_address, .d_mem_wdata,
-    .d_mem_read, .d_mem_write, .d_mem_byte_enable
+    .d_mem_read, .d_mem_write, .d_mem_byte_enable,
+
+    /* Peformance counter signals */
+    .l2hits_out, .l2misses_out, .dl1hits_out, .dl1misses_out, .il1hits_out,
+    .il1misses_out, .bpredicts_out, .bmispredicts_out, .stalls_out,
+    .counter_clear_vec
 );
 
 
