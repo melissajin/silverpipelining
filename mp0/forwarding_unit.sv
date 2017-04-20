@@ -25,7 +25,7 @@ begin
     // LDI and STI hazard
     if(indirectmux_sel & forward_save.load_regfile_wb && (forward_save.dest_wb == forward_EX.src1_ex))
 		forward_a_EX_sel = 2'b11;
-	if(forward_save.load_regfile_wb && (forward_save.dest_wb == forward_EX.src2_ex))
+	if(indirectmux_sel & forward_save.load_regfile_wb && (forward_save.dest_wb == forward_EX.src2_ex))
 		forward_b_EX_sel = 2'b11;
 
 	// WB hazard
@@ -57,7 +57,6 @@ begin
 
     if(forward_MEM.load_regfile_wb && (forward_MEM.dest_wb == forward_MEM.baseR_mem))
 		forward_MEM_addr_sel = 1'b1;
-
 end
 
 endmodule : forwarding_unit
