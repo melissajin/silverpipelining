@@ -23,7 +23,7 @@ begin
 	forward_b_EX_sel = 2'b00;
 
     // LDI and STI hazard
-    if(forward_save.load_regfile_wb && (forward_save.dest_wb == forward_EX.src1_ex))
+    if(indirectmux_sel & forward_save.load_regfile_wb && (forward_save.dest_wb == forward_EX.src1_ex))
 		forward_a_EX_sel = 2'b11;
 	if(forward_save.load_regfile_wb && (forward_save.dest_wb == forward_EX.src2_ex))
 		forward_b_EX_sel = 2'b11;
@@ -48,19 +48,16 @@ begin
     mdr_WB_in_mux_sel = 1'b0;
 
     // LDI/STI hazard
-    if(forward_save.dest_wb == forward_MEM.sourceR_mem)
+    if(indirectmux_sel & forward_save.load_regfile_wb && forward_save.dest_wb == forward_MEM.sourceR_mem)
 		forward_MEM_data_sel = 2'b10;
 
 	// WB hazard
-	if((~indirectmux_sel) && forward_MEM.dest_wb == forward_MEM.sourceR_mem)
+	if(forward_MEM.load_regfile_wb && (~indirectmux_sel) && forward_MEM.dest_wb == forward_MEM.sourceR_mem)
 		forward_MEM_data_sel = 2'b01;
 
     if(forward_MEM.load_regfile_wb && (forward_MEM.dest_wb == forward_MEM.baseR_mem))
 		forward_MEM_addr_sel = 1'b1;
 
-    // STR/LDR hazard
-    if(address_MEM == address_WB && d_mem_write_WB)
-        mdr_WB_in_mux_sel = 1'b1;
 end
 
 endmodule : forwarding_unit

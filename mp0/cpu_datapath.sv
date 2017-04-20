@@ -506,7 +506,7 @@ mux4 forward_wb_mux
 register #($bits(lc3b_forward_save)) forward_wb_save
 (
     .clk,
-    .load(load_mem_wb^load),
+    .load(d_mem_resp^load),
     .in(forward_save_in),
     .out(forward_save_out)
 );
@@ -532,7 +532,7 @@ assign wb_sig_4_inter.opcode = wb_sig_4.opcode;
 assign wb_sig_4_inter.destmux_sel = wb_sig_4.destmux_sel;
 assign wb_sig_4_inter.regfilemux_sel = wb_sig_4.regfilemux_sel;
 assign wb_sig_4_inter.load_cc = wb_sig_4.load_cc;
-assign wb_sig_4_inter.load_regfile = wb_sig_4.load_regfile;
+assign wb_sig_4_inter.load_regfile = ((wb_sig_4_inter.opcode == op_ldi) && {wb_sig_4_inter.d_mem_read, wb_sig_4_inter.d_mem_write} != 2'b00) ? 1'b0 : wb_sig_4.load_regfile;
 assign wb_sig_4_inter.forward_WB_sel = wb_sig_4.forward_WB_sel;
 
 // forwarding signals assignment MEM/WB -> EX

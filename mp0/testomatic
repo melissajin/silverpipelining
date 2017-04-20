@@ -10,7 +10,7 @@ MP=mp0
 #MP directory
 MP_DIR=$HOME/ece411/mp3/$MP
 #Location of LC3bAssembler; Should usually be in bin
-ASSEMBLER=$HOME/ece411/bin/LC3bAssembler
+ASSEMBLER=$HOME/ece411/mp3/bin/LC3bAssembler
 #Addressability of physical memory; from load_memory.sh
 ADDRESSABILITY=16
 
