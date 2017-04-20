@@ -109,6 +109,7 @@ typedef struct packed {
 
 typedef struct packed {
     logic d_out;
+    logic v_out;
     logic hit;
 } lc3b_cWay_state;
 

@@ -22,22 +22,29 @@ module l2_cache_control
     input lc3b_cacheline pmem_wdata_inter,
     output logic pmem_read, pmem_write,
     output lc3b_word pmem_address,
-    output lc3b_cacheline pmem_wdata
+    output lc3b_cacheline pmem_wdata,
+    output logic eviction
 );
 
 /* List of states */
 enum int unsigned {
-    process_request, fetch_cline, write_back, buffer, buffer_2
+    process_request, fetch_cline, write_back, buffer, buffer_2, evict_cline
 } state, next_state;
 
 logic [2:0] lru_sel;
-logic hit, dirty_lru;
+logic hit, dirty_lru, valid_lru;
 assign hit = way_state.way0.hit | way_state.way1.hit | way_state.way2.hit | way_state.way3.hit
             | way_state.way4.hit | way_state.way5.hit | way_state.way6.hit | way_state.way7.hit;
 assign dirty_lru = (way_state.way0.d_out == 1 && lru_sel == 0) || (way_state.way1.d_out == 1 && lru_sel == 1) ||
                    (way_state.way2.d_out == 1 && lru_sel == 2) || (way_state.way3.d_out == 1 && lru_sel == 3) ||
                    (way_state.way4.d_out == 1 && lru_sel == 4) || (way_state.way5.d_out == 1 && lru_sel == 5) ||
                    (way_state.way6.d_out == 1 && lru_sel == 6) || (way_state.way7.d_out == 1 && lru_sel == 7);
+
+assign valid_lru = (way_state.way0.v_out == 1 && lru_sel == 0) || (way_state.way1.v_out == 1 && lru_sel == 1) ||
+                   (way_state.way2.v_out == 1 && lru_sel == 2) || (way_state.way3.v_out == 1 && lru_sel == 3) ||
+                   (way_state.way4.v_out == 1 && lru_sel == 4) || (way_state.way5.v_out == 1 && lru_sel == 5) ||
+                   (way_state.way6.v_out == 1 && lru_sel == 6) || (way_state.way7.v_out == 1 && lru_sel == 7);
+
 always_comb
 begin : state_actions
     /* Default output assignments */
@@ -46,6 +53,7 @@ begin : state_actions
     pmemaddr_sel = 4'h0;
     mem_resp = 0; pmem_read = 0; pmem_write = 0;
 	lru_out = lru_in;
+    eviction = 0;
 
     case (state)
         process_request: begin
@@ -137,6 +145,18 @@ begin : state_actions
                 mem_resp = 1;
                 pmemwdata_sel = 7;
             end
+
+            // setup for write_back and evict_cline
+            if(next_state == write_back || next_state == evict_cline) begin
+                pmemwdata_sel = lru_sel;
+                pmemaddr_sel = {1'b0, lru_sel}+4'b0001;
+            end
+        end
+        evict_cline: begin
+            eviction = 1;
+
+            // setup for feth_cline ... not conditional since victim cache will respond in 1 clk cycle
+            pmemaddr_sel = 4'b0000;
         end
         fetch_cline: begin
             pmem_read = 1;
@@ -208,9 +228,14 @@ begin : state_actions
             endcase
         end
         write_back: begin
+            eviction = 1;
             pmem_write = 1;
             pmemwdata_sel = lru_sel;
             pmemaddr_sel = {1'b0, lru_sel}+4'b0001;
+
+            // setup for feth_cline
+            if(pmem_resp == 1'b1)
+                pmemaddr_sel = 4'b0000;
         end
         default:;
     endcase
@@ -227,11 +252,16 @@ begin : next_state_logic
             if(~(hit) & (mem_read ^ mem_write)) begin
                 if(dirty_lru)
                     next_state = write_back;
+                else if(valid_lru)
+                    next_state = evict_cline;
                 else
                     next_state = fetch_cline;
             end else if(mem_read ^ mem_write) begin
                 next_state = buffer;
             end
+        end
+        evict_cline: begin
+            next_state = fetch_cline;
         end
         fetch_cline: begin
             if(pmem_resp == 1)

@@ -14,7 +14,7 @@ module l2_cache_datapath
 
     /* Arbiter signals */
     input lc3b_word mem_address,
-	 input lc3b_cacheline l2_wdata,
+	input lc3b_cacheline l2_wdata,
     output lc3b_cacheline l2_mem_rdata,
 
     /* Physical Memory signals */
@@ -192,6 +192,15 @@ assign state.way4.hit = (v_out4 & (mem_address[15:7] == tag4));
 assign state.way5.hit = (v_out5 & (mem_address[15:7] == tag5));
 assign state.way6.hit = (v_out6 & (mem_address[15:7] == tag6));
 assign state.way7.hit = (v_out7 & (mem_address[15:7] == tag7));
+
+assign state.way0.v_out = v_out0;
+assign state.way1.v_out = v_out1;
+assign state.way2.v_out = v_out2;
+assign state.way3.v_out = v_out3;
+assign state.way4.v_out = v_out4;
+assign state.way5.v_out = v_out5;
+assign state.way6.v_out = v_out6;
+assign state.way7.v_out = v_out7;
 
 assign pmem_wdata_inter = wayselector_out;
 assign l2_mem_rdata = wayselector_out;

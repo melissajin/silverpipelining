@@ -25,6 +25,10 @@ module l1_cache_control
     output logic eviction
 );
 
+logic hit_any;
+
+assign hit_any = (hit1 | hit0);
+
 /* List of states */
 enum int unsigned {
     process_request, fetch_cline, write_back, evict_cline
@@ -49,12 +53,12 @@ begin : state_actions
                 if(mem_write) begin
                     d_set0 = 1;
                     load_d0 = 1;
-	                 load_TD0 = 1;
+	                load_TD0 = 1;
                 end
                 lru_set = 1;
                 load_lru = 1;
                 mem_resp = 1;
-	             l2wdata_sel = 0;
+	            l2wdata_sel = 0;
             end
             if(hit1 & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -65,16 +69,23 @@ begin : state_actions
                 lru_set = 0;
                 load_lru = 1;
                 mem_resp = 1;
- 	             l2wdata_sel = 1;
+ 	            l2wdata_sel = 1;
+            end
+
+            // setup for write_back and evict_cline
+            if(next_state == write_back || next_state == evict_cline) begin
+                l2wdata_sel = lru_in;
+                if(lru_in == 0)
+                    l2addr_sel = 2'b01;
+                else
+                    l2addr_sel = 2'b10;
             end
         end
         evict_cline: begin
             eviction = 1;
-            l2wdata_sel = lru_in;
-            if(lru_in == 0)
-                l2addr_sel = 2'b01;
-            else
-                l2addr_sel = 2'b10;
+
+            // setup for feth_cline ... not conditional since victim cache will respond in 1 clk cycle
+            l2addr_sel = 2'b00;
         end
         fetch_cline: begin
             l2_read = 1;
@@ -100,6 +111,10 @@ begin : state_actions
                 l2addr_sel = 2'b01;
             else
                 l2addr_sel = 2'b10;
+
+            // setup for feth_cline
+            if(l2_resp == 1'b1)
+                l2addr_sel = 2'b00;
         end
         default:;
     endcase
@@ -113,7 +128,7 @@ begin : next_state_logic
 
     case (state)
         process_request: begin
-            if(~(hit1 | hit0) & (mem_read ^ mem_write)) begin
+            if(~(hit_any) & (mem_read ^ mem_write)) begin
                 if((d_in0 == 1 && lru_in == 0) || (d_in1 == 1 && lru_in == 1))
                     next_state = write_back;
                 else if((v_in0 == 1 && lru_in == 0) || (v_in1 == 1 && lru_in == 1))
