@@ -4,13 +4,14 @@
  * (counts number of correct and number of incorrect predictions).
  *
  * Implementation: Essentially a glorified register, driven by cache controller, hazard detection unit, etc.
- * Note: it can only count up to 2^32 things (may increase if necessary)
+ * Note: it can only count up to 2^16 things (may increase if necessary)
  */
 
-module performance_counter #(parameter width = 32)
+module performance_counter #(parameter width = 16)
 (
     input clk,
     input increment,
+    input clear,
     output logic [width-1:0] output_count
 );
 
@@ -34,7 +35,11 @@ always_ff @(posedge clk)
 /* Combinational logic for output and next_count */
 always_comb
   begin
-    if(increment == 1)
+    if(clear == 1)
+      begin
+        next_count = 0;
+      end
+    else if(increment == 1)
       begin
         next_count = count + 1;
       end

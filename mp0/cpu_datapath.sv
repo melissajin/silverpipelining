@@ -456,6 +456,30 @@ mux2 mdr_wb_in_mux
     .f(mdr_WB_in_mux_out)
 );
 
+// Choose between the mdr_WB_in_mux_out and the
+// current performance counter values
+mux16 performance_counter_mux
+(
+    .sel
+    .a
+    .b
+    .c
+    .d
+    .e
+    .f
+    .g
+    .h
+    .i
+    .j
+    .k
+    .l
+    .m
+    .n
+    .o
+    .p
+    .y
+);
+
 /************************* Stage 5 *************************/
 /***** MEM_WB Pipeline Register *****/
 mem_wb MEM_WB
