@@ -28,7 +28,7 @@ module l2_cache_control
 
 /* List of states */
 enum int unsigned {
-    process_request, fetch_cline, write_back, buffer, buffer_2, evict_cline
+    process_request, fetch_cline, write_back, evict_cline
 } state, next_state;
 
 logic [2:0] lru_sel;
@@ -256,8 +256,6 @@ begin : next_state_logic
                     next_state = evict_cline;
                 else
                     next_state = fetch_cline;
-            end else if(mem_read ^ mem_write) begin
-                next_state = buffer;
             end
         end
         evict_cline: begin
@@ -270,9 +268,6 @@ begin : next_state_logic
         write_back: begin
             if(pmem_resp == 1)
                 next_state = fetch_cline;
-        end
-        buffer: begin
-            next_state = process_request;
         end
         default: next_state = process_request;
     endcase
