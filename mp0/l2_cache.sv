@@ -5,22 +5,18 @@ module l2_cache
     input clk,
 
     /******* Signals between Arbiter and L2 Cache *******/
-    // inputs
-    input mem_read, mem_write,                                          // control
+    input mem_read, mem_write,
     input lc3b_word mem_address,
-    input lc3b_cacheline mem_wdata,                             // datapath
-    // outputs
-    output logic mem_resp,                                              // control
-    output lc3b_cacheline mem_rdata,                                         // datapath
+    input lc3b_cacheline mem_wdata,
+    output logic mem_resp,
+    output lc3b_cacheline mem_rdata,
 
     /******* Signals between L2 Cache and Physical Memory *******/
-    // inputs
-    input pmem_resp,                                                    // control
-    input lc3b_cacheline pmem_rdata,                                    // datapath
-    // outputs
-    output logic pmem_read, pmem_write,                                   // control
-    output lc3b_word pmem_address,                                      // datapath
-    output lc3b_cacheline pmem_wdata,                                    // datapath
+    input pmem_resp,
+    input lc3b_cacheline pmem_rdata,
+    output logic pmem_read, pmem_write,
+    output lc3b_word pmem_address,
+    output lc3b_cacheline pmem_wdata,
     output logic eviction
 );
 
@@ -42,19 +38,17 @@ l2_cache_control control
     .clk,
 
     /* Control signals */
-    // inputs
     .lru_in(lru_cur), .way_state(cache_state),
-    // outputs
     .ctl(cache_ctl), .lru_out(lru_set), .pmemwdata_sel, .pmemaddr_sel,
 
 
     /* Arbiter signals */
-    .mem_read(mem_read_sync), .mem_write(mem_write_sync),      // inputs
-    .mem_resp,                  // outputs
+    .mem_read(mem_read_sync), .mem_write(mem_write_sync),
+    .mem_resp,
 
     /* Memory signals */
-    .pmem_resp, .pmem_address_inter, .pmem_wdata_inter,    // inputs
-    .pmem_read, .pmem_write, .pmem_address, .pmem_wdata,    // outputs
+    .pmem_resp, .pmem_address_inter, .pmem_wdata_inter,
+    .pmem_read, .pmem_write, .pmem_address, .pmem_wdata,
     .eviction
 );
 
@@ -69,47 +63,21 @@ l2_cache_datapath datapath
     .lru_out(lru_cur), .state(cache_state),
 
     /* Arbiter signals */
-    .mem_address(mem_address_sync), .l2_wdata(mem_wdata_sync),              // inputs
-    .l2_mem_rdata(mem_rdata),                        // outputs
+    .mem_address(mem_address_sync), .l2_wdata(mem_wdata_sync),
+    .l2_mem_rdata(mem_rdata),
 
     /* Memory signals */
-    .pmem_read, .pmem_rdata,                         // inputs
-    .pmem_address_inter, .pmem_wdata_inter           // outputs
+    .pmem_read, .pmem_rdata,
+    .pmem_address_inter, .pmem_wdata_inter
 
 );
 
 // Synchronization between Arbiter and L2 cache
-register #(.width(1)) mem_read_reg
-(
-    .clk,
-    .load(1'b1),
-    .in(mem_read),
-    .out(mem_read_sync)
-);
-
-register #(.width(1)) mem_write_reg
-(
-    .clk,
-    .load(1'b1),
-    .in(mem_write),
-    .out(mem_write_sync)
-);
-
-register #(.width(16)) mem_address_reg
-(
-    .clk,
-    .load(1'b1),
-    .in(mem_address),
-    .out(mem_address_sync)
-);
-
-register #(.width(128)) mem_wdata_reg
-(
-    .clk,
-    .load(1'b1),
-    .in(mem_wdata),
-    .out(mem_wdata_sync)
-);
-
+// always_ff @ (posedge clk) begin
+    assign mem_read_sync = mem_read;
+    assign mem_write_sync = mem_write;
+    assign mem_address_sync = mem_address;
+    assign mem_wdata_sync = mem_wdata;
+// end
 
 endmodule : l2_cache
