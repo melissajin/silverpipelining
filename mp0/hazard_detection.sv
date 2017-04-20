@@ -92,7 +92,7 @@ always_comb begin
                 flush_mem_op = 1'b1;
                 bmispredicts_inc = 1'b1;
               end
-            else begin
+            else if(nzp_WB != 3'b000) begin
                 bpredicts_inc = 1'b1;
             end
         end

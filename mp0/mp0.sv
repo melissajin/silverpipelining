@@ -70,12 +70,13 @@ logic stalls_inc, stalls_clear;
 lc3b_word stalls_out;
 
 logic [8:0] counter_clear_vec;
+logic stall_pipe;
 
 // Nine performance counters
 performance_counter l2hits
 (
     .clk,
-    .increment(l2hits_inc),
+    .increment(l2hits_inc & ~stall_pipe),
     .clear(l2hits_clear),
     .output_count(l2hits_out)
 );
@@ -107,7 +108,7 @@ performance_counter dl1misses
 performance_counter il1hits
 (
     .clk,
-    .increment(il1hits_inc),
+    .increment(il1hits_inc & ~stall_pipe),
     .clear(il1hits_clear),
     .output_count(il1hits_out)
 );
@@ -261,7 +262,8 @@ cpu cpu_inst
     /* Peformance counter signals */
     .l2hits_out, .l2misses_out, .dl1hits_out, .dl1misses_out, .il1hits_out,
     .il1misses_out, .bpredicts_out, .bmispredicts_out, .stalls_out,
-    .counter_clear_vec, .bpredicts_inc, .bmispredicts_inc, .stalls_inc
+    .counter_clear_vec, .bpredicts_inc, .bmispredicts_inc, .stalls_inc,
+    .stall_pipe
 );
 
 

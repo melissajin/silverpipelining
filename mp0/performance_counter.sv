@@ -29,7 +29,7 @@ initial
 /* Update on rising clock edge */
 always_ff @(posedge clk)
   begin
-      count = next_count;
+      count <= next_count;
   end
 
 /* Combinational logic for output and next_count */

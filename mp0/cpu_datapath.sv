@@ -30,7 +30,8 @@ module cpu_datapath
     input lc3b_word dl1misses_out, il1hits_out, il1misses_out,
     input lc3b_word bpredicts_out, bmispredicts_out, stalls_out,
     output logic [8:0] counter_clear_vec,
-    output logic bpredicts_inc, bmispredicts_inc, stalls_inc
+    output logic bpredicts_inc, bmispredicts_inc, stalls_inc,
+    output logic stall_pipe
 );
 
 /********** Internal Signals **********/
@@ -607,6 +608,8 @@ assign forward_MEM_sigs.baseR_mem = src1_MEM_out;
 assign forward_save_in.load_regfile_wb = wb_sig_5.load_regfile;
 assign forward_save_in.forward_val = forward_WB_out;
 assign forward_save_in.dest_wb = dest_WB_out;
+
+assign stall_pipe = ~load;
 
 /***** pcmux_sel logic *****/
 always_comb begin

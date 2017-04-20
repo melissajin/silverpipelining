@@ -3,15 +3,20 @@ ORIGIN 4x0000
 SEGMENT CodeSegment:
   LEA R0, DataSegment
   LDR R1, R0, LOC1
-  BRnzp CONT
+  BRnzp CONT ; Taken
   STR R1, R0, LOC2
   NOP
   NOP
   NOP
 CONT:
   LDR R1, R0, LOC2
+  BRn DONE ; Not taken
+  NOP
+  NOP
+  NOP
+  NOP
 DONE:
-  BRnzp DONE
+  BRnzp DONE ; Taken
 
 SEGMENT DataSegment:
 LOC1: DATA2 10

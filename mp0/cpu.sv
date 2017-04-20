@@ -24,7 +24,8 @@ module cpu
     input lc3b_word dl1misses_out, il1hits_out, il1misses_out,
     input lc3b_word bpredicts_out, bmispredicts_out, stalls_out,
     output logic [8:0] counter_clear_vec,
-    output logic bpredicts_inc, bmispredicts_inc, stalls_inc
+    output logic bpredicts_inc, bmispredicts_inc, stalls_inc,
+    output logic stall_pipe
 );
 
 /* Internal connections */
@@ -54,7 +55,8 @@ cpu_datapath datapath
     /* Peformance counter signals */
     .l2hits_out, .l2misses_out, .dl1hits_out, .dl1misses_out, .il1hits_out,
     .il1misses_out, .bpredicts_out, .bmispredicts_out, .stalls_out,
-    .counter_clear_vec, .bpredicts_inc, .bmispredicts_inc, .stalls_inc
+    .counter_clear_vec, .bpredicts_inc, .bmispredicts_inc, .stalls_inc,
+    .stall_pipe
 );
 
 
