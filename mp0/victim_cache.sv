@@ -4,6 +4,8 @@ module victim_cache
 (
     input clk,
 
+    // inputs
+    input eviction,
     input buf_mem_read, buf_mem_write,
     input lc3b_word buf_mem_address,
     input lc3b_cacheline buf_mem_wdata,
@@ -39,6 +41,7 @@ victim_cache_controller controller
     .valid(valid), .dirty(dirty), .index_sel(index_sel), .read_src_sel(read_src_sel), .write_sel(write_sel), .smemaddr_sel(smemaddr_sel),
 
     // signals to lower level memory
+    .eviction,
     .buf_mem_read, .buf_mem_write, .buf_mem_resp,
 
     // signals to higher level memory

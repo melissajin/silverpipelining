@@ -18,6 +18,7 @@ module victim_cache_controller
     output logic [3:0] smemaddr_sel,
 
     // signals to lower level memory
+    input eviction,
     input buf_mem_read, buf_mem_write,
     output logic buf_mem_resp,
 
@@ -120,14 +121,17 @@ begin : state_actions
                 dirty = 0;
                 load_d = 1;
             end
-            if(buf_mem_write) begin
+            if(eviction) begin
                 buf_mem_resp = 1;
                 index_sel = lru_sel;
                 write_sel = 1;
-                load_lru = 1;
-                load_d = 1;
-                dirty = 1;
+                if(buf_mem_write)
+                    dirty = 1;
+                else
+                    dirty = 0;
                 valid = 1;
+                load_d = 1;
+                load_lru = 1;
                 case(lru_sel)
                     3'b000: lru_out = {lru_in[6], lru_in[5], lru_in[4], 1'b1, lru_in[2], 1'b1, 1'b1};
                     3'b001: lru_out = {lru_in[6], lru_in[5], lru_in[4], 1'b0, lru_in[2], 1'b1, 1'b1};
