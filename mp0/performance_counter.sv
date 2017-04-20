@@ -41,7 +41,7 @@ always_comb
       end
     else if(increment == 1)
       begin
-        next_count = count + 1;
+        next_count = count + 16'h1;
       end
     else
       begin
@@ -51,3 +51,5 @@ always_comb
     output_count = count;
 
   end
+
+endmodule : performance_counter

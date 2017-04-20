@@ -4,8 +4,8 @@ import lc3b_types::*;
 
 module address_decode
 (
-  input mem_address,
-  input opcode,
+  input lc3b_word mem_address,
+  input lc3b_opcode opcode,
   output logic [3:0] mux_sel,
   output logic clear_counter_0,
   output logic clear_counter_1,

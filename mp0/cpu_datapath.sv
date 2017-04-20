@@ -39,7 +39,6 @@ logic load_pc, load_pcbak;
 logic control_instruc_ident, control_instruc_ident_wb;
 logic flush, flush_mem_op, d_mem_read_loc, d_mem_write_loc;
 logic [3:0] performance_counter_mux_sel;
-logic [8:0] counter_clear_vec;
 lc3b_word performance_counter_mux_out;
 
 /**** Stage 1 ****/
@@ -132,7 +131,8 @@ hazard_detection hazard_detection_inst
 
     /* outputs */
     .load, .load_pc, .load_pcbak,
-    .control_instruc_ident_wb, .flush, .flush_mem_op, .i_mem_read(i_mem_read)
+    .control_instruc_ident_wb, .flush, .flush_mem_op, .i_mem_read(i_mem_read),
+    .bpredicts_inc, .bmispredicts_inc, .stalls_inc
 );
 
 forwarding_unit forwarding
