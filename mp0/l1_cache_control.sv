@@ -21,7 +21,10 @@ module l1_cache_control
     input lc3b_cacheline l2_wdata_inter,
     output logic l2_read, l2_write,
     output lc3b_word l2_address,
-    output lc3b_cacheline l2_wdata
+    output lc3b_cacheline l2_wdata,
+
+    // Performance counter signals
+    output logic l1hits_inc, l1misses_inc
 );
 
 /* List of states */
@@ -41,6 +44,8 @@ begin : state_actions
     l2addr_sel = 2'b00;
     mem_resp = 0; l2_read = 0; l2_write = 0;
 
+    l1hits_inc = 0;
+    l1misses_inc = 0;
 
     case (state)
         process_request: begin
@@ -54,6 +59,7 @@ begin : state_actions
                 load_lru = 1;
                 mem_resp = 1;
 	             l2wdata_sel = 0;
+               l1hits_inc = 1;
             end
             if(hit1 & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -65,6 +71,10 @@ begin : state_actions
                 load_lru = 1;
                 mem_resp = 1;
  	             l2wdata_sel = 1;
+               l1hits_inc = 1;
+            end
+            if(~(hit1 | hit0) & (mem_read ^ mem_write)) begin
+              l1misses_inc = 1;
             end
         end
         fetch_cline: begin

@@ -216,7 +216,10 @@ l1_cache d_cache
 
     /******* Signals between Cache and Arbiter *******/
     .l2_resp(resp_d), .l2_rdata(rdata_d),                                                     // inputs
-    .l2_read(read_d), .l2_write(write_d), .l2_address(address_d), .l2_wdata(wdata_d)          // outputs
+    .l2_read(read_d), .l2_write(write_d), .l2_address(address_d), .l2_wdata(wdata_d),          // outputs
+
+    /******* Performance counter signals *******/
+    .l1hits_inc(dl1hits_inc), .l1misses_inc(dl1misses_inc)
 );
 
 l1_cache i_cache
@@ -232,8 +235,10 @@ l1_cache i_cache
 
     /******* Signals between Cache and Arbiter *******/
     .l2_resp(resp_i), .l2_rdata(rdata_i),                                                     // inputs
-    .l2_read(read_i), .l2_write(write_i), .l2_address(address_i), .l2_wdata(wdata_i)          // outputs
+    .l2_read(read_i), .l2_write(write_i), .l2_address(address_i), .l2_wdata(wdata_i),          // outputs
 
+    /******* Performance counter signals *******/
+    .l1hits_inc(il1hits_inc), .l1misses_inc(il1misses_inc)
 );
 
 cpu cpu_inst
@@ -256,7 +261,7 @@ cpu cpu_inst
     /* Peformance counter signals */
     .l2hits_out, .l2misses_out, .dl1hits_out, .dl1misses_out, .il1hits_out,
     .il1misses_out, .bpredicts_out, .bmispredicts_out, .stalls_out,
-    .counter_clear_vec
+    .counter_clear_vec, .bpredicts_inc, .bmispredicts_inc, .stalls_inc
 );
 
 

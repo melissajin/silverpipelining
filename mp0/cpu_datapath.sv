@@ -29,7 +29,8 @@ module cpu_datapath
     input lc3b_word l2hits_out, l2misses_out, dl1hits_out,
     input lc3b_word dl1misses_out, il1hits_out, il1misses_out,
     input lc3b_word bpredicts_out, bmispredicts_out, stalls_out,
-    output logic [8:0] counter_clear_vec
+    output logic [8:0] counter_clear_vec,
+    output logic bpredicts_inc, bmispredicts_inc, stalls_inc
 );
 
 /********** Internal Signals **********/

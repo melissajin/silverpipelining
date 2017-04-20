@@ -14,7 +14,10 @@ module hazard_detection
     output logic load, load_pc, load_pcbak,
     output logic control_instruc_ident_wb,
     output logic flush, flush_mem_op,
-    output logic i_mem_read
+    output logic i_mem_read,
+
+    // Perfomance counter outputs
+    output logic bpredicts_inc, bmispredicts_inc, stalls_inc
 );
 
 logic mem_op;
@@ -22,6 +25,7 @@ logic mem_op;
 assign load_pcbak = 1'b0;
 
 assign mem_op = (d_mem_read | d_mem_write);
+assign stalls_inc = ~load;
 
 always_comb begin
     case ({i_mem_resp, d_mem_resp, mem_op})
@@ -78,13 +82,19 @@ always_comb begin
 
     flush = 1'b0;
     flush_mem_op = 1'b0;
+    bpredicts_inc = 1'b0;
+    bmispredicts_inc = 1'b0;
     case (op_WB)
         op_br: begin
             if(br_enable) begin
                 load_pc = 1'b1;
                 flush = 1'b1;
                 flush_mem_op = 1'b1;
+                bmispredicts_inc = 1'b1;
               end
+            else begin
+                bpredicts_inc = 1'b1;
+            end
         end
         op_jmp: load_pc = 1'b1;
         op_jsr: load_pc = 1'b1;
