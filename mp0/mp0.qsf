@@ -37,7 +37,7 @@
 
 
 set_global_assignment -name FAMILY "Stratix III"
-set_global_assignment -name DEVICE EP3SE50F780C2
+set_global_assignment -name DEVICE EP3SE80F1152C2
 set_global_assignment -name TOP_LEVEL_ENTITY mp0
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 13.1
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "00:00:00  AUGUST 25, 2014"
@@ -49,7 +49,6 @@ set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name DEVICE_FILTER_SPEED_GRADE 2
 set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
-set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 1.1V
 set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (SystemVerilog)"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "SYSTEMVERILOG HDL" -section_id eda_simulation
 
@@ -62,17 +61,26 @@ set_global_assignment -name EDA_TEST_BENCH_NAME eviction_buffer_tb -section_id e
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id eviction_buffer_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "2000 ns" -section_id eviction_buffer_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME eviction_buffer_tb -section_id eviction_buffer_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE eviction_buffer_tb.sv -section_id eviction_buffer_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id eviction_buffer_tb
 set_global_assignment -name EDA_TEST_BENCH_NAME mp0_tb -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id mp0_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "2000 ns" -section_id mp0_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME mp0_tb -section_id mp0_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE mp0_tb.sv -section_id mp0_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id mp0_tb
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name EDA_TEST_BENCH_NAME physical_memory_tb -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id physical_memory_tb
+set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "2000 ns" -section_id physical_memory_tb
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME physical_memory_tb -section_id physical_memory_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE eviction_buffer_tb.sv -section_id eviction_buffer_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id eviction_buffer_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE mp0_tb.sv -section_id mp0_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id mp0_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory_tb.sv -section_id physical_memory_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE physical_memory.sv -section_id physical_memory_tb
+set_global_assignment -name SYSTEMVERILOG_FILE hardware_prefetcher_datapath.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hardware_prefetcher_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hardware_prefetcher.sv
 set_global_assignment -name SYSTEMVERILOG_FILE victim_cache_datapath.sv
 set_global_assignment -name SYSTEMVERILOG_FILE victim_cache_controller.sv
 set_global_assignment -name SYSTEMVERILOG_FILE victim_cache.sv

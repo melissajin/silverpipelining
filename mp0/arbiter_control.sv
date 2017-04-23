@@ -12,141 +12,70 @@
 	input clk,
 
 	// Inputs driving control decisions
-	input i_cache_read_in, d_cache_read_in,
-	input i_cache_write_in, d_cache_write_in, // i_cache_write_in will always be 0
-	input l2_resp_in,
+	input priority2_read_in, priority1_read_in,
+	input priority2_write_in, priority1_write_in,
+	input s_resp_in,
 
 	// Output to datapath
-	output logic cache_arbiter_sel
+	output logic cache_arbiter_sel, access
  );
 
+ /* List of states */
  enum int unsigned {
-    /* List of states */
-	 idle,
-	 d_cache,
-	 i_cache,
-     buffer
+	 idle, d_cache, i_cache
  } state, next_state;
 
 
- always_comb
-	begin : state_actions
-		/* Default output assignments */
-		cache_arbiter_sel = 1'b0;
+always_comb
+begin : state_actions
+	cache_arbiter_sel = 1'b0;
+    if(state == d_cache)
+        cache_arbiter_sel = 1'b1;
 
-		/* Actions for each state */
-		case(state)
-
-			idle:
-				begin
-					cache_arbiter_sel = 1'b0;
-				end
-
-			d_cache:
-				begin
-					cache_arbiter_sel = 1'b1;
-				end
-
-			i_cache:
-				begin
-					cache_arbiter_sel = 1'b0;
-				end
-
-            buffer:
-				begin
-					cache_arbiter_sel = 1'b0;
-				end
-
-			default: begin ; end // Nothing
-
-		endcase
-	end
+    // Getting rid of buffering of resp signal issue
+    access = 1'b1;
+    if(s_resp_in)
+        access = 1'b0;
+end
 
 always_comb
-	begin : next_state_logic
+begin : next_state_logic
+	next_state = state;
 
-		next_state = state; // The default next state
+	case(state)
+		idle: begin
+    		if(priority1_read_in | priority1_write_in)
+				next_state = d_cache;
+    		else if(priority2_read_in | priority2_write_in)
+				next_state = i_cache;
+		end
+		d_cache: begin
+			if(s_resp_in)
+					next_state = idle;
+			else begin
+                if(priority1_read_in | priority1_write_in)
+                    next_state = d_cache;
+                else
+                    next_state = idle;
+			end
+		end
+		i_cache: begin
+			if(s_resp_in)
+                next_state = idle;
+			else begin
+                if(priority2_read_in | priority2_write_in)
+                    next_state = i_cache;
+                else
+                    next_state = idle;
+			end
+		end
+		default: begin ; end // Nothing
+	endcase
+end
 
-		/* Next state information and conditions (if any) for transitioning between states */
-		case(state)
-
-			idle:
-				begin
-					if(d_cache_read_in | d_cache_write_in) // D-Cache request
-						begin
-							next_state = d_cache;
-						end
-
-					else if(i_cache_read_in | i_cache_write_in) // I-Cache request
-						begin
-							next_state = i_cache;
-						end
-
-					else // No memory request
-						begin
-							next_state = idle;
-						end
-				end
-
-			d_cache:
-				begin
-					if(l2_resp_in) // If the L2 has responded to D-cache's request
-						begin
-    						next_state = buffer;
-						end
-
-					else
-						begin
-                            if(d_cache_read_in | d_cache_write_in)
-                                next_state = d_cache; // Must remain in the same state if L2 hasn't responded
-                            else
-                                next_state = idle;
-						end
-				end
-
-			i_cache:
-				begin
-					if(l2_resp_in) // If the L2 has responded to I-cache's request
-						begin
-                            next_state = buffer;
-						end
-
-					else
-						begin
-                            if(i_cache_read_in | i_cache_write_in)
-                                next_state = i_cache; // Must remain in the same state if L2 hasn't responded
-                            else
-                                next_state = idle;
-						end
-				end
-
-            buffer:
-                begin
-                    if(d_cache_read_in | d_cache_write_in)
-                        begin
-                            next_state = d_cache; // Transition to the d-cache state if D-cache now has a request
-                        end
-
-                    else if(i_cache_read_in | i_cache_write_in) // Another I-Cache request
-                        begin
-                            next_state = i_cache; // Stay in the same state
-                        end
-
-                    else // No memory request
-                        begin
-                            next_state = idle;
-                        end
-                end
-
-			default: begin ; end // Nothing
-
-		endcase
-	end
-
- always_ff @(posedge clk)
-	begin: next_state_assignment
-		/* Assignment of next state on clock edge */
-		state <= next_state;
-	end
+always_ff @(posedge clk)
+begin: next_state_assignment
+	state <= next_state;
+end
 
  endmodule : arbiter_control

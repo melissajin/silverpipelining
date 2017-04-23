@@ -11,27 +11,27 @@
  module arbiter_datapath
  (
 	// Inputs from the split L1 cache
-	input lc3b_word i_cache_address_in, d_cache_address_in,
-	input lc3b_cacheline i_cache_wdata_in, d_cache_wdata_in,
-	input i_cache_read_in, d_cache_read_in,
-	input i_cache_write_in, d_cache_write_in,
+	input lc3b_word priority2_address_in, priority1_address_in,
+	input lc3b_cacheline priority2_wdata_in, priority1_wdata_in,
+	input priority2_read_in, priority1_read_in,
+	input priority2_write_in, priority1_write_in,
 
 	// Inputs from the L2 cache
-	input lc3b_cacheline l2_rdata_in,
-	input l2_resp_in,
+	input lc3b_cacheline s_rdata_in,
+	input s_resp_in,
 
 	// Inputs from the arbiter control
 	input cache_arbiter_sel,
 
 	// Outputs to the L2 cache
-	output lc3b_word l2_address_out,
-	output lc3b_cacheline l2_wdata_out,
-	output logic l2_read_out,
-	output logic l2_write_out,
+	output lc3b_word s_address_out,
+	output lc3b_cacheline s_wdata_out,
+	output logic s_read_out,
+	output logic s_write_out,
 
 	// Outputs to the split L1 cache
-	output logic i_cache_resp_out, d_cache_resp_out,
-	output lc3b_cacheline i_cache_rdata_out, d_cache_rdata_out
+	output logic priority2_resp_out, priority1_resp_out,
+	output lc3b_cacheline priority2_rdata_out, priority1_rdata_out
  );
 
  // Most of the datapath consists of pairs of MUXes
@@ -39,41 +39,40 @@
 mux2 #(.width(16)) addrmux
 (
 	.sel(cache_arbiter_sel),
-	.a(i_cache_address_in),
-	.b(d_cache_address_in),
-	.f(l2_address_out)
+	.a(priority2_address_in),
+	.b(priority1_address_in),
+	.f(s_address_out)
 );
 
-mux2 #(.width(128)) wdatamux
+mux2 #(.width($bits(lc3b_cacheline))) wdatamux
 (
 	.sel(cache_arbiter_sel),
-	.a(i_cache_wdata_in),
-	.b(d_cache_wdata_in),
-	.f(l2_wdata_out)
+	.a(priority2_wdata_in),
+	.b(priority1_wdata_in),
+	.f(s_wdata_out)
 );
 
 mux2 #(.width(1)) readmux
 (
 	.sel(cache_arbiter_sel),
-	.a(i_cache_read_in),
-	.b(d_cache_read_in),
-	.f(l2_read_out)
+	.a(priority2_read_in),
+	.b(priority1_read_in),
+	.f(s_read_out)
 );
 
 mux2 #(.width(1)) writemux
 (
 	.sel(cache_arbiter_sel),
-	.a(i_cache_write_in),
-	.b(d_cache_write_in),
-	.f(l2_write_out)
+	.a(priority2_write_in),
+	.b(priority1_write_in),
+	.f(s_write_out)
 );
 
-always_comb
-	begin
-		d_cache_resp_out = cache_arbiter_sel & l2_resp_in; // Output memory response signals
-		i_cache_resp_out = ~cache_arbiter_sel & l2_resp_in;
-		d_cache_rdata_out = l2_rdata_in;
-		i_cache_rdata_out = l2_rdata_in;
-	end
+always_comb begin
+	priority1_resp_out = cache_arbiter_sel & s_resp_in; // Output memory response signals
+	priority2_resp_out = ~cache_arbiter_sel & s_resp_in;
+	priority1_rdata_out = s_rdata_in;
+	priority2_rdata_out = s_rdata_in;
+end
 
  endmodule : arbiter_datapath

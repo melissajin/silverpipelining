@@ -40,6 +40,19 @@ logic resp_d, read_d, write_d;
 lc3b_word address_d;
 lc3b_cacheline wdata_d, rdata_d;
 
+/********  Signals between Prefetcher and L2 Arbiter, Prefetcher and PMEM Arbiter ********/
+logic l2_arbit_resp_i, l2_arbit_read_i, l2_arbit_write_i;
+lc3b_word l2_arbit_address_i;
+lc3b_cacheline l2_arbit_rdata_i, l2_arbit_wdata_i;
+
+logic pf_arbit_resp_i, pf_arbit_read_i, pf_arbit_write_i;
+lc3b_word pf_arbit_address_i;
+lc3b_cacheline pf_arbit_rdata_i, pf_arbit_wdata_i;
+
+logic pmem_arbit_resp, pmem_arbit_read, pmem_arbit_write;
+lc3b_word pmem_arbit_address;
+lc3b_cacheline pmem_arbit_rdata, pmem_arbit_wdata;
+
 /********  Signals between CPU and L1 D and I Caches ********/
 logic i_mem_resp, i_mem_read, i_mem_write;
 lc3b_mem_wmask i_mem_byte_enable;
@@ -63,24 +76,36 @@ lc3b_cacheline buf_mem_wdata_l1_i;
 logic buf_mem_resp_l1_i;
 lc3b_cacheline buf_mem_rdata_l1_i;
 
-// assign pmem_address = L2_address;
-// assign pmem_wdata = L2_wdata;
-// assign pmem_read = (L2_read);
-// assign pmem_write = (L2_write);
-// assign L2_resp = pmem_resp;
-// assign L2_rdata = pmem_rdata;
+arbiter pmem_arbiter
+(
+    .clk,
 
+    /******* Signals between Arbiter and L2 *******/
+    .s_rdata_in(pmem_rdata),
+    .s_resp_in(pmem_resp),
+    .s_address_out(pmem_address),
+    .s_wdata_out(pmem_wdata), .s_read_out(pmem_read),
+    .s_write_out(pmem_write),
+
+    /******* Signals between Arbiter and L1 Victim Caches *******/
+    .priority2_address_in(pf_arbit_address_i), .priority1_address_in(pmem_arbit_address),
+    .priority2_wdata_in(pf_arbit_wdata_i), .priority1_wdata_in(pmem_arbit_wdata),
+    .priority2_read_in(pf_arbit_read_i), .priority1_read_in(pmem_arbit_read),
+    .priority2_write_in(pf_arbit_write_i), .priority1_write_in(pmem_arbit_write),
+    .priority2_resp_out(pf_arbit_resp_i), .priority1_resp_out(pmem_arbit_resp),
+    .priority2_rdata_out(pf_arbit_rdata_i), .priority1_rdata_out(pmem_arbit_rdata)
+);
 
 victim_cache victim_cache_l2
 (
     .clk,
 
     /******* Signals between Victim Cache and Physical Memory *******/
-    .s_mem_resp(pmem_resp),
-    .s_mem_rdata(pmem_rdata),
-    .s_mem_read(pmem_read), .s_mem_write(pmem_write),
-    .s_mem_address(pmem_address),
-    .s_mem_wdata(pmem_wdata),
+    .s_mem_resp(pmem_arbit_resp),
+    .s_mem_rdata(pmem_arbit_rdata),
+    .s_mem_read(pmem_arbit_read), .s_mem_write(pmem_arbit_write),
+    .s_mem_address(pmem_arbit_address),
+    .s_mem_wdata(pmem_arbit_wdata),
 
     /******* Signals between Victim Cache and L2 Cache *******/
     .buf_mem_read(buf_mem_read_l2), .buf_mem_write(buf_mem_write_l2),
@@ -110,24 +135,24 @@ l2_cache l2_inst
     .mem_rdata(L2_rdata)
 );
 
-arbiter arbiter_inst
+arbiter l2_arbiter
 (
     .clk,
 
     /******* Signals between Arbiter and L2 *******/
-    .l2_rdata_in(L2_rdata),
-    .l2_resp_in(L2_resp),
-    .l2_address_out(L2_address),
-    .l2_wdata_out(L2_wdata), .l2_read_out(L2_read),
-    .l2_write_out(L2_write),
+    .s_rdata_in(L2_rdata),
+    .s_resp_in(L2_resp),
+    .s_address_out(L2_address),
+    .s_wdata_out(L2_wdata), .s_read_out(L2_read),
+    .s_write_out(L2_write),
 
     /******* Signals between Arbiter and L1 Victim Caches *******/
-    .i_cache_address_in(address_i), .d_cache_address_in(address_d),
-    .i_cache_wdata_in(wdata_i), .d_cache_wdata_in(wdata_d),
-    .i_cache_read_in(read_i), .d_cache_read_in(read_d),
-    .i_cache_write_in(write_i), .d_cache_write_in(write_d),
-    .i_cache_resp_out(resp_i), .d_cache_resp_out(resp_d),
-    .i_cache_rdata_out(rdata_i), .d_cache_rdata_out(rdata_d)
+    .priority2_address_in(l2_arbit_address_i), .priority1_address_in(address_d),
+    .priority2_wdata_in(l2_arbit_wdata_i), .priority1_wdata_in(wdata_d),
+    .priority2_read_in(l2_arbit_read_i), .priority1_read_in(read_d),
+    .priority2_write_in(l2_arbit_write_i), .priority1_write_in(write_d),
+    .priority2_resp_out(l2_arbit_resp_i), .priority1_resp_out(resp_d),
+    .priority2_rdata_out(l2_arbit_rdata_i), .priority1_rdata_out(rdata_d)
 );
 
 victim_cache victim_cache_l1_d
@@ -164,6 +189,24 @@ l1_cache d_cache
     .mem_read(d_mem_read), .mem_write(d_mem_write), .mem_byte_enable(d_mem_byte_enable),
     .mem_address(d_mem_address), .mem_wdata(d_mem_wdata),
     .mem_resp(d_mem_resp), .mem_rdata(d_mem_rdata)
+);
+
+hardware_prefetcher prefetcher
+(
+    .clk,
+
+    /***** PMEM Arbiter Signals *****/
+    .pmem_resp(pf_arbit_resp_i), .pmem_rdata(pf_arbit_rdata_i),
+    .pmem_read(pf_arbit_read_i), .pmem_write(pf_arbit_write_i),
+    .pmem_address(pf_arbit_address_i), .pmem_wdata(pf_arbit_wdata_i),
+
+    /***** L2 Arbiter Signals *****/
+    .l2_read(l2_arbit_read_i), .l2_write(l2_arbit_write_i), .l2_address(l2_arbit_address_i), .l2_wdata(l2_arbit_wdata_i),
+    .l2_resp(l2_arbit_resp_i), .l2_rdata(l2_arbit_rdata_i),
+
+    /***** I-Cache Signals *****/
+    .i_read(read_i), .i_write(write_i), .i_address(address_i), .i_wdata(wdata_i),
+    .i_resp(resp_i), .i_rdata(rdata_i)
 );
 
 victim_cache victim_cache_l1_i

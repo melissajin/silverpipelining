@@ -1,10 +1,10 @@
 package lc3b_types;
 
 typedef logic [15:0] lc3b_word;
-typedef logic  [7:0] lc3b_byte;
-typedef logic [127:0] lc3b_cacheline;
+typedef logic [7:0] lc3b_byte;
+typedef logic [255:0] lc3b_cacheline;
 typedef logic [2:0] lc3b_c_index;
-typedef logic [8:0] lc3b_c_tag;
+typedef logic [7:0] lc3b_c_tag;
 typedef logic [6:0] lc3b_7b_plru;
 
 // IR output types

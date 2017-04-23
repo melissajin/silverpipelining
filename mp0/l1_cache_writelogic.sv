@@ -4,20 +4,20 @@ module l1_cache_writelogic
 (
     input l2_read,
     input lc3b_mem_wmask mem_byte_enable,
-    input [2:0] offset,
+    input [3:0] offset,
     input lc3b_word mem_wdata,
     input lc3b_cacheline l2_rdata, cur_cacheline,
     output lc3b_cacheline output_cacheline
 );
 
 
-logic [7:0] wordselector;
+logic [15:0] wordselector;
 
-decoder3 decoder3_inst(.encodedvalue(offset),.decodedvalue(wordselector));
+decoder4 decoder4_inst(.encodedvalue(offset),.decodedvalue(wordselector));
 
 generate
 	 genvar i;
-    for (i=0; i<8; i++)
+    for (i=0; i<16; i++)
     begin: module_instant_loop
         mux4 #(8) writelogic_highbyte
         (
