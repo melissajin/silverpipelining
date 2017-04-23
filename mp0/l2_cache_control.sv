@@ -23,7 +23,10 @@ module l2_cache_control
     output logic pmem_read, pmem_write,
     output lc3b_word pmem_address,
     output lc3b_cacheline pmem_wdata,
-    output logic eviction
+    output logic eviction,
+    
+    /* Performance counter signals */
+    output logic l2hits_inc, l2misses_inc
 );
 
 /* List of states */
@@ -54,6 +57,8 @@ begin : state_actions
     mem_resp = 0; pmem_read = 0; pmem_write = 0;
 	lru_out = lru_in;
     eviction = 0;
+  l2hits_inc = 0;
+  l2misses_inc = 0;
 
     case (state)
         process_request: begin
@@ -67,6 +72,7 @@ begin : state_actions
                 ctl.load_lru = 1;
                 mem_resp = 1;
 	            pmemwdata_sel = 0;
+              l2hits_inc = 1;
             end
             if(way_state.way1.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -78,6 +84,7 @@ begin : state_actions
                 ctl.load_lru = 1;
                 mem_resp = 1;
  	            pmemwdata_sel = 1;
+              l2hits_inc = 1;
             end
             if(way_state.way2.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -89,6 +96,7 @@ begin : state_actions
                 ctl.load_lru = 1;
                 mem_resp = 1;
                 pmemwdata_sel = 2;
+                l2hits_inc = 1;
             end
             if(way_state.way3.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -100,6 +108,7 @@ begin : state_actions
                 ctl.load_lru = 1;
                 mem_resp = 1;
                 pmemwdata_sel = 3;
+                l2hits_inc = 1;
             end
             if(way_state.way4.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -111,6 +120,7 @@ begin : state_actions
                 ctl.load_lru = 1;
                 mem_resp = 1;
                 pmemwdata_sel = 4;
+                l2hits_inc = 1;
             end
             if(way_state.way5.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -122,6 +132,7 @@ begin : state_actions
                 ctl.load_lru = 1;
                 mem_resp = 1;
                 pmemwdata_sel = 5;
+                l2hits_inc = 1;
             end
             if(way_state.way6.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -133,6 +144,7 @@ begin : state_actions
                 ctl.load_lru = 1;
                 mem_resp = 1;
                 pmemwdata_sel = 6;
+                l2hits_inc = 1;
             end
             if(way_state.way7.hit & (mem_read ^ mem_write)) begin
                 if(mem_write) begin
@@ -144,6 +156,10 @@ begin : state_actions
                 ctl.load_lru = 1;
                 mem_resp = 1;
                 pmemwdata_sel = 7;
+                l2hits_inc = 1;
+            end
+            if(~(hit) & (mem_read ^ mem_write)) begin
+                l2misses_inc = 1;
             end
 
             // setup for write_back and evict_cline

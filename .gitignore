@@ -45,7 +45,7 @@ mp?/simulation/modelsim/vsim.wlf
 mp?/simulation/modelsim/*ram*.hdl.mif
 mp?/simulation/modelsim/memory.lst
 
-mp?/rtl_work/*
+mp?/rtl_work
 mp?/modelsim.ini
 mp?/transcript
 mp?/vsim.wlf

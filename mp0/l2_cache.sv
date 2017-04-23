@@ -17,7 +17,10 @@ module l2_cache
     output logic pmem_read, pmem_write,
     output lc3b_word pmem_address,
     output lc3b_cacheline pmem_wdata,
-    output logic eviction
+    output logic eviction,
+    
+    /* Performance counter signals */
+    output logic l2hits_inc, l2misses_inc
 );
 
 lc3b_L2_ctl cache_ctl;
@@ -49,7 +52,10 @@ l2_cache_control control
     /* Memory signals */
     .pmem_resp, .pmem_address_inter, .pmem_wdata_inter,
     .pmem_read, .pmem_write, .pmem_address, .pmem_wdata,
-    .eviction
+    .eviction,
+    
+    /******* Performance counter signals *******/
+    .l2hits_inc, .l2misses_inc
 );
 
 l2_cache_datapath datapath

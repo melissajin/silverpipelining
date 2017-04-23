@@ -21,7 +21,10 @@ module l1_cache
     output logic l2_read, l2_write,                                   // control
     output lc3b_word l2_address,                                      // datapath
     output lc3b_cacheline l2_wdata,                                    // datapath
-    output logic eviction
+    output logic eviction,
+    
+    // Performance counter signals
+    output logic l1hits_inc, l1misses_inc
 );
 
 logic load_lru, l2wdata_sel;
@@ -54,7 +57,10 @@ l1_cache_control control
     /* Memory signals */
     .l2_resp, .l2_address_inter, .l2_wdata_inter,              // inputs
     .l2_read, .l2_write, .l2_address, .l2_wdata,                // outputs
-    .eviction
+    .eviction,
+    
+    // Performance counter signals
+    .l1hits_inc, .l1misses_inc
 );
 
 

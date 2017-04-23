@@ -255,12 +255,28 @@ cpu cpu_inst
     /******* Data Memory signals *******/
     .d_mem_resp, .d_mem_rdata,
     .d_mem_read, .d_mem_write, .d_mem_byte_enable,
-    .d_mem_address, .d_mem_wdata
+    .d_mem_address, .d_mem_wdata,
+
+    /* Peformance counter signals */
+    .l2hits_out, .l2misses_out, .dl1hits_out, .dl1misses_out, .il1hits_out,
+    .il1misses_out, .bpredicts_out, .bmispredicts_out, .stalls_out,
+    .counter_clear_vec, .bpredicts_inc, .bmispredicts_inc, .stalls_inc,
+    .stall_pipe
 );
 
 
 assign i_mem_write = 1'b0;
 assign i_mem_byte_enable = 2'b11;
 assign i_mem_wdata = 16'h0000;
+
+assign l2hits_clear = counter_clear_vec[0];
+assign l2misses_clear = counter_clear_vec[1];
+assign dl1hits_clear = counter_clear_vec[2];
+assign dl1misses_clear = counter_clear_vec[3];
+assign il1hits_clear = counter_clear_vec[4];
+assign il1misses_clear = counter_clear_vec[5];
+assign bpredicts_clear = counter_clear_vec[6];
+assign bmispredicts_clear = counter_clear_vec[7];
+assign stalls_clear = counter_clear_vec[8];
 
 endmodule : mp0
