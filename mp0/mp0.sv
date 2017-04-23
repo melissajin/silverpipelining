@@ -76,6 +76,38 @@ lc3b_cacheline buf_mem_wdata_l1_i;
 logic buf_mem_resp_l1_i;
 lc3b_cacheline buf_mem_rdata_l1_i;
 
+/*******  Signals relating to performance counters  **********/
+logic l2hits_inc, l2hits_clear;
+lc3b_word l2hits_out;
+
+logic l2misses_inc, l2misses_clear;
+lc3b_word l2misses_out;
+
+logic dl1hits_inc, dl1hits_clear;
+lc3b_word dl1hits_out;
+
+logic dl1misses_inc, dl1misses_clear;
+lc3b_word dl1misses_out;
+
+logic il1hits_inc, il1hits_clear;
+lc3b_word il1hits_out;
+
+logic il1misses_inc, il1misses_clear;
+lc3b_word il1misses_out;
+
+logic bpredicts_inc, bpredicts_clear;
+lc3b_word bpredicts_out;
+
+logic bmispredicts_inc, bmispredicts_clear;
+lc3b_word bmispredicts_out;
+
+logic stalls_inc, stalls_clear;
+lc3b_word stalls_out;
+
+logic [8:0] counter_clear_vec;
+logic stall_pipe;
+
+
 arbiter pmem_arbiter
 (
     .clk,
@@ -132,7 +164,10 @@ l2_cache l2_inst
     .mem_read(L2_read), .mem_write(L2_write),
     .mem_address(L2_address), .mem_wdata(L2_wdata),
     .mem_resp(L2_resp),
-    .mem_rdata(L2_rdata)
+    .mem_rdata(L2_rdata),
+
+    /******* Performance counter signals *******/
+    .l2hits_inc, .l2misses_inc
 );
 
 arbiter l2_arbiter
@@ -188,7 +223,10 @@ l1_cache d_cache
     /******* Signals between CPU and Cache *******/
     .mem_read(d_mem_read), .mem_write(d_mem_write), .mem_byte_enable(d_mem_byte_enable),
     .mem_address(d_mem_address), .mem_wdata(d_mem_wdata),
-    .mem_resp(d_mem_resp), .mem_rdata(d_mem_rdata)
+    .mem_resp(d_mem_resp), .mem_rdata(d_mem_rdata),
+
+    /******* Performance counter signals *******/
+    .l1hits_inc(dl1hits_inc), .l1misses_inc(dl1misses_inc)
 );
 
 hardware_prefetcher prefetcher
@@ -241,7 +279,10 @@ l1_cache i_cache
     /******* Signals between CPU and Cache *******/
     .mem_read(i_mem_read), .mem_write(i_mem_write), .mem_byte_enable(i_mem_byte_enable),
     .mem_address(i_mem_address), .mem_wdata(i_mem_wdata),
-    .mem_resp(i_mem_resp), .mem_rdata(i_mem_rdata)
+    .mem_resp(i_mem_resp), .mem_rdata(i_mem_rdata),
+
+    /******* Performance counter signals *******/
+    .l1hits_inc(il1hits_inc), .l1misses_inc(il1misses_inc)
 );
 
 cpu cpu_inst
@@ -257,7 +298,7 @@ cpu cpu_inst
     .d_mem_read, .d_mem_write, .d_mem_byte_enable,
     .d_mem_address, .d_mem_wdata,
 
-    /* Peformance counter signals */
+    /******* Peformance counter signals *******/
     .l2hits_out, .l2misses_out, .dl1hits_out, .dl1misses_out, .il1hits_out,
     .il1misses_out, .bpredicts_out, .bmispredicts_out, .stalls_out,
     .counter_clear_vec, .bpredicts_inc, .bmispredicts_inc, .stalls_inc,
@@ -278,5 +319,78 @@ assign il1misses_clear = counter_clear_vec[5];
 assign bpredicts_clear = counter_clear_vec[6];
 assign bmispredicts_clear = counter_clear_vec[7];
 assign stalls_clear = counter_clear_vec[8];
+
+// Nine performance counters
+performance_counter l2hits
+(
+    .clk,
+    .increment(l2hits_inc & ~stall_pipe),
+    .clear(l2hits_clear),
+    .output_count(l2hits_out)
+);
+
+performance_counter l2misses
+(
+    .clk,
+    .increment(l2misses_inc),
+    .clear(l2misses_clear),
+    .output_count(l2misses_out)
+);
+
+performance_counter dl1hits
+(
+    .clk,
+    .increment(dl1hits_inc),
+    .clear(dl1hits_clear),
+    .output_count(dl1hits_out)
+);
+
+performance_counter dl1misses
+(
+    .clk,
+    .increment(dl1misses_inc),
+    .clear(dl1misses_clear),
+    .output_count(dl1misses_out)
+);
+
+performance_counter il1hits
+(
+    .clk,
+    .increment(il1hits_inc & ~stall_pipe),
+    .clear(il1hits_clear),
+    .output_count(il1hits_out)
+);
+
+performance_counter il1misses
+(
+    .clk,
+    .increment(il1misses_inc),
+    .clear(il1misses_clear),
+    .output_count(il1misses_out)
+);
+
+performance_counter bpredicts
+(
+    .clk,
+    .increment(bpredicts_inc),
+    .clear(bpredicts_clear),
+    .output_count(bpredicts_out)
+);
+
+performance_counter bmispredicts
+(
+    .clk,
+    .increment(bmispredicts_inc),
+    .clear(bmispredicts_clear),
+    .output_count(bmispredicts_out)
+);
+
+performance_counter stalls
+(
+    .clk,
+    .increment(stalls_inc),
+    .clear(stalls_clear),
+    .output_count(stalls_out)
+);
 
 endmodule : mp0
