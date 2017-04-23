@@ -20,7 +20,7 @@ DONE:
   BRnz CONT ; Handling multiple branches in the pipeline
   BRp CONT
   BRnzp CONT
-  JMP DONE
+  JMP R7
 
 SEGMENT DataSegment:
 LOC1: DATA2 10
