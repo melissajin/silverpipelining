@@ -1,6 +1,6 @@
 import lc3b_types::*;
 
-module array #(parameter width = 128)
+module array #(parameter width = 256)
 (
     input clk,
     input write,

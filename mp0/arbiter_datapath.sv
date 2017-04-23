@@ -44,7 +44,7 @@ mux2 #(.width(16)) addrmux
 	.f(s_address_out)
 );
 
-mux2 #(.width(128)) wdatamux
+mux2 #(.width($bits(lc3b_cacheline))) wdatamux
 (
 	.sel(cache_arbiter_sel),
 	.a(priority2_wdata_in),

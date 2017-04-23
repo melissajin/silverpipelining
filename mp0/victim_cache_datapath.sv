@@ -41,7 +41,7 @@ assign d_in.data = write_data;
 
 assign s_mem_wdata = wayselector_out;
 
-mux2 #(128) write_data_mux
+mux2 #($bits(lc3b_cacheline)) write_data_mux
 (
     .sel(write_sel),
     .a(wayselector_out),
@@ -74,7 +74,7 @@ register #(7) lru
     .out(lru_out)
 );
 
-mux8 #(128) wayselector_mux
+mux8 #($bits(lc3b_cacheline)) wayselector_mux
 (
     .sel(index_sel),
     .a(d_out[0].data),
@@ -110,7 +110,7 @@ mux16 #(16) smemaddr_mux
     .y(s_mem_address)
 );
 
-mux2 #(128) read_mux
+mux2 #($bits(lc3b_cacheline)) read_mux
 (
     .sel(read_src_sel),
     .a(wayselector_out),
@@ -118,7 +118,7 @@ mux2 #(128) read_mux
     .f(buf_mem_rdata)
 );
 
-register #(128) read_miss_reg
+register #($bits(lc3b_cacheline)) read_miss_reg
 (
     .clk,
     .load(1'b1),

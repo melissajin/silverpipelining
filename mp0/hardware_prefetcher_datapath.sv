@@ -24,7 +24,7 @@ module hardware_prefetcher_datapath
 );
 
 lc3b_word prefetch_addr_in;
-assign prefetch_addr_in = i_address + 16'h0010;
+assign prefetch_addr_in = i_address + 16'h0020;
 
 lc3b_cacheline prefetch_line_out;
 

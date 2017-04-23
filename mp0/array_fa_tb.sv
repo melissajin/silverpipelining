@@ -21,13 +21,13 @@ begin: TEST_SIGNALS
 	datain = 0;
 
 	#5
-		datain = 128'hffff;
+		datain = 256'hffff;
 		index = 3;
 		write = 1;
 	#20
 		write = 0;
 	#20
-		datain = 128'hffff;
+		datain = 256'hffff;
 		index = 7;
 		write = 1;
 end

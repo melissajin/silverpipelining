@@ -35,7 +35,7 @@ array #(1) valid
     .dataout(v_out)
 );
 
-array #(9) tag
+array #($bits(lc3b_c_tag)) tag
 (
     .clk,
     .write(load_TD),
@@ -44,7 +44,7 @@ array #(9) tag
     .dataout(tag_out)
 );
 
-array #(128) data
+array #($bits(lc3b_cacheline)) data
 (
     .clk,
     .write(load_TD),
