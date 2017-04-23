@@ -16,15 +16,13 @@ module mem_wb
     input lc3b_word pcp_off_WB_in,
     input lc3b_word mdr_WB_in,
     input lc3b_word mar_WB_in,
-    input lc3b_word wdata_forward_in,
 
     /* data outputs */
     output lc3b_reg dest_WB_out,
     output lc3b_word pc_WB_out, alu_WB_out,
     output lc3b_word pcp_off_WB_out,
     output lc3b_word mdr_WB_out,
-    output lc3b_word mar_WB_out,
-    output lc3b_word wdata_forward_out
+    output lc3b_word mar_WB_out
 );
 
 /* Control Signal Registers */
@@ -80,15 +78,6 @@ register_with_clear mdr_wb
     .clear,
     .in(mdr_WB_in),
     .out(mdr_WB_out)
-);
-
-register_with_clear wdata_forward
-(
-    .clk,
-    .load,
-    .clear,
-    .in(wdata_forward_in),
-    .out(wdata_forward_out)
 );
 
 register_with_clear mar_wb

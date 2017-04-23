@@ -97,13 +97,11 @@ lc3b_word mar_WB_out;
 lc3b_word pc_WB_out, pc_plus_off_WB;
 lc3b_word mdr_MEM_out, mdr_WB_out, mdr_WB_mod, alu_WB_out;
 lc3b_word wdata_forward_out;
-lc3b_word mdr_WB_in_mux_out;
 
 // forwarding signals
 // WB -> EX
 lc3b_word forward_WB_out;
 logic [1:0] forward_WB_sel;
-logic mdr_WB_in_mux_sel;
 lc3b_forward_save forward_save_in, forward_save_out;
 
 
@@ -132,8 +130,7 @@ forwarding_unit forwarding
     .address_MEM(d_mem_address_out), .address_WB(mar_WB_out),
     .d_mem_write_WB(wb_sig_5.d_mem_write),
 	.forward_a_EX_sel(forward_a_EX_sel), .forward_b_EX_sel(forward_b_EX_sel),
-    .forward_MEM_data_sel(forward_MEM_data_sel), .forward_MEM_addr_sel(forward_MEM_addr_sel),
-    .mdr_WB_in_mux_sel(mdr_WB_in_mux_sel)
+    .forward_MEM_data_sel(forward_MEM_data_sel), .forward_MEM_addr_sel(forward_MEM_addr_sel)
 );
 
 /************************* Stage 1 *************************/
@@ -409,7 +406,7 @@ mux4 forward_mem_mux
     .a(alu_MEM_out),
     .b(pc_MEM_out),
     .c(pc_plus_off_MEM),
-    .d(mdr_WB_in_mux_out),
+    .d(d_mem_rdata),
     .f(forward_MEM_out)
 );
 
@@ -448,14 +445,6 @@ adj #(6) offset6_adjuster_MEM
     .out(adj6_offset_MEM)
 );
 
-mux2 mdr_wb_in_mux
-(
-    .sel(mdr_WB_in_mux_sel),
-    .a(d_mem_rdata),
-    .b(wdata_forward_out),
-    .f(mdr_WB_in_mux_out)
-);
-
 /************************* Stage 5 *************************/
 /***** MEM_WB Pipeline Register *****/
 mem_wb MEM_WB
@@ -472,15 +461,13 @@ mem_wb MEM_WB
     .dest_WB_in(dest_MEM_out),
     .pc_WB_in(pc_MEM_out), .alu_WB_in(alu_MEM_out),
     .pcp_off_WB_in(pc_plus_off_MEM),
-    .mdr_WB_in(mdr_WB_in_mux_out), .mar_WB_in(d_mem_address_out),
-    .wdata_forward_in(d_mem_wdata),
+    .mdr_WB_in(d_mem_rdata), .mar_WB_in(d_mem_address_out),
 
     /* data outputs */
     .dest_WB_out(dest_WB_out), .pc_WB_out(pc_WB_out),
     .pcp_off_WB_out(pc_plus_off_WB),
     .alu_WB_out(alu_WB_out), .mdr_WB_out(mdr_WB_out),
-    .mar_WB_out(mar_WB_out),
-    .wdata_forward_out(wdata_forward_out)
+    .mar_WB_out(mar_WB_out)
 );
 
 mux4 mdrmux_wb
