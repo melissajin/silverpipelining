@@ -30,6 +30,7 @@ module cpu_datapath
 logic load, load_mem_wb;
 logic load_pc, load_pcbak;
 logic control_instruc_ident, control_instruc_ident_wb;
+logic flush, flush_mem_op, d_mem_read_loc, d_mem_write_loc;
 
 /**** Stage 1 ****/
 lc3b_word pcmux_out, pc_out, pcbak_out, pcPlus2mux_out;
@@ -121,7 +122,7 @@ hazard_detection hazard_detection_inst
 
     /* outputs */
     .load, .load_pc, .load_pcbak,
-    .control_instruc_ident_wb, .i_mem_read(i_mem_read)
+    .control_instruc_ident_wb, .flush, .flush_mem_op, .i_mem_read(i_mem_read)
 );
 
 forwarding_unit forwarding
@@ -183,7 +184,7 @@ mux2 irmux
 /***** IF_ID Pipeline Register *****/
 if_id IF_ID
 (
-    .clk, .load(load & (~control_instruc_ident_wb)),
+    .clk, .load(load & (~control_instruc_ident_wb)), .clear(flush),
 
     /* data inputs */
     .pc_ID_in(pc_plus2_out), .ir_in(irmux_out),
@@ -258,7 +259,7 @@ cccomp cccomp_inst
 /***** ID_EX Pipeline Register *****/
 id_ex ID_EX
 (
-    .clk, .load(load),
+    .clk, .load(load), .clear(flush),
 
     /* control inputs */
     .ex_sig_in(cw.ex), .mem_sig_in(cw.mem), .wb_sig_in(cw.wb),
@@ -378,7 +379,7 @@ adj #(11) offset11_adjuster
 /***** EX_MEM Pipeline Register *****/
 ex_mem EX_MEM
 (
-    .clk, .load(load),
+    .clk, .load(load), .clear(flush),
 
     /* control inputs */
     .mem_sig_in(mem_sig_3), .wb_sig_in(wb_sig_3),
@@ -459,7 +460,7 @@ mux2 mdr_wb_in_mux
 /***** MEM_WB Pipeline Register *****/
 mem_wb MEM_WB
 (
-    .clk, .load(load_mem_wb),
+    .clk, .load(load_mem_wb), .clear(flush),
 
     /* control Signals */
     .wb_sig_in(wb_sig_4_inter),
@@ -513,8 +514,10 @@ register #($bits(lc3b_forward_save)) forward_wb_save
 
 // Data Memory Signals
 assign d_mem_address =  d_mem_address_out;
-assign d_mem_read = ({wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} == 2'b00) ? mem_sig_4.d_mem_read : wb_sig_5.d_mem_read;
-assign d_mem_write = ({wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} == 2'b00) ? mem_sig_4.d_mem_write : wb_sig_5.d_mem_write;
+assign d_mem_read_loc = ({wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} == 2'b00) ? mem_sig_4.d_mem_read : wb_sig_5.d_mem_read;
+assign d_mem_write_loc = ({wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} == 2'b00) ? mem_sig_4.d_mem_write : wb_sig_5.d_mem_write;
+assign d_mem_read = d_mem_read_loc & ~flush_mem_op;
+assign d_mem_write = d_mem_write_loc & ~flush_mem_op;
 
 // Instruction Memory Signals
 assign i_mem_address = pc_out;

@@ -2,7 +2,7 @@ import lc3b_types::*;
 
 module if_id
 (
-    input clk, load,
+    input clk, load, clear,
 
     /* inputs */
     input lc3b_word pc_ID_in,
@@ -15,10 +15,11 @@ module if_id
     output lc3b_ir_10_0 ir_10_0
 );
 
-register pc_id
+register_with_clear pc_id
 (
     .clk,
     .load,
+    .clear,
     .in(pc_ID_in),
     .out(pc_ID_out)
 );
@@ -26,7 +27,7 @@ register pc_id
 ir_id_reg ir_id
 (
     // inputs
-    .clk, .load, .in(ir_in),
+    .clk, .load, .clear, .in(ir_in),
 
     // outputs
     .opcode(opcode), .dest(dest_ID_out), .src1(src1),

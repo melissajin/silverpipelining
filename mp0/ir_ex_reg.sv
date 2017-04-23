@@ -4,6 +4,7 @@ module ir_ex_reg
 (
     input clk,
     input load,
+    input clear,
     input lc3b_ir_10_0 in,
     output lc3b_imm4 imm4,
     output lc3b_imm5 imm5,
@@ -16,7 +17,12 @@ lc3b_word data;
 
 always_ff @(posedge clk)
 begin
-    if (load == 1)
+    if(clear == 1)
+      begin
+        data = 0;
+      end
+
+    else if (load == 1)
     begin
         data = in;
     end
