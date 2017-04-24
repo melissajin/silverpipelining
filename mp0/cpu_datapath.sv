@@ -27,7 +27,7 @@ module cpu_datapath
 );
 
 /********** Internal Signals **********/
-logic load, load_mem_wb;
+logic load, load_mem_wb, load_mem_wb_force;
 logic load_pc, load_pcbak;
 logic control_instruc_ident, control_instruc_ident_wb;
 logic flush, flush_mem_op, d_mem_read_loc, d_mem_write_loc;
@@ -79,6 +79,7 @@ lc3b_offset11 PCoffset11_MEM;
 // Mem -> EX
 lc3b_reg src1_MEM_out, src2_MEM_out;
 lc3b_word forward_MEM_out;
+lc3b_word forward_MEM_inter; //needed if forwarding ldb
 logic [1:0] forward_MEM_sel;
 
 // WB -> MEM
@@ -119,7 +120,7 @@ hazard_detection hazard_detection_inst
     .nzp_ID(dest_ID_out), .nzp_EX(dest_EX_out), .nzp_MEM(dest_MEM_out), .nzp_WB(dest_WB_out),
 
     /* outputs */
-    .load, .load_pc, .load_pcbak,
+    .load, .load_pc, .load_pcbak, .load_mem_wb_force,
     .control_instruc_ident_wb, .flush, .flush_mem_op, .i_mem_read(i_mem_read)
 );
 
@@ -283,7 +284,7 @@ mux4 forward_sr1_mux
 (
     .sel(forward_a_EX_sel),
     .a(src1_data_EX),
-    .b(forward_MEM_out),
+    .b(forward_MEM_inter),
     .c(forward_WB_out),
     .d(forward_save_out.forward_val),
     .f(forward_sr1_out)
@@ -293,7 +294,7 @@ mux4 forward_sr2_mux
 (
     .sel(forward_b_EX_sel),
     .a(src2_data_EX),
-    .b(forward_MEM_out),
+    .b(forward_MEM_inter),
     .c(forward_WB_out),
     .d(forward_save_out.forward_val),
     .f(forward_sr2_out)
@@ -513,7 +514,7 @@ assign i_mem_address = pc_out;
 assign ir_4 = ir_10_0[4];
 assign ir_5 = ir_10_0[5];
 assign ir_11 = dest_WB_out[2];
-assign load_mem_wb = load | d_mem_resp;
+assign load_mem_wb = (load | d_mem_resp) & load_mem_wb_force;
 
 // LDI/STI control signal
 assign wb_sig_4_inter.d_mem_read = ((wb_sig_5.opcode == op_ldi || wb_sig_5.opcode == op_sti) && {wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} != 2'b00) ? 1'b0 : wb_sig_4.d_mem_read;
@@ -591,6 +592,17 @@ always_comb begin
             mdrmux_WB_sel = 2'b10;
         else
             mdrmux_WB_sel = 2'b01;
+    end
+end
+
+/***** forwarding ldb from MEM to EX *****/
+always_comb begin
+    forward_MEM_inter = forward_MEM_out;
+    if(wb_sig_4.opcode == op_ldb) begin
+        if(mar_MEM_out[0] == 1)
+            forward_MEM_inter = {8'h00, forward_MEM_out[15:8]};
+        else
+            forward_MEM_inter = {8'h00, forward_MEM_out[7:0]};
     end
 end
 

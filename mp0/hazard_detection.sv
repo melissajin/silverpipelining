@@ -11,7 +11,7 @@ module hazard_detection
     input lc3b_nzp nzp_ID, nzp_EX, nzp_MEM, nzp_WB,
 
     /* outputs */
-    output logic load, load_pc, load_pcbak,
+    output logic load, load_pc, load_pcbak, load_mem_wb_force,
     output logic control_instruc_ident_wb,
     output logic flush, flush_mem_op,
     output logic i_mem_read
@@ -95,9 +95,11 @@ always_comb begin
     if(i_mem_read == 1'b0 && control_instruc_ident_wb != 1'b1)
         load_pc = 1'b0;
 
+    load_mem_wb_force = 1'b1;
     if(i_mem_resp == 1'b0 && i_mem_read == 1'b1 && ((op_ID == op_br && nzp_ID != 3'b000) || (op_EX == op_br && nzp_EX != 3'b000) || (op_MEM == op_br && nzp_MEM != 3'b000)) && (op_WB != op_br || nzp_WB == 3'b000)) begin
         load = 1'b0;
         load_pc = 1'b0;
+        load_mem_wb_force = 1'b0;
     end
 
 end
