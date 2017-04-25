@@ -118,6 +118,49 @@ CODE:
 	NOP
 	NOP
 	NOP
+	;; Testing LDB
+	LDB R7, R0, 1
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	LDB R6, R0, 2
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	LDB R5, R0, 5
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	LDB R4, R0, 6
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	LDB R3, R0, 9
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	LDB R2, R0, 10
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	LDB R1, R0, 13
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
 
 
 HALT_PROG:

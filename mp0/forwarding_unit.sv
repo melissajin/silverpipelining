@@ -13,8 +13,7 @@ module forwarding_unit
 	output logic [1:0] forward_a_EX_sel,
 	output logic [1:0] forward_b_EX_sel,
     output logic [1:0] forward_MEM_data_sel,
-    output logic forward_MEM_addr_sel,
-    output logic mdr_WB_in_mux_sel
+    output logic forward_MEM_addr_sel
 );
 
 always_comb
@@ -45,7 +44,6 @@ always_comb
 begin
 	forward_MEM_data_sel = 2'b00;
     forward_MEM_addr_sel = 1'b0;
-    mdr_WB_in_mux_sel = 1'b0;
 
     // LDI/STI hazard
     if(indirectmux_sel & forward_save.load_regfile_wb && forward_save.dest_wb == forward_MEM.sourceR_mem)

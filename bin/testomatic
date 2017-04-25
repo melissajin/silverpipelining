@@ -10,9 +10,9 @@ MP=mp0
 #MP directory
 MP_DIR=$HOME/ece411/mp3/$MP
 #Location of LC3bAssembler; Should usually be in bin
-ASSEMBLER=$HOME/ece411/mp3/bin/LC3bAssembler
+ASSEMBLER=$HOME/ece411/bin/LC3bAssembler
 #Addressability of physical memory; from load_memory.sh
-ADDRESSABILITY=32
+ADDRESSABILITY=16
 
 #Testcode directory;Not required but can be used to avoid entering path everytime
 TESTCODE_DIR=$HOME/ece411/testcode
@@ -181,7 +181,7 @@ tail -n 7 "${MODELSIM}/${MP}_run_msim_rtl_verilog.do" | head -n 1 >> "${WORK_DIR
 #echo "restart -f" >> "${WORK_DIR}/do.do"
 
 #####EXPERIMENTAL#####
-echo 'add list -radix hexadecimal [concat [string range [find instances -r regfile_inst] 0 [expr [string first " " [find instances -r regfile_inst]] - 1]] "/data}"]' | tee -a "${WORK_DIR}/do.do" "${WORK_DIR}/repeat.do" > /dev/null
+echo 'add list -radix hexadecimal [concat [string range [find instances -r regfile] 0 [expr [string first " " [find instances -r regfile]] - 1]] "/data}"]' | tee -a "${WORK_DIR}/do.do" "${WORK_DIR}/repeat.do" > /dev/null
 #echo "add list -radix hexadecimal $REG_FILE" | tee -a "${WORK_DIR}/do.do" "${WORK_DIR}/repeat.do" > /dev/null
 
 #Debug signals
@@ -261,7 +261,7 @@ echo
 kill $!; trap 'kill $!' SIGTERM
 TIME=0
 
-if [[ ! -e "${WORK_DIR}/test_list.lst" ]]; then
+if [[ ! -e "${WORK_DIR}/test_list.lst" ]]; then 
 	echo "Check $MP_DIR/transcript for errors"
 	exit 6
 fi
@@ -302,7 +302,7 @@ do
 	test=( $b )
 
 	#time column
-	print_err="${test[0]} " #${test[1]} "
+	print_err="${test[0]} " #${test[1]} " 
 	print_cor="${test[0]//[${test[0]}]/ } " #${test[1]//[${test[1]}]/ } "
 
 	for ((i=0; i<=7; i++)) #7->$COMP_I
@@ -339,7 +339,7 @@ do
 	fi
 done  <"$SIM_LIST" 3<"${WORK_DIR}/tmp.lst"
 
-if [[ $BOOL -eq 1 ]]; then
+if [[ $BOOL -eq 1 ]]; then 
 	echo -e "Total errors = ${err_cnt}"
 	echo
 	echo -e "Final values:"
@@ -1046,3 +1046,5 @@ echo "Created simulator executable"
 BOOL=1
 fi
 done
+
+
