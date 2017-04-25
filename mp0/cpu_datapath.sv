@@ -87,6 +87,7 @@ lc3b_forward_mem forward_MEM_sigs;
 lc3b_word forward_MEM_address, adj6_offset_MEM;
 logic [1:0] forward_MEM_data_sel;
 logic forward_MEM_addr_sel;
+lc3b_word forward_WB_inter; // Accounts for forwarding for STB
 
 /**** Stage 5 ****/
 logic addrmux_sel, indirectmux_sel;
@@ -416,7 +417,7 @@ mux4 dmem_data_mux
 (
     .sel(forward_MEM_data_sel),
     .a(mdr_MEM_out),
-    .b(forward_WB_out),
+    .b(forward_WB_inter),
     .c(forward_save_out.forward_val),
     .d(16'h0000),
     .f(d_mem_wdata)
@@ -603,6 +604,17 @@ always_comb begin
             forward_MEM_inter = {8'h00, forward_MEM_out[15:8]};
         else
             forward_MEM_inter = {8'h00, forward_MEM_out[7:0]};
+    end
+end
+
+/***** forwarding result of WB to MEM in case of STB *****/
+always_comb begin
+    forward_WB_inter = forward_WB_out;
+    if(wb_sig_4.opcode == op_stb) begin
+        if(mar_MEM_out[0] == 1)
+            forward_WB_inter = {forward_WB_out[7:0], 8'h0};
+        else
+            forward_WB_inter = {8'h0, forward_WB_out[7:0]};
     end
 end
 
