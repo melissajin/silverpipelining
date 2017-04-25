@@ -1,4 +1,3 @@
-
 import lc3b_types::*;
 
 module forwarding_unit

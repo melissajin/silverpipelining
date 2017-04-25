@@ -132,7 +132,6 @@ hazard_detection hazard_detection_inst
 
     /* outputs */
     .load, .load_pc, .load_pcbak, .load_mem_wb_force,
-    .load, .load_pc, .load_pcbak,
     .control_instruc_ident_wb, .flush, .flush_mem_op, .i_mem_read(i_mem_read),
     .bpredicts_inc, .bmispredicts_inc, .stalls_inc
 );
@@ -459,20 +458,12 @@ adj #(6) offset6_adjuster_MEM
     .out(adj6_offset_MEM)
 );
 
-mux2 mdr_wb_in_mux
-(
-    .sel(mdr_WB_in_mux_sel),
-    .a(d_mem_rdata),
-    .b(wdata_forward_out),
-    .f(mdr_WB_in_mux_out)
-);
-
 // Choose between the mdr_WB_in_mux_out and the
 // current performance counter values
 mux16 performance_counter_mux
 (
     .sel(performance_counter_mux_sel),
-    .a(mdr_WB_in_mux_out),
+    .a(d_mem_rdata),
     .b(l2hits_out),
     .c(l2misses_out),
     .d(dl1hits_out),
@@ -525,7 +516,6 @@ mem_wb MEM_WB
     .pc_WB_in(pc_MEM_out), .alu_WB_in(alu_MEM_out),
     .pcp_off_WB_in(pc_plus_off_MEM),
     .mdr_WB_in(performance_counter_mux_out), .mar_WB_in(d_mem_address_out),
-    .wdata_forward_in(d_mem_wdata),
 
     /* data outputs */
     .dest_WB_out(dest_WB_out), .pc_WB_out(pc_WB_out),
@@ -681,6 +671,7 @@ always_comb begin
             forward_WB_inter = {8'h0, forward_WB_out[7:0]};
     end
 end
+
 
 /***** indirectmux_sel logic *****/
 always_comb begin
