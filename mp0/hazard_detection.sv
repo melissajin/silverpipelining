@@ -95,7 +95,7 @@ always_comb begin
                 flush = 1'b1;
                 flush_mem_op = 1'b1;
               end
-            else if(prediction == taken) begin
+            else if(nzp_WB != 3'b000 && prediction == taken) begin
                 load_pc = 1'b1;
                 flush = 1'b1;
                 flush_mem_op = 1'b1;
