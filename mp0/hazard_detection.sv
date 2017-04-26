@@ -2,26 +2,36 @@ import lc3b_types::*; /* Import types defined in lc3b_types.sv */
 
 module hazard_detection
 (
+    input clk,
+
     /* inputs */
+    input lc3b_word mem_address,
     input logic br_enable,
     input logic i_mem_resp, d_mem_resp,
     input logic d_mem_read, d_mem_write,
     input logic MEM_inter_read, MEM_inter_write,
-    input lc3b_opcode op_ID, op_EX, op_MEM, op_MEM_inter, op_WB,
-    input lc3b_nzp nzp_ID, nzp_EX, nzp_MEM, nzp_WB,
+    input lc3b_opcode op_IF, op_ID, op_EX, op_MEM, op_MEM_inter, op_WB,
+    input lc3b_nzp nzp_IF, nzp_ID, nzp_EX, nzp_MEM, nzp_WB,
 
     /* outputs */
     output logic load, load_pc, load_pcbak, load_mem_wb_force,
     output logic control_instruc_ident_wb,
     output logic flush, flush_mem_op,
-    output logic i_mem_read
+    output logic i_mem_read,
+    output logic prediction,
+    output logic taken_out, not_taken_out, branch_in_flight_out
 );
 
 logic mem_op;
+logic br_instruction, taken, not_taken;
 
 assign load_pcbak = 1'b0;
 
 assign mem_op = (d_mem_read | d_mem_write);
+
+assign br_instruction = (op_IF == op_br && nzp_IF != 3'b000);
+assign taken_out = taken;
+assign not_taken_out = not_taken;
 
 always_comb begin
     case ({i_mem_resp, d_mem_resp, mem_op})
@@ -80,11 +90,16 @@ always_comb begin
     flush_mem_op = 1'b0;
     case (op_WB)
         op_br: begin
-            if(br_enable) begin
+            if(br_enable & (prediction == not_taken)) begin
                 load_pc = 1'b1;
                 flush = 1'b1;
                 flush_mem_op = 1'b1;
               end
+            else if(prediction == taken) begin
+                load_pc = 1'b1;
+                flush = 1'b1;
+                flush_mem_op = 1'b1;
+            end
         end
         op_jmp: load_pc = 1'b1;
         op_jsr: load_pc = 1'b1;
@@ -142,11 +157,17 @@ always_comb begin
         default: ;
     endcase
 
+    taken = 1'b0;
+    not_taken = 1'b0;
     case (op_WB)
         op_br: begin
             if(br_enable) begin
                 i_mem_read = 1'b0;
                 control_instruc_ident_wb = 1'b1;
+                taken = 1'b1;
+            end
+            else if(nzp_WB != 3'b000) begin
+                not_taken = 1'b1;
             end
         end
         op_jmp:begin
@@ -164,5 +185,17 @@ always_comb begin
         default: ;
     endcase
 end
+
+branch_predictor #(.num_addr_bits(5)) branch_predictor_inst
+(
+    .clk,
+
+    .mem_address,
+    .br_instruction,
+    .taken,
+    .not_taken,
+    .prediction,
+    .branch_in_flight_out
+);
 
 endmodule // hazard_detection

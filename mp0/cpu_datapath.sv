@@ -31,12 +31,13 @@ logic load, load_mem_wb, load_mem_wb_force;
 logic load_pc, load_pcbak;
 logic control_instruc_ident, control_instruc_ident_wb;
 logic flush, flush_mem_op, d_mem_read_loc, d_mem_write_loc;
+logic prediction, taken_out, not_taken_out, branch_in_flight_out;
 
 /**** Stage 1 ****/
 lc3b_word pcmux_out, pc_out, pcbak_out, pcPlus2mux_out;
-lc3b_word pc_plus2_out, addrmux_out;
+lc3b_word pc_plus2_out, pc_plus2_save_out, addrmux_out;
 lc3b_word adj11_offset, adj9_offset;
-lc3b_word irmux_out;
+lc3b_word irmux_out, br_addr_calc_out, br_offset_signed;
 
 /**** Stage 2 ****/
 lc3b_word pc_ID_out;
@@ -91,7 +92,8 @@ lc3b_word forward_WB_inter; // Accounts for forwarding for STB
 
 /**** Stage 5 ****/
 logic addrmux_sel, indirectmux_sel;
-logic [1:0] pcmux_sel, mdrmux_WB_sel;
+logic [2:0] pcmux_sel;
+logic [1:0] mdrmux_WB_sel;
 logic br_enable;
 lc3b_control_word_wb wb_sig_5;
 lc3b_reg dest_WB_out;
@@ -110,19 +112,23 @@ lc3b_forward_save forward_save_in, forward_save_out;
 /************************* Hazard Detection *************************/
 hazard_detection hazard_detection_inst
 (
+    .clk,
+
     /* inputs */
+    .mem_address(pc_out),
     .br_enable(br_enable),
     .i_mem_resp, .d_mem_resp,
     .d_mem_read, .d_mem_write,
     .MEM_inter_read(wb_sig_4_inter.d_mem_read), .MEM_inter_write(wb_sig_4_inter.d_mem_write),
-    .op_ID(opcode), .op_EX(wb_sig_3.opcode),
+    .op_IF(lc3b_opcode'(irmux_out[15:12])), .op_ID(opcode), .op_EX(wb_sig_3.opcode),
     .op_MEM(wb_sig_4.opcode), .op_MEM_inter(wb_sig_4_inter.opcode),
     .op_WB(wb_sig_5.opcode),
-    .nzp_ID(dest_ID_out), .nzp_EX(dest_EX_out), .nzp_MEM(dest_MEM_out), .nzp_WB(dest_WB_out),
+    .nzp_IF(irmux_out[11:9]), .nzp_ID(dest_ID_out), .nzp_EX(dest_EX_out), .nzp_MEM(dest_MEM_out), .nzp_WB(dest_WB_out),
 
     /* outputs */
     .load, .load_pc, .load_pcbak, .load_mem_wb_force,
-    .control_instruc_ident_wb, .flush, .flush_mem_op, .i_mem_read(i_mem_read)
+    .control_instruc_ident_wb, .flush, .flush_mem_op, .i_mem_read(i_mem_read),
+    .prediction, .taken_out, .not_taken_out, .branch_in_flight_out
 );
 
 forwarding_unit forwarding
@@ -137,14 +143,18 @@ forwarding_unit forwarding
 
 /************************* Stage 1 *************************/
 /***** PC *****/
-mux4 pcmux
+mux8 pcmux
 (
     .sel(pcmux_sel),
     .a(pc_plus2_out),
     .b(pc_plus_off_WB),
     .c(alu_WB_out),
     .d(mdr_WB_mod),
-    .f(pcmux_out)
+    .e(pc_plus2_save_out),
+    .f(br_addr_calc_out),
+    .g(16'h0),
+    .h(16'h0),
+    .y(pcmux_out)
 );
 
 register pc
@@ -153,6 +163,21 @@ register pc
     .load(load_pc),
     .in(pcmux_out),
     .out(pc_out)
+);
+
+register pcPlus2_save
+(
+    .clk,
+    .load(irmux_out[15:12] == op_br),
+    .in(pc_plus2_out),
+    .out(pc_plus2_save_out)
+);
+
+adder br_addr_calc
+(
+    .a(pc_plus2_out),
+    .b(br_offset_signed),
+    .c(br_addr_calc_out)
 );
 
 register pcbak
@@ -501,6 +526,8 @@ register #($bits(lc3b_forward_save)) forward_wb_save
     .out(forward_save_out)
 );
 
+assign br_offset_signed = $signed({irmux_out[8:0]});
+
 // Data Memory Signals
 assign d_mem_address =  d_mem_address_out;
 assign d_mem_read_loc = ({wb_sig_5.d_mem_read, wb_sig_5.d_mem_write} == 2'b00) ? mem_sig_4.d_mem_read : wb_sig_5.d_mem_read;
@@ -548,26 +575,34 @@ assign forward_save_in.dest_wb = dest_WB_out;
 
 /***** pcmux_sel logic *****/
 always_comb begin
-    pcmux_sel = 2'b00;
+    pcmux_sel = 3'b000;
     case (wb_sig_5.opcode)
         op_br: begin
             if(br_enable)
-                pcmux_sel = 2'b01;
+                pcmux_sel = 3'b001;
         end
         op_jmp: begin
-            pcmux_sel = 2'b10;
+            pcmux_sel = 3'b010;
         end
         op_jsr: begin
             if(ir_11)
-                pcmux_sel = 2'b01;
+                pcmux_sel = 3'b001;
             else
-                pcmux_sel = 2'b10;
+                pcmux_sel = 3'b010;
         end
         op_trap: begin
-            pcmux_sel = 2'b11;
+            pcmux_sel = 3'b011;
         end
-        default: pcmux_sel = 2'b00;
+        default: pcmux_sel = 3'b000;
     endcase
+
+    if(irmux_out[15:12] == op_br && irmux_out[11:9] != 3'b000 && branch_in_flight_out == 1'b0) begin // Begin branch prediction
+        if(prediction == 1'b1) // If we're predicting taken
+            pcmux_sel = 3'b101;
+    end
+
+    if(flush == 1'b1 && not_taken_out == 1'b1) // If we predicted taken incorrectly
+        pcmux_sel = 3'b100;
 end
 
 /***** addrmux_sel logic *****/

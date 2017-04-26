@@ -1,11 +1,9 @@
-import lc3b_types::*;
 
 module saturating_counter
 (
     input clk,
 
     // inputs to driuve the counter's state
-    input logic br_instruction,
     input logic taken,
     input logic not_taken,
 
@@ -43,30 +41,30 @@ begin : next_state_logic
 
 	case(state)
       weakly_not_taken: begin
-          if(br_instruction & br_taken) // taken branch
+          if(taken) // taken branch
               next_state = weakly_taken;
-          else if(br_instruction) // not taken branch
+          else if(not_taken) // not taken branch
               next_state = strongly_not_taken;
       end
 
       weakly_taken: begin
-          if(br_instruction & br_taken) // taken branch
+          if(taken) // taken branch
               next_state = strongly_taken;
-          else if(br_instruction) // not taken branch
+          else if(not_taken) // not taken branch
               next_state = weakly_not_taken;
       end
 
       strongly_not_taken: begin
-          if(br_instruction & br_taken) // taken branch
+          if(taken) // taken branch
               next_state = weakly_not_taken;
-          else if(br_instruction) // not taken branch
+          else if(not_taken) // not taken branch
               next_state = strongly_not_taken;
       end
 
       strongly_taken: begin
-          if(br_instruction & br_taken) // taken branch
+          if(taken) // taken branch
               next_state = strongly_taken;
-          else if(br_instruction) // not taken branch
+          else if(not_taken) // not taken branch
               next_state = weakly_taken;
       end
 
