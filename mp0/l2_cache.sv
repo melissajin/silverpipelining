@@ -73,11 +73,11 @@ l2_cache_datapath datapath
 );
 
 // Synchronization between Arbiter and L2 cache
-// always_ff @ (posedge clk) begin
-    assign mem_read_sync = mem_read;
-    assign mem_write_sync = mem_write;
-    assign mem_address_sync = mem_address;
-    assign mem_wdata_sync = mem_wdata;
-// end
+always_ff @ (posedge clk) begin
+    mem_read_sync = mem_read;
+    mem_write_sync = mem_write;
+    mem_address_sync = mem_address;
+    mem_wdata_sync = mem_wdata;
+end
 
 endmodule : l2_cache
