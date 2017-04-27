@@ -31,6 +31,7 @@ logic load, load_mem_wb, load_mem_wb_force;
 logic load_pc, load_pcbak;
 logic control_instruc_ident, control_instruc_ident_wb;
 logic flush, flush_mem_op, d_mem_read_loc, d_mem_write_loc;
+logic stall, unstall_mem_wb, unstall;
 
 /**** Stage 1 ****/
 lc3b_word pcmux_out, pc_out, pcbak_out, pcPlus2mux_out;
@@ -130,9 +131,11 @@ forwarding_unit forwarding
     .forward_EX(forward_EX_sigs), .forward_MEM(forward_MEM_sigs),
     .forward_save(forward_save_out), .indirectmux_sel(indirectmux_sel),
     .address_MEM(d_mem_address_out), .address_WB(mar_WB_out),
-    .d_mem_write_WB(wb_sig_5.d_mem_write),
+    .d_mem_write_WB(wb_sig_5.d_mem_write), .d_mem_resp(d_mem_resp),
+    .unstall(unstall),
 	.forward_a_EX_sel(forward_a_EX_sel), .forward_b_EX_sel(forward_b_EX_sel),
-    .forward_MEM_data_sel(forward_MEM_data_sel), .forward_MEM_addr_sel(forward_MEM_addr_sel)
+    .forward_MEM_data_sel(forward_MEM_data_sel), .forward_MEM_addr_sel(forward_MEM_addr_sel),
+    .stall(stall), .unstall_mem_wb(unstall_mem_wb)
 );
 
 /************************* Stage 1 *************************/
@@ -150,7 +153,7 @@ mux4 pcmux
 register pc
 (
     .clk,
-    .load(load_pc),
+    .load(load_pc & ~stall),
     .in(pcmux_out),
     .out(pc_out)
 );
@@ -158,7 +161,7 @@ register pc
 register pcbak
 (
     .clk,
-    .load(load_pcbak),
+    .load(load_pcbak & ~stall),
     .in(pcmux_out),
     .out(pcbak_out)
 );
@@ -183,7 +186,7 @@ mux2 irmux
 /***** IF_ID Pipeline Register *****/
 if_id IF_ID
 (
-    .clk, .load(load & (~control_instruc_ident_wb)), .clear(flush),
+    .clk, .load(load & (~control_instruc_ident_wb) & ~stall), .clear(flush),
 
     /* data inputs */
     .pc_ID_in(pc_plus2_out), .ir_in(irmux_out),
@@ -213,7 +216,7 @@ mux2 #(3) src2mux
 regfile regfile_inst
 (
     .clk,
-    .load(wb_sig_5.load_regfile),
+    .load(wb_sig_5.load_regfile & ~stall),
     .in(regfilemux_out),
     .src_a(src1),
     .src_b(src2mux_out),
@@ -242,7 +245,7 @@ gencc gencc_inst
 register #(3) cc
 (
     .clk,
-    .load(wb_sig_5.load_cc),
+    .load(wb_sig_5.load_cc & ~stall),
     .in(gencc_out),
     .out(cc_out)
 );
@@ -258,7 +261,7 @@ cccomp cccomp_inst
 /***** ID_EX Pipeline Register *****/
 id_ex ID_EX
 (
-    .clk, .load(load), .clear(flush),
+    .clk, .load(load & ~stall), .clear(flush),
 
     /* control inputs */
     .ex_sig_in(cw.ex), .mem_sig_in(cw.mem), .wb_sig_in(cw.wb),
@@ -285,7 +288,7 @@ mux4 forward_sr1_mux
 (
     .sel(forward_a_EX_sel),
     .a(src1_data_EX),
-    .b(forward_MEM_inter),
+    .b(forward_MEM_inter),      /* TODO: forward from WB instead of MEM */
     .c(forward_WB_out),
     .d(forward_save_out.forward_val),
     .f(forward_sr1_out)
@@ -295,7 +298,7 @@ mux4 forward_sr2_mux
 (
     .sel(forward_b_EX_sel),
     .a(src2_data_EX),
-    .b(forward_MEM_inter),
+    .b(forward_MEM_inter),      /* TODO: forward from WB instead of MEM */
     .c(forward_WB_out),
     .d(forward_save_out.forward_val),
     .f(forward_sr2_out)
@@ -378,7 +381,7 @@ adj #(11) offset11_adjuster
 /***** EX_MEM Pipeline Register *****/
 ex_mem EX_MEM
 (
-    .clk, .load(load), .clear(flush),
+    .clk, .load(load & ~stall), .clear(flush | unstall_mem_wb),
 
     /* control inputs */
     .mem_sig_in(mem_sig_3), .wb_sig_in(wb_sig_3),
@@ -408,7 +411,7 @@ mux4 forward_mem_mux
     .a(alu_MEM_out),
     .b(pc_MEM_out),
     .c(pc_plus_off_MEM),
-    .d(d_mem_rdata),
+    .d(d_mem_rdata),  /*TODO: Need to get rid of this*/
     .f(forward_MEM_out)
 );
 
@@ -451,7 +454,8 @@ adj #(6) offset6_adjuster_MEM
 /***** MEM_WB Pipeline Register *****/
 mem_wb MEM_WB
 (
-    .clk, .load(load_mem_wb), .clear(flush),
+    .clk, .load(load_mem_wb & (~stall | unstall_mem_wb)), .clear(flush),
+    .unstall_mem_wb(unstall_mem_wb), .unstall(unstall),
 
     /* control Signals */
     .wb_sig_in(wb_sig_4_inter),
@@ -496,7 +500,7 @@ mux4 forward_wb_mux
 register #($bits(lc3b_forward_save)) forward_wb_save
 (
     .clk,
-    .load(1'b1),
+    .load(1'b1 & ~stall),
     .in(forward_save_in),
     .out(forward_save_out)
 );
@@ -534,6 +538,7 @@ assign forward_EX_sigs.src1_ex = src1_EX_out;
 assign forward_EX_sigs.src2_ex = src2_EX_out;
 assign forward_EX_sigs.load_regfile_mem = wb_sig_4.load_regfile;
 assign forward_EX_sigs.load_regfile_wb = wb_sig_5.load_regfile;
+assign forward_EX_sigs.d_read_mem = d_mem_read;
 
 // forwarding signals assignment WB -> MEM
 assign forward_MEM_sigs.load_regfile_wb = wb_sig_5.load_regfile;

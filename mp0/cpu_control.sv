@@ -94,7 +94,7 @@ begin : state_actions
             cw.wb.load_cc = 1'b1;
 
             // forwarding signals
-            cw.mem.forward_MEM_sel = 2'b11;
+            // cw.mem.forward_MEM_sel = 2'b11;   /* TODO: stall instead of forward */
             cw.wb.forward_WB_sel = 2'b11;
         end
         op_ldi: begin
@@ -113,7 +113,7 @@ begin : state_actions
             cw.wb.load_cc = 1'b1;
 
             // forwarding signals
-            cw.mem.forward_MEM_sel = 2'b11;
+            //cw.mem.forward_MEM_sel = 2'b11;      /* TODO: stall instead of forward */
             cw.wb.forward_WB_sel = 2'b11;
         end
         op_ldr: begin
@@ -131,7 +131,7 @@ begin : state_actions
             cw.wb.load_cc = 1'b1;
 
             // forwarding signals
-            cw.mem.forward_MEM_sel = 2'b11;
+            // cw.mem.forward_MEM_sel = 2'b11;      /* TODO: stall instead of forward */
             cw.wb.forward_WB_sel = 2'b11;
         end
         op_lea: begin

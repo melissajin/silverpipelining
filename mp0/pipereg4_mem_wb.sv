@@ -2,7 +2,8 @@ import lc3b_types::*;
 
 module mem_wb
 (
-    input clk, load, clear,
+    input clk, load, clear, unstall_mem_wb,
+    output logic unstall,
 
     /* control inputs */
     input lc3b_control_word_wb wb_sig_in,
@@ -33,6 +34,15 @@ register_with_clear #($bits(lc3b_control_word_wb)) wb_sig
     .clear,
     .in(wb_sig_in),
     .out(wb_sig_out)
+);
+
+register_with_clear #(1) unstall_reg
+(
+    .clk,
+    .load,
+    .clear,
+    .in(unstall_mem_wb),
+    .out(unstall)
 );
 
 register_with_clear #(3) dest_wb
