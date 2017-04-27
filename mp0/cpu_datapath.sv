@@ -168,7 +168,7 @@ register pc
 register pcPlus2_save
 (
     .clk,
-    .load(irmux_out[15:12] == op_br),
+    .load(irmux_out[15:12] == op_br && irmux_out[11:9] != 3'b00 && branch_in_flight_out == 1'b0),
     .in(pc_plus2_out),
     .out(pc_plus2_save_out)
 );
@@ -526,7 +526,7 @@ register #($bits(lc3b_forward_save)) forward_wb_save
     .out(forward_save_out)
 );
 
-assign br_offset_signed = $signed({irmux_out[8:0]});
+assign br_offset_signed = ($signed({irmux_out[8:0]}) << 1);
 
 // Data Memory Signals
 assign d_mem_address =  d_mem_address_out;
@@ -603,6 +603,7 @@ always_comb begin
 
     if(flush == 1'b1 && not_taken_out == 1'b1) // If we predicted taken incorrectly
         pcmux_sel = 3'b100;
+
 end
 
 /***** addrmux_sel logic *****/

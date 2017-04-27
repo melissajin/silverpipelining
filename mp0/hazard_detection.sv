@@ -90,12 +90,12 @@ always_comb begin
     flush_mem_op = 1'b0;
     case (op_WB)
         op_br: begin
-            if(br_enable & (prediction == not_taken)) begin
+            if(br_enable & (prediction == 1'b0 && taken == 1'b1)) begin
                 load_pc = 1'b1;
                 flush = 1'b1;
                 flush_mem_op = 1'b1;
               end
-            else if(nzp_WB != 3'b000 && prediction == taken) begin
+            else if(br_enable == 1'b0 && nzp_WB != 3'b000 && prediction == 1'b1 && not_taken == 1'b1) begin
                 load_pc = 1'b1;
                 flush = 1'b1;
                 flush_mem_op = 1'b1;

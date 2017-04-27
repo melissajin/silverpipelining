@@ -20,6 +20,7 @@ add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radi
 add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/d_mem_write
 add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/MEM_inter_read
 add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/MEM_inter_write
+add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/op_IF
 add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/op_ID
 add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/op_EX
 add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/op_MEM
@@ -35,11 +36,13 @@ add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radi
 add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/control_instruc_ident_wb
 add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/i_mem_read
 add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/mem_op
-add wave -noupdate -expand -group CPU /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/prediction
-add wave -noupdate -expand -group CPU /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/br_instruction
-add wave -noupdate -expand -group CPU /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/taken
-add wave -noupdate -expand -group CPU /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/not_taken
-add wave -noupdate -expand -group CPU /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/branch_in_flight_out
+add wave -noupdate -expand -group CPU /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/flush
+add wave -noupdate -expand -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/prediction
+add wave -noupdate -expand -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/br_instruction
+add wave -noupdate -expand -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/taken
+add wave -noupdate -expand -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/not_taken
+add wave -noupdate -expand -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/branch_in_flight_out
+add wave -noupdate -expand -group CPU -label mem_addr_reg_out -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/branch_predictor_inst/mem_addr_reg/out
 add wave -noupdate -expand -group CPU -group forwarding -radix hexadecimal -childformat {{/mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX.dest_mem -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX.dest_wb -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX.src1_ex -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX.src2_ex -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX.load_regfile_mem -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX.load_regfile_wb -radix hexadecimal}} -expand -subitemconfig {/mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX.dest_mem {-height 15 -radix hexadecimal} /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX.dest_wb {-height 15 -radix hexadecimal} /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX.src1_ex {-height 15 -radix hexadecimal} /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX.src2_ex {-height 15 -radix hexadecimal} /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX.load_regfile_mem {-height 15 -radix hexadecimal} /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX.load_regfile_wb {-height 15 -radix hexadecimal}} /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_EX
 add wave -noupdate -expand -group CPU -group forwarding -radix hexadecimal -childformat {{/mp0_tb/dut/cpu_inst/datapath/forwarding/forward_MEM.load_regfile_wb -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/forwarding/forward_MEM.dest_wb -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/forwarding/forward_MEM.sourceR_mem -radix hexadecimal} {/mp0_tb/dut/cpu_inst/datapath/forwarding/forward_MEM.baseR_mem -radix hexadecimal}} -expand -subitemconfig {/mp0_tb/dut/cpu_inst/datapath/forwarding/forward_MEM.load_regfile_wb {-height 15 -radix hexadecimal} /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_MEM.dest_wb {-height 15 -radix hexadecimal} /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_MEM.sourceR_mem {-height 15 -radix hexadecimal} /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_MEM.baseR_mem {-height 15 -radix hexadecimal}} /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_MEM
 add wave -noupdate -expand -group CPU -group forwarding -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_save
@@ -51,12 +54,16 @@ add wave -noupdate -expand -group CPU -group forwarding -radix hexadecimal /mp0_
 add wave -noupdate -expand -group CPU -group forwarding -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_b_EX_sel
 add wave -noupdate -expand -group CPU -group forwarding -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_MEM_data_sel
 add wave -noupdate -expand -group CPU -group forwarding -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/forwarding/forward_MEM_addr_sel
-add wave -noupdate -expand -group CPU -group pc_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/sel
-add wave -noupdate -expand -group CPU -group pc_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/a
-add wave -noupdate -expand -group CPU -group pc_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/b
-add wave -noupdate -expand -group CPU -group pc_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/c
-add wave -noupdate -expand -group CPU -group pc_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/d
-add wave -noupdate -expand -group CPU -group pc_mux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/f
+add wave -noupdate -expand -group CPU -expand -group pcmux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/sel
+add wave -noupdate -expand -group CPU -expand -group pcmux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/a
+add wave -noupdate -expand -group CPU -expand -group pcmux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/b
+add wave -noupdate -expand -group CPU -expand -group pcmux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/c
+add wave -noupdate -expand -group CPU -expand -group pcmux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/d
+add wave -noupdate -expand -group CPU -expand -group pcmux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/e
+add wave -noupdate -expand -group CPU -expand -group pcmux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/f
+add wave -noupdate -expand -group CPU -expand -group pcmux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/g
+add wave -noupdate -expand -group CPU -expand -group pcmux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/h
+add wave -noupdate -expand -group CPU -expand -group pcmux -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pcmux/y
 add wave -noupdate -expand -group CPU -expand -group pc_reg -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pc/load
 add wave -noupdate -expand -group CPU -expand -group pc_reg -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pc/in
 add wave -noupdate -expand -group CPU -expand -group pc_reg -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/pc/out
@@ -337,7 +344,7 @@ add wave -noupdate -expand -group d-cache -radix hexadecimal /mp0_tb/dut/d_cache
 add wave -noupdate -expand -group d-cache -radix hexadecimal /mp0_tb/dut/d_cache/l2_address_inter
 add wave -noupdate -expand -group d-cache -radix hexadecimal /mp0_tb/dut/d_cache/l2_wdata_inter
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {16319 ps} 0}
+WaveRestoreCursors {{Cursor 1} {1940332 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 217
 configure wave -valuecolwidth 202
@@ -353,4 +360,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ps} {82032 ps}
+WaveRestoreZoom {1903095 ps} {2005635 ps}

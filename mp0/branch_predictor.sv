@@ -19,7 +19,7 @@ logic[(1<<num_addr_bits)-1:0] decode_output;
 logic[(1<<num_addr_bits)-1:0] prediction_output;
 lc3b_word mem_addr_reg_out;
 
-logic branch_in_flight;
+logic branch_in_flight, branch_in_flight_next;
 
 decoder_N #(.N(num_addr_bits)) counter_chooser
 (
@@ -62,11 +62,17 @@ endgenerate
 assign prediction = prediction_output[mem_addr_reg_out[num_addr_bits:1]];
 assign branch_in_flight_out = branch_in_flight;
 
-always @ (posedge br_instruction or posedge taken or posedge not_taken) begin
+// always @ (posedge br_instruction or posedge taken or posedge not_taken) begin
+always_ff @ (posedge clk) begin
+    branch_in_flight <= branch_in_flight_next;
+end
+
+always_comb begin
+    branch_in_flight_next = branch_in_flight;
     if(taken | not_taken) // Branch has ended
-        branch_in_flight <= 1'b0;
-    else if(~branch_in_flight)
-        branch_in_flight <= 1'b1;
+        branch_in_flight_next = 1'b0;
+    else if(br_instruction & ~branch_in_flight)
+        branch_in_flight_next = 1'b1;
 end
 
 endmodule : branch_predictor
