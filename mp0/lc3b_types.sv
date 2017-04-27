@@ -133,6 +133,7 @@ typedef struct packed {
 	logic load_regfile_mem;
 	logic load_regfile_wb;
   logic d_read_mem;
+  lc3b_opcode opcode;
 } lc3b_forward_ex;
 
 typedef struct packed {

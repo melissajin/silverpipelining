@@ -216,7 +216,7 @@ mux2 #(3) src2mux
 regfile regfile_inst
 (
     .clk,
-    .load(wb_sig_5.load_regfile & ~stall),
+    .load(wb_sig_5.load_regfile/* & ~stall*/),
     .in(regfilemux_out),
     .src_a(src1),
     .src_b(src2mux_out),
@@ -245,7 +245,7 @@ gencc gencc_inst
 register #(3) cc
 (
     .clk,
-    .load(wb_sig_5.load_cc & ~stall),
+    .load(wb_sig_5.load_cc/* & ~stall*/),
     .in(gencc_out),
     .out(cc_out)
 );
@@ -454,7 +454,7 @@ adj #(6) offset6_adjuster_MEM
 /***** MEM_WB Pipeline Register *****/
 mem_wb MEM_WB
 (
-    .clk, .load(load_mem_wb & (~stall | unstall_mem_wb)), .clear(flush),
+    .clk, .load(load_mem_wb /*& (~stall | unstall_mem_wb)*/), .clear(flush),
     .unstall_mem_wb(unstall_mem_wb), .unstall(unstall),
 
     /* control Signals */
@@ -500,7 +500,7 @@ mux4 forward_wb_mux
 register #($bits(lc3b_forward_save)) forward_wb_save
 (
     .clk,
-    .load(1'b1 & ~stall),
+    .load(1'b1),
     .in(forward_save_in),
     .out(forward_save_out)
 );
@@ -539,6 +539,7 @@ assign forward_EX_sigs.src2_ex = src2_EX_out;
 assign forward_EX_sigs.load_regfile_mem = wb_sig_4.load_regfile;
 assign forward_EX_sigs.load_regfile_wb = wb_sig_5.load_regfile;
 assign forward_EX_sigs.d_read_mem = d_mem_read;
+assign forward_EX_sigs.opcode = wb_sig_3.opcode;
 
 // forwarding signals assignment WB -> MEM
 assign forward_MEM_sigs.load_regfile_wb = wb_sig_5.load_regfile;
@@ -547,7 +548,7 @@ assign forward_MEM_sigs.sourceR_mem = dest_MEM_out;
 assign forward_MEM_sigs.baseR_mem = src1_MEM_out;
 
 // save wb for LDI and STI
-assign forward_save_in.load_regfile_wb = ((wb_sig_4_inter.opcode == op_ldi || wb_sig_4_inter.opcode == op_sti) && ({wb_sig_4_inter.d_mem_read, wb_sig_4_inter.d_mem_write} != 2'b00))? wb_sig_5.load_regfile : 1'b0;
+assign forward_save_in.load_regfile_wb = wb_sig_5.load_regfile; //((wb_sig_5.opcode == op_ldr|| wb_sig_5.opcode == op_ldb || wb_sig_4_inter.opcode == op_ldi || wb_sig_4_inter.opcode == op_sti) && ({wb_sig_4_inter.d_mem_read, wb_sig_4_inter.d_mem_write} != 2'b00))? wb_sig_5.load_regfile : 1'b0;
 assign forward_save_in.forward_val = forward_WB_out;
 assign forward_save_in.dest_wb = dest_WB_out;
 

@@ -17,9 +17,9 @@ CODE:
 	LEA R0, DATA
 
   ;Testing LDB
-	LDR R1, R0, 0
-	ADD R2, R1, R1
-
+	LDR R1, R0, TVAL_1
+	LDR R2, R0, TVAL_2
+	ADD R2, R2, R1
 
 HALT_PROG:
 	BRnzp HALT_PROG

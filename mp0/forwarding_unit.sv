@@ -27,9 +27,9 @@ begin
   unstall_mem_wb = 1'b0;
 
     // LDI and STI hazard
-    if(indirectmux_sel & forward_save.load_regfile_wb && (forward_save.dest_wb == forward_EX.src1_ex))
+    if(forward_save.load_regfile_wb && (forward_save.dest_wb == forward_EX.src1_ex))
 		forward_a_EX_sel = 2'b11;
-	if(indirectmux_sel & forward_save.load_regfile_wb && (forward_save.dest_wb == forward_EX.src2_ex))
+	if(forward_save.load_regfile_wb && (forward_save.dest_wb == forward_EX.src2_ex))
 		forward_b_EX_sel = 2'b11;
 
 	// WB hazard
@@ -45,7 +45,8 @@ begin
 
 	// MEM hazard TODO: Need to stall instead
 	if(forward_EX.d_read_mem && ((forward_EX.dest_mem == forward_EX.src1_ex)
-      || (forward_EX.dest_mem == forward_EX.src2_ex))) begin
+      || ((forward_EX.dest_mem == forward_EX.src2_ex) && (forward_EX.opcode == op_add
+        || forward_EX.opcode == op_and)))) begin
     stall = 1'b1;
     if(d_mem_resp) begin
       unstall_mem_wb = 1'b1;
