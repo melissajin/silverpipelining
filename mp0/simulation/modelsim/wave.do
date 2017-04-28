@@ -38,6 +38,7 @@ add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radi
 add wave -noupdate -expand -group CPU -expand -group hazard_detection_unit -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/mem_op
 add wave -noupdate -expand -group CPU /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/flush
 add wave -noupdate -expand -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/prediction
+add wave -noupdate -expand -group CPU /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/branch_predictor_inst/prediction_sync
 add wave -noupdate -expand -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/br_instruction
 add wave -noupdate -expand -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/taken
 add wave -noupdate -expand -group CPU -radix hexadecimal /mp0_tb/dut/cpu_inst/datapath/hazard_detection_inst/not_taken
@@ -344,7 +345,7 @@ add wave -noupdate -expand -group d-cache -radix hexadecimal /mp0_tb/dut/d_cache
 add wave -noupdate -expand -group d-cache -radix hexadecimal /mp0_tb/dut/d_cache/l2_address_inter
 add wave -noupdate -expand -group d-cache -radix hexadecimal /mp0_tb/dut/d_cache/l2_wdata_inter
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {1940332 ps} 0}
+WaveRestoreCursors {{Cursor 1} {11719150 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 217
 configure wave -valuecolwidth 202
@@ -360,4 +361,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {1903095 ps} {2005635 ps}
+WaveRestoreZoom {11680227 ps} {11744315 ps}

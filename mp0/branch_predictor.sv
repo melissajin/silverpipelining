@@ -12,33 +12,17 @@ module branch_predictor #(parameter num_addr_bits = 4)
     input not_taken,
 
     // Predictor's current foretelling
-    output logic prediction, prediction_sync,
-    output logic branch_in_flight_out
+    output logic prediction
 );
 
 logic[(1<<num_addr_bits)-1:0] decode_output;
 logic[(1<<num_addr_bits)-1:0] prediction_output;
-lc3b_word mem_addr_reg_out;
-
-logic branch_in_flight, branch_in_flight_next;
 
 decoder_N #(.N(num_addr_bits)) counter_chooser
 (
-    .a(mem_addr_reg_out[num_addr_bits:1]),
+    .a(mem_address[num_addr_bits:1]),
     .y(decode_output)
 );
-
-register mem_addr_reg
-(
-    .clk,
-    .load(br_instruction & ~branch_in_flight),
-    .in(mem_address),
-    .out(mem_addr_reg_out)
-);
-
-initial begin
-    branch_in_flight = 1'b0;
-end
 
 /* Use a generate loop to initialize the "predictor table" */
 generate
@@ -60,21 +44,6 @@ generate
 
 endgenerate
 
-assign prediction_sync = prediction_output[mem_addr_reg_out[num_addr_bits:1]];
 assign prediction = prediction_output[mem_address[num_addr_bits:1]];
-assign branch_in_flight_out = branch_in_flight;
-
-// always @ (posedge br_instruction or posedge taken or posedge not_taken) begin
-always_ff @ (posedge clk) begin
-    branch_in_flight <= branch_in_flight_next;
-end
-
-always_comb begin
-    branch_in_flight_next = branch_in_flight;
-    if(taken | not_taken) // Branch has ended
-        branch_in_flight_next = 1'b0;
-    else if(br_instruction & ~branch_in_flight)
-        branch_in_flight_next = 1'b1;
-end
 
 endmodule : branch_predictor

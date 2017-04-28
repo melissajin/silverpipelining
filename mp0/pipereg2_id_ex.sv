@@ -21,6 +21,7 @@ module id_ex
     input lc3b_word pc_EX_in,
     input lc3b_word src1_data_in, src2_data_in,
     input lc3b_ir_10_0 ir_10_0_in,
+    input prediction_EX_in,
 
     /* data outputs */
     output lc3b_reg dest_EX_out,
@@ -33,9 +34,18 @@ module id_ex
     output lc3b_imm5 imm5_EX,
     output lc3b_offset6 offset6_EX,
     output lc3b_trapvect8 trapVect8_EX,
-    output lc3b_offset11 offset11_EX_out
+    output lc3b_offset11 offset11_EX_out,
+    output logic prediction_EX_out
 );
 
+register_with_clear #(.width(1)) prediction
+(
+    .clk,
+    .load,
+    .clear,
+    .in(prediction_EX_in),
+    .out(prediction_EX_out)
+);
 
 /* Control Signal Registers */
 register_with_clear #($bits(lc3b_control_word_ex)) ex_sig

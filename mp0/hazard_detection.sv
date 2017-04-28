@@ -12,19 +12,20 @@ module hazard_detection
     input logic MEM_inter_read, MEM_inter_write,
     input lc3b_opcode op_IF, op_ID, op_EX, op_MEM, op_MEM_inter, op_WB,
     input lc3b_nzp nzp_IF, nzp_ID, nzp_EX, nzp_MEM, nzp_WB,
+    input prediction_WB_out,
 
     /* outputs */
     output logic load, load_pc, load_pcbak, load_mem_wb_force,
     output logic control_instruc_ident_wb,
     output logic flush, flush_mem_op,
     output logic i_mem_read,
-    output logic prediction_out, prediction_sync_out,
-    output logic taken_out, not_taken_out, branch_in_flight_out
+    output logic prediction_out,
+    output logic taken_out, not_taken_out
 );
 
 logic mem_op;
 logic br_instruction, taken, not_taken;
-logic prediction, prediction_sync;
+logic prediction;
 
 assign load_pcbak = 1'b0;
 
@@ -34,7 +35,6 @@ assign br_instruction = (op_IF == op_br && nzp_IF != 3'b000);
 assign taken_out = taken;
 assign not_taken_out = not_taken;
 assign prediction_out = prediction;
-assign prediction_sync_out = prediction_sync;
 
 always_comb begin
     case ({i_mem_resp, d_mem_resp, mem_op})
@@ -93,12 +93,12 @@ always_comb begin
     flush_mem_op = 1'b0;
     case (op_WB)
         op_br: begin
-            if(br_enable & (prediction_sync == 1'b0 && taken == 1'b1)) begin
+            if(br_enable & (prediction_WB_out == 1'b0 && taken == 1'b1)) begin
                 load_pc = 1'b1;
                 flush = 1'b1;
                 flush_mem_op = 1'b1;
               end
-            else if(br_enable == 1'b0 && nzp_WB != 3'b000 && prediction_sync == 1'b1 && not_taken == 1'b1) begin
+            else if(br_enable == 1'b0 && nzp_WB != 3'b000 && prediction_WB_out == 1'b1 && not_taken == 1'b1) begin
                 load_pc = 1'b1;
                 flush = 1'b1;
                 flush_mem_op = 1'b1;
@@ -165,14 +165,14 @@ always_comb begin
     case (op_WB)
         op_br: begin
             if(br_enable) begin
-                if(prediction_sync == 1'b0) begin
+                if(prediction_WB_out == 1'b0) begin
                     i_mem_read = 1'b0;
                     control_instruc_ident_wb = 1'b1;
                 end
                 taken = 1'b1;
             end
             else if(nzp_WB != 3'b000) begin
-                if(prediction_sync == 1'b1) begin
+                if(prediction_WB_out == 1'b1) begin
                     i_mem_read = 1'b0;
                     control_instruc_ident_wb = 1'b1;
                 end
@@ -203,9 +203,7 @@ branch_predictor #(.num_addr_bits(5)) branch_predictor_inst
     .br_instruction,
     .taken,
     .not_taken,
-    .prediction,
-    .prediction_sync,
-    .branch_in_flight_out
+    .prediction
 );
 
 endmodule // hazard_detection

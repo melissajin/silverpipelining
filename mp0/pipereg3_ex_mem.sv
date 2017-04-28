@@ -21,6 +21,7 @@ module ex_mem
     input lc3b_word mar_MEM_in, mdr_MEM_in,
     input lc3b_offset11 offset11_MEM_in,
     input logic [1:0] mem_byte_enable_in,
+    input prediction_MEM_in,
 
     /* data outputs */
     output lc3b_reg dest_MEM_out,
@@ -30,7 +31,17 @@ module ex_mem
     output lc3b_word pcp_off_MEM_out,
     output lc3b_word mar_MEM_out, mdr_MEM_out,
     output lc3b_offset11 offset11_MEM_out,
-    output logic [1:0] mem_byte_enable_out
+    output logic [1:0] mem_byte_enable_out,
+    output logic prediction_MEM_out
+);
+
+register_with_clear #(.width(1)) prediction
+(
+    .clk,
+    .load,
+    .clear,
+    .in(prediction_MEM_in),
+    .out(prediction_MEM_out)
 );
 
 /* Control Signal Registers */

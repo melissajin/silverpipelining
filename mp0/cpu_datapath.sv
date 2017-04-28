@@ -31,7 +31,7 @@ logic load, load_mem_wb, load_mem_wb_force;
 logic load_pc, load_pcbak;
 logic control_instruc_ident, control_instruc_ident_wb;
 logic flush, flush_mem_op, d_mem_read_loc, d_mem_write_loc;
-logic prediction, prediction_sync, taken_out, not_taken_out, branch_in_flight_out;
+logic prediction, taken_out, not_taken_out;
 
 /**** Stage 1 ****/
 lc3b_word pcmux_out, pc_out, pcbak_out, pcPlus2mux_out;
@@ -40,6 +40,7 @@ lc3b_word adj11_offset, adj9_offset;
 lc3b_word irmux_out, br_addr_calc_out, br_offset_signed;
 
 /**** Stage 2 ****/
+logic prediction_ID_out;
 lc3b_word pc_ID_out;
 lc3b_ir_10_0 ir_10_0;
 lc3b_reg dest_ID_out, src1, src2;
@@ -49,6 +50,7 @@ lc3b_word regfilemux_out;
 lc3b_nzp gencc_out, cc_out;
 
 /**** Stage 3 ****/
+logic prediction_EX_out;
 logic [1:0] mdrmux_EX_sel;
 lc3b_control_word_ex ex_sig_3;
 lc3b_control_word_mem mem_sig_3;
@@ -69,6 +71,7 @@ lc3b_forward_ex forward_EX_sigs;
 logic [1:0] forward_a_EX_sel, forward_b_EX_sel;
 
 /**** Stage 4 ****/
+logic prediction_MEM_out;
 lc3b_control_word_mem mem_sig_4;
 lc3b_control_word_wb wb_sig_4;
 lc3b_control_word_wb wb_sig_4_inter;
@@ -91,6 +94,7 @@ logic forward_MEM_addr_sel;
 lc3b_word forward_WB_inter; // Accounts for forwarding for STB
 
 /**** Stage 5 ****/
+logic prediction_WB_out;
 logic addrmux_sel, indirectmux_sel;
 logic [2:0] pcmux_sel;
 logic [1:0] mdrmux_WB_sel;
@@ -124,11 +128,12 @@ hazard_detection hazard_detection_inst
     .op_MEM(wb_sig_4.opcode), .op_MEM_inter(wb_sig_4_inter.opcode),
     .op_WB(wb_sig_5.opcode),
     .nzp_IF(irmux_out[11:9]), .nzp_ID(dest_ID_out), .nzp_EX(dest_EX_out), .nzp_MEM(dest_MEM_out), .nzp_WB(dest_WB_out),
+    .prediction_WB_out,
 
     /* outputs */
     .load, .load_pc, .load_pcbak, .load_mem_wb_force,
     .control_instruc_ident_wb, .flush, .flush_mem_op, .i_mem_read(i_mem_read),
-    .prediction_out(prediction), .prediction_sync_out(prediction_sync), .taken_out, .not_taken_out, .branch_in_flight_out
+    .prediction_out(prediction), .taken_out, .not_taken_out
 );
 
 forwarding_unit forwarding
@@ -150,7 +155,7 @@ mux8 pcmux
     .b(pc_plus_off_WB),
     .c(alu_WB_out),
     .d(mdr_WB_mod),
-    .e(pc_plus2_save_out),
+    .e(pc_WB_out),
     .f(br_addr_calc_out),
     .g(16'h0),
     .h(16'h0),
@@ -163,14 +168,6 @@ register pc
     .load(load_pc),
     .in(pcmux_out),
     .out(pc_out)
-);
-
-register pcPlus2_save
-(
-    .clk,
-    .load(irmux_out[15:12] == op_br && irmux_out[11:9] != 3'b00 && branch_in_flight_out == 1'b0),
-    .in(pc_plus2_out),
-    .out(pc_plus2_save_out)
 );
 
 adder br_addr_calc
@@ -211,11 +208,11 @@ if_id IF_ID
     .clk, .load(load & (~control_instruc_ident_wb)), .clear(flush),
 
     /* data inputs */
-    .pc_ID_in(pc_plus2_out), .ir_in(irmux_out),
+    .pc_ID_in(pc_plus2_out), .ir_in(irmux_out), .prediction_ID_in(prediction),
 
     /* data outputs */
     .pc_ID_out(pc_ID_out), .opcode(opcode), .dest_ID_out(dest_ID_out),
-    .src1(src1), .src2(src2), .ir_10_0(ir_10_0)
+    .src1(src1), .src2(src2), .ir_10_0(ir_10_0), .prediction_ID_out
 );
 
 mux2 #(3) destmux
@@ -295,7 +292,7 @@ id_ex ID_EX
     .dest_EX_in(dest_ID_out), .pc_EX_in(pc_ID_out),
     .src1_EX_in(src1), .src2_EX_in(src2mux_out),
     .src1_data_in(src1_data_out), .src2_data_in(src2_data_out),
-    .ir_10_0_in(ir_10_0),
+    .ir_10_0_in(ir_10_0), .prediction_EX_in(prediction_ID_out),
 
     /* data outputs */
     .dest_EX_out(dest_EX_out), .pc_EX_out(pc_EX_out),
@@ -303,7 +300,8 @@ id_ex ID_EX
     .src1_data_EX(src1_data_EX), .src2_data_EX(src2_data_EX),
 
     .imm4_EX(imm4_EX), .imm5_EX(imm5_EX), .offset6_EX(offset6_EX),
-    .trapVect8_EX(trapVect8_EX), .offset11_EX_out(PCoffset11_EX)
+    .trapVect8_EX(trapVect8_EX), .offset11_EX_out(PCoffset11_EX),
+    .prediction_EX_out
 );
 
 mux4 forward_sr1_mux
@@ -417,14 +415,15 @@ ex_mem EX_MEM
     .pcp_off_MEM_in(pc_plus_off_EX), .offset11_MEM_in(PCoffset11_EX),
     .alu_MEM_in(alu_EX_out), .mar_MEM_in(marmux_EX_out),
     .mdr_MEM_in(mdrmux_EX_out), .mem_byte_enable_in(mdrmux_EX_sel),
-
+    .prediction_MEM_in(prediction_EX_out),
 
     /* data outputs */
     .dest_MEM_out(dest_MEM_out), .pc_MEM_out(pc_MEM_out),
     .src1_MEM_out(src1_MEM_out), .src2_MEM_out(src2_MEM_out),
     .pcp_off_MEM_out(pc_plus_off_MEM), .offset11_MEM_out(PCoffset11_MEM),
     .alu_MEM_out(alu_MEM_out), .mar_MEM_out(mar_MEM_out),
-    .mdr_MEM_out(mdr_MEM_out), .mem_byte_enable_out(d_mem_byte_enable)
+    .mdr_MEM_out(mdr_MEM_out), .mem_byte_enable_out(d_mem_byte_enable),
+    .prediction_MEM_out
 );
 
 mux4 forward_mem_mux
@@ -489,12 +488,13 @@ mem_wb MEM_WB
     .pc_WB_in(pc_MEM_out), .alu_WB_in(alu_MEM_out),
     .pcp_off_WB_in(pc_plus_off_MEM),
     .mdr_WB_in(d_mem_rdata), .mar_WB_in(d_mem_address_out),
+    .prediction_WB_in(prediction_MEM_out),
 
     /* data outputs */
     .dest_WB_out(dest_WB_out), .pc_WB_out(pc_WB_out),
     .pcp_off_WB_out(pc_plus_off_WB),
     .alu_WB_out(alu_WB_out), .mdr_WB_out(mdr_WB_out),
-    .mar_WB_out(mar_WB_out)
+    .mar_WB_out(mar_WB_out), .prediction_WB_out
 );
 
 mux4 mdrmux_wb
@@ -578,7 +578,7 @@ always_comb begin
     pcmux_sel = 3'b000;
     case (wb_sig_5.opcode)
         op_br: begin
-            if(br_enable == 1'b1 && prediction_sync == 1'b0) // Don't want to reload if we predicted taken correctly
+            if(br_enable == 1'b1 && prediction_WB_out == 1'b0) // Don't want to reload if we predicted taken correctly
                 pcmux_sel = 3'b001;
         end
         op_jmp: begin
@@ -596,7 +596,7 @@ always_comb begin
         default: pcmux_sel = 3'b000;
     endcase
 
-    if(irmux_out[15:12] == op_br && irmux_out[11:9] != 3'b000 && branch_in_flight_out == 1'b0) begin // Begin branch prediction
+    if(irmux_out[15:12] == op_br && irmux_out[11:9] != 3'b000) begin // Begin branch prediction
         if(prediction == 1'b1) begin // If we're predicting taken
             pcmux_sel = 3'b101;
         end
