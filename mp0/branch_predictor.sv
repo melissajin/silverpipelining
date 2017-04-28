@@ -6,7 +6,8 @@ module branch_predictor #(parameter num_addr_bits = 4)
     input clk,
 
     // inputs to driuve the predictor's state
-    input lc3b_word mem_address,
+    input lc3b_word mem_address_IF,
+    input lc3b_word mem_address_WB,
     input br_instruction,
     input taken,
     input not_taken,
@@ -20,9 +21,10 @@ logic[(1<<num_addr_bits)-1:0] prediction_output;
 
 decoder_N #(.N(num_addr_bits)) counter_chooser
 (
-    .a(mem_address[num_addr_bits:1]),
+    .a(mem_address_WB[num_addr_bits:1]),
     .y(decode_output)
 );
+
 
 /* Use a generate loop to initialize the "predictor table" */
 generate
@@ -44,6 +46,6 @@ generate
 
 endgenerate
 
-assign prediction = prediction_output[mem_address[num_addr_bits:1]];
+assign prediction = prediction_output[mem_address_IF[num_addr_bits:1]];
 
 endmodule : branch_predictor

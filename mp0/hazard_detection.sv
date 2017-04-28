@@ -5,7 +5,7 @@ module hazard_detection
     input clk,
 
     /* inputs */
-    input lc3b_word mem_address,
+    input lc3b_word mem_address_IF, mem_address_WB,
     input logic br_enable,
     input logic i_mem_resp, d_mem_resp,
     input logic d_mem_read, d_mem_write,
@@ -186,7 +186,8 @@ branch_predictor #(.num_addr_bits(5)) branch_predictor_inst
 (
     .clk,
 
-    .mem_address,
+    .mem_address_IF,
+    .mem_address_WB,
     .br_instruction,
     .taken,
     .not_taken,

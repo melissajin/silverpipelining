@@ -119,7 +119,7 @@ hazard_detection hazard_detection_inst
     .clk,
 
     /* inputs */
-    .mem_address(pc_out),
+    .mem_address_IF(pc_out), .mem_address_WB(pc_WB_out),
     .br_enable(br_enable),
     .i_mem_resp, .d_mem_resp,
     .d_mem_read, .d_mem_write,
