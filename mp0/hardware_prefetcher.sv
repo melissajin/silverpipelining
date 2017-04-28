@@ -26,9 +26,9 @@ module hardware_prefetcher
     output lc3b_cacheline pmem_wdata
 );
 
-
 /***** Internal Signals *****/
-logic load_pf_line, load_pf_addr, i_rdata_sel, valid;
+logic load_pf_line, load_pf_addr, i_rdata_sel, valid, pf_prediction;
+logic [1:0] pf_hit;
 lc3b_word prefetch_addr_cur;
 
 assign l2_wdata = i_wdata;
@@ -36,12 +36,20 @@ assign l2_write = i_write;
 assign pmem_wdata = i_wdata;
 assign pmem_write = i_write;
 
+prefetcher_predictor pf_predictor
+(
+    .clk,
+    .hit(pf_hit),
+    .prediction(pf_prediction)
+);
+
+
 hardware_prefetcher_controller controller
 (
     .clk,
 
-    .prefetch_addr(prefetch_addr_cur), .valid,
-    .load_pf_line, .load_pf_addr, .i_rdata_sel,
+    .prefetch_addr(prefetch_addr_cur), .valid, .pf_prediction,
+    .load_pf_line, .load_pf_addr, .i_rdata_sel, .pf_hit,
 
     .i_read, .i_address, .i_resp,
 
