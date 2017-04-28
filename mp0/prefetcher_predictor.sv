@@ -6,7 +6,7 @@ module prefetcher_predictor
 );
 
 enum int unsigned {
-    strongly_taken, weakly_taken, weakly_not_taken, strongly_not_taken
+    weakly_taken, strongly_taken, weakly_not_taken, strongly_not_taken
 } state, next_state;
 
 always_comb

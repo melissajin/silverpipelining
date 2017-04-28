@@ -42,9 +42,10 @@ begin : state_actions
                 pf_hit = 2'b11;
                 // load_pf_addr = 1'b1;     ---> check performance difference
             end
+            else
+                pf_hit = 1'b10;
         end
         fetch_cline: begin
-            pf_hit = 1'b10;
             load_pf_addr = 1'b1;
             l2_read = 1'b1;
             i_rdata_sel = 1'b0;
@@ -72,7 +73,7 @@ begin : next_state_logic
 		fetch_cline: begin
             if(l2_resp == 1'b1 && pf_prediction == 1'b1)
                 next_state = prefetch_cline;
-            else
+            else if(l2_resp == 1'b1)
                 next_state = process_request;
 		end
 		prefetch_cline: begin
