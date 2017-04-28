@@ -21,18 +21,28 @@ module hardware_prefetcher
 
 
 /***** Internal Signals *****/
-logic load_pf_line, load_pf_addr, i_rdata_sel, valid, l2_address_sel;
+logic load_pf_line, load_pf_addr, i_rdata_sel, valid;
+logic l2_address_sel, pf_prediction;
+logic [1:0] pf_hit;
 lc3b_word prefetch_addr_cur;
 
 assign l2_wdata = i_wdata;
 assign l2_write = i_write;
 
+prefetcher_predictor pf_predictor
+(
+    .clk,
+    .hit(pf_hit),
+    .prediction(pf_prediction)
+);
+
+
 hardware_prefetcher_controller controller
 (
     .clk,
 
-    .prefetch_addr(prefetch_addr_cur), .valid,
-    .load_pf_line, .load_pf_addr, .i_rdata_sel, .l2_address_sel,
+    .prefetch_addr(prefetch_addr_cur), .valid, .pf_prediction,
+    .load_pf_line, .load_pf_addr, .i_rdata_sel, .l2_address_sel, .pf_hit,
 
     .i_read, .i_address, .i_resp,
 
@@ -50,6 +60,5 @@ hardware_prefetcher_datapath datapath
 
     .l2_rdata, .l2_read, .l2_address
 );
-
 
 endmodule : hardware_prefetcher
