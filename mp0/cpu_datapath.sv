@@ -526,7 +526,7 @@ register #($bits(lc3b_forward_save)) forward_wb_save
     .out(forward_save_out)
 );
 
-assign br_offset_signed = ($signed({irmux_out[8:0]}) << 1) + 16'h2;
+assign br_offset_signed = ($signed({irmux_out[8:0]}) << 1); //+ 16'h2;
 
 // Data Memory Signals
 assign d_mem_address =  d_mem_address_out;
@@ -536,7 +536,7 @@ assign d_mem_read = d_mem_read_loc & ~flush_mem_op;
 assign d_mem_write = d_mem_write_loc & ~flush_mem_op;
 
 // Instruction Memory Signals
-assign i_mem_address = (pcmux_sel == 3'b101) ? (pcmux_out - 16'h2) : pc_out;
+assign i_mem_address = pc_out;
 
 // Control Signals
 assign ir_4 = ir_10_0[4];
@@ -597,8 +597,9 @@ always_comb begin
     endcase
 
     if(irmux_out[15:12] == op_br && irmux_out[11:9] != 3'b000 && branch_in_flight_out == 1'b0) begin // Begin branch prediction
-        if(prediction == 1'b1) // If we're predicting taken
+        if(prediction == 1'b1) begin // If we're predicting taken
             pcmux_sel = 3'b101;
+        end
     end
 
     if(flush == 1'b1 && not_taken_out == 1'b1) // If we predicted taken incorrectly

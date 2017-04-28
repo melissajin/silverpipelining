@@ -165,11 +165,17 @@ always_comb begin
     case (op_WB)
         op_br: begin
             if(br_enable) begin
-                i_mem_read = 1'b0;
-                control_instruc_ident_wb = 1'b1;
+                if(prediction_sync == 1'b0) begin
+                    i_mem_read = 1'b0;
+                    control_instruc_ident_wb = 1'b1;
+                end
                 taken = 1'b1;
             end
             else if(nzp_WB != 3'b000) begin
+                if(prediction_sync == 1'b1) begin
+                    i_mem_read = 1'b0;
+                    control_instruc_ident_wb = 1'b1;
+                end
                 not_taken = 1'b1;
             end
         end
