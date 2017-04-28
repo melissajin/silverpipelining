@@ -126,12 +126,7 @@ always_comb begin
     i_mem_read = 1'b1;
     control_instruc_ident_wb = 1'b0;
 
-    // Remove the special case on BR to implement static branch prediction (predict not taken)
     case (op_ID)
-        // op_br: begin
-        //     if(nzp_ID != 3'b000)
-        //         i_mem_read = 1'b0;
-        // end
         op_jmp: i_mem_read = 1'b0;
         op_jsr: i_mem_read = 1'b0;
         op_trap: i_mem_read = 1'b0;
@@ -139,10 +134,6 @@ always_comb begin
     endcase
 
     case (op_EX)
-        // op_br: begin
-        //     if(nzp_EX != 3'b000)
-        //         i_mem_read = 1'b0;
-        // end
         op_jmp: i_mem_read = 1'b0;
         op_jsr: i_mem_read = 1'b0;
         op_trap: i_mem_read = 1'b0;
@@ -150,10 +141,6 @@ always_comb begin
     endcase
 
     case (op_MEM)
-        // op_br: begin
-        //     if(nzp_MEM != 3'b000)
-        //         i_mem_read = 1'b0;
-        // end
         op_jmp: i_mem_read = 1'b0;
         op_jsr: i_mem_read = 1'b0;
         op_trap: i_mem_read = 1'b0;
