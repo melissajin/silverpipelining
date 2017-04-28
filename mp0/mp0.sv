@@ -60,7 +60,7 @@ lc3b_word i_mem_rdata, i_mem_address, i_mem_wdata;
 
 logic d_mem_resp, d_mem_read, d_mem_write;
 lc3b_mem_wmask d_mem_byte_enable;
-lc3b_word d_mem_rdata, d_mem_address, d_mem_wdata;
+lc3b_word d_mem_rdata, d_mem_rdata_inter, d_mem_address, d_mem_address_inter, d_mem_wdata;
 logic eviction_l1_d, eviction_l1_i;
 
 /********  Signals between Lower Victim Cache and L1 D and I Cache ********/
@@ -187,9 +187,16 @@ l1_cache d_cache
 
     /******* Signals between CPU and Cache *******/
     .mem_read(d_mem_read), .mem_write(d_mem_write), .mem_byte_enable(d_mem_byte_enable),
-    .mem_address(d_mem_address), .mem_wdata(d_mem_wdata),
-    .mem_resp(d_mem_resp), .mem_rdata(d_mem_rdata)
+    .mem_address(d_mem_address_inter), .mem_wdata(d_mem_wdata),
+    .mem_resp(d_mem_resp), .mem_rdata(d_mem_rdata_inter)
 );
+
+always_latch begin
+    if(!clk) begin
+        d_mem_rdata <= d_mem_rdata_inter;
+        d_mem_address_inter <= d_mem_address;
+    end
+end
 
 hardware_prefetcher prefetcher
 (
