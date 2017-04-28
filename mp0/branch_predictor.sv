@@ -12,7 +12,8 @@ module branch_predictor #(parameter num_addr_bits = 4)
     input not_taken,
 
     // Predictor's current foretelling
-    output logic prediction, output logic branch_in_flight_out
+    output logic prediction, prediction_sync,
+    output logic branch_in_flight_out
 );
 
 logic[(1<<num_addr_bits)-1:0] decode_output;
@@ -59,7 +60,8 @@ generate
 
 endgenerate
 
-assign prediction = prediction_output[mem_addr_reg_out[num_addr_bits:1]];
+assign prediction_sync = prediction_output[mem_addr_reg_out[num_addr_bits:1]];
+assign prediction = prediction_output[mem_address[num_addr_bits:1]];
 assign branch_in_flight_out = branch_in_flight;
 
 // always @ (posedge br_instruction or posedge taken or posedge not_taken) begin
