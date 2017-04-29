@@ -29,7 +29,7 @@ module victim_cache_controller
 
 /* List of states */
 enum int unsigned {
-    process_request, fetch_cline, return_cline, write_back, buffer, buffer_2
+    process_request, fetch_cline, return_cline, write_back, buffer
 } state, next_state;
 
 logic hit_any, dirty_any;
@@ -211,9 +211,6 @@ begin : next_state_logic
         write_back: begin
             if(s_mem_resp == 1)
                 next_state = process_request;
-        end
-        buffer: begin
-            next_state = buffer_2;
         end
         default: next_state = process_request;
     endcase
