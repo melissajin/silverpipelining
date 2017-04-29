@@ -198,7 +198,7 @@ branch_predictor #(.num_addr_bits(5)) branch_predictor_inst
     .clk,
 
     .mem_address_IF,
-    .mem_address_WB,
+    .mem_address_WB(mem_address_WB - 16'h0002),
     .br_instruction,
     .taken,
     .not_taken,
