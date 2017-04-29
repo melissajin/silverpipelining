@@ -41,8 +41,10 @@ logic control_instruc_ident, control_instruc_ident_wb;
 logic flush, flush_mem_op, d_mem_read_loc, d_mem_write_loc;
 logic [3:0] performance_counter_mux_sel;
 lc3b_word performance_counter_mux_out;
+logic taken_out, not_taken_out;
 
 /**** Stage 1 ****/
+logic prediction;
 lc3b_word pcmux_out, pc_out, pcbak_out, pcPlus2mux_out;
 lc3b_word pc_plus2_out, pc_plus2_save_out, addrmux_out;
 lc3b_word adj11_offset, adj9_offset;
