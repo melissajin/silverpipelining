@@ -6,7 +6,7 @@ module hardware_prefetcher_controller
 
     /***** Control Signals *****/
     input lc3b_word prefetch_addr,
-    input valid, pf_prediction,
+    input valid, pf_prediction, new_line,
     output logic load_pf_line, load_pf_addr, i_rdata_sel, l2_address_sel,
     output logic [1:0] pf_hit,
 
@@ -32,13 +32,16 @@ begin : state_actions
     case(state)
         process_request: begin
             if((prefetch_addr == i_address) & valid & i_read) begin
-                i_rdata_sel = 1'b1;
-                i_resp = 1'b1;
                 pf_hit = 2'b11;
+                if(new_line) begin
+                    i_rdata_sel = 1'b1;
+                    i_resp = 1'b1;
+                end
                // load_pf_addr = 1'b1;     ---> check performance difference
            end
-           else if((prefetch_addr != i_address || (~valid)) && i_read)
-               pf_hit = 1'b10;
+           else if((prefetch_addr != i_address) & new_line & i_read) begin
+               pf_hit = 2'b10;
+           end
         end
         fetch_cline: begin
             load_pf_addr = 1'b1;
@@ -63,7 +66,7 @@ begin : next_state_logic
 
 	case(state)
 		process_request: begin
-            if((prefetch_addr != i_address || (~valid)) && i_read) begin
+            if((prefetch_addr != i_address || (~valid) || (~new_line)) && i_read) begin
                 next_state = fetch_cline;
             end
 		end
