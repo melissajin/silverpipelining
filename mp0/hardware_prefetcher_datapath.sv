@@ -6,10 +6,8 @@ module hardware_prefetcher_datapath
 
     /***** Control Signals *****/
     input load_pf_line, load_pf_addr, i_rdata_sel, l2_address_sel,
-    input [1:0] pf_hit,
-    input pf_prediction,
     output lc3b_word prefetch_addr_out,
-    output logic valid, new_line,
+    output logic valid,
 
     /***** I-Cache Signals *****/
     input lc3b_word i_address,
@@ -22,10 +20,8 @@ module hardware_prefetcher_datapath
 );
 
 lc3b_word prefetch_addr_in;
-logic clear_new;
-
 assign prefetch_addr_in = i_address + 16'h0020;
-assign clear_new = (pf_hit[1] == 1'b1);
+
 lc3b_cacheline prefetch_line_out;
 
 register #(1) validity
@@ -34,15 +30,6 @@ register #(1) validity
     .load(l2_read),
     .in(1'b1),
     .out(valid)
-);
-
-register_with_clear #(1) new_line_reg
-(
-    .clk,
-    .load(load_pf_line),
-    .clear(clear_new),
-    .in(1'b1),
-    .out(new_line)
 );
 
 register #($bits(lc3b_word)) prefetch_address
