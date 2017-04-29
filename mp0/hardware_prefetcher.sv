@@ -16,52 +16,39 @@ module hardware_prefetcher
     input lc3b_cacheline l2_rdata,
     output logic l2_read, l2_write,
     output lc3b_word l2_address,
-    output lc3b_cacheline l2_wdata,
-
-    /***** PMEM Arbiter Signals *****/
-    input pmem_resp,
-    input lc3b_cacheline pmem_rdata,
-    output logic pmem_read, pmem_write,
-    output lc3b_word pmem_address,
-    output lc3b_cacheline pmem_wdata
+    output lc3b_cacheline l2_wdata
 );
 
 
 /***** Internal Signals *****/
-logic load_pf_line, load_pf_addr, i_rdata_sel, valid;
+logic load_pf_line, load_pf_addr, i_rdata_sel, valid, l2_address_sel;
 lc3b_word prefetch_addr_cur;
 
 assign l2_wdata = i_wdata;
 assign l2_write = i_write;
-assign pmem_wdata = i_wdata;
-assign pmem_write = i_write;
 
 hardware_prefetcher_controller controller
 (
     .clk,
 
     .prefetch_addr(prefetch_addr_cur), .valid,
-    .load_pf_line, .load_pf_addr, .i_rdata_sel,
+    .load_pf_line, .load_pf_addr, .i_rdata_sel, .l2_address_sel,
 
     .i_read, .i_address, .i_resp,
 
-    .l2_resp, .l2_read,
-
-    .pmem_resp, .pmem_read
+    .l2_resp, .l2_read
 );
 
 hardware_prefetcher_datapath datapath
 (
     .clk,
 
-    .load_pf_line, .load_pf_addr, .i_rdata_sel,
+    .load_pf_line, .load_pf_addr, .i_rdata_sel, .l2_address_sel,
     .prefetch_addr_out(prefetch_addr_cur), .valid,
 
     .i_address, .i_rdata,
 
-    .l2_rdata, .l2_address,
-
-    .pmem_read, .pmem_rdata, .pmem_address
+    .l2_rdata, .l2_read, .l2_address
 );
 
 
