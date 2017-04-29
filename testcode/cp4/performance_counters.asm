@@ -35,7 +35,7 @@ DONE: ; Load all performance counter values
   STI R2, R0, COUNTER5 ; IL1 misses
   STI R1, R0, COUNTER6 ; Branch predicts
   STI R7, R0, COUNTER7 ; Branch mispredicts
-  STI R6, R0, COUNTER8 ; Stallsf
+  STI R6, R0, COUNTER8 ; Stalls
 
   ; Load them back and verify that they have decreased (register values won't show up as zero due to memory accesses required)
   LDI R7, R0, COUNTER0 ; L2 hits

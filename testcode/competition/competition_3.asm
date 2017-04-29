@@ -1,36 +1,36 @@
-ORIGIN 0 
+ORIGIN 0
 Segment CS:
         LEA R0, STORESEGMENT
 	LDR R4, R0, SIXTYFOUR
 	LDR R3, R0, SIXTYFOUR
-	
+
 
 	AND R1,R1,0
-	AND R2,R2,0 
+	AND R2,R2,0
 
 	;R3 IS NUMBER OF COLS
 	;R4 IS NUMBER OF ROWS
-	;R1 IS THE COL INDEX 
+	;R1 IS THE COL INDEX
 	;R2 IS THE ROW index
 
 	O_LOOP:
 	NOT R5, R2
 	ADD R5, R5, 1   ; R5 <= -R2
-	AND R1, R1, 0   ; set the col index to 0. 
+	AND R1, R1, 0   ; set the col index to 0.
 	I_LOOP:
 	LEA R0, STORESEGMENT
 	STR R1, R0, STR1 ; Save registers before invoking routine
 	STR R2, R0, STR2
 	STR R3, R0, STR3
-	STR R4, R0, STR4 
+	STR R4, R0, STR4
 	STR R5, R0, STR5
 	STR R6, R0, STR6
 
 	LEA R0, MATRIX
 	TRAP TRAPVECTOR         ; Trap to transpose routine
         LEA R0, STORESEGMENT
-        LDR R7, R0, STOREGOOD   ;; Check whether the values loaded from memory are correct . Value at MAtrix(i,j) = 2*i + j + 4096. 
-        LDR R4, R0, SIXTEEN3   
+        LDR R7, R0, STOREGOOD   ;; Check whether the values loaded from memory are correct . Value at MAtrix(i,j) = 2*i + j + 4096.
+        LDR R4, R0, SIXTEEN3
         AND R5, R5, 0
         STR R5, R0, STOREGOOD
         ADD R5, R2, R2
@@ -50,10 +50,10 @@ Segment CS:
         BRnp CONTINUE
         LDR R3, R0, GOOD
         AND R5, R7, R3
-        STR R5, R0, STOREGOOD  ; M[StoreGood] <= 0x600d if all transposes are ok so far. 0 otherwise. 
-        
-   CONTINUE: 	
-        LEA R0, STORESEGMENT   ; Restore registers    
+        STR R5, R0, STOREGOOD  ; M[StoreGood] <= 0x600d if all transposes are ok so far. 0 otherwise.
+
+   CONTINUE:
+        LEA R0, STORESEGMENT   ; Restore registers
 	LDR R1, R0, STR1
 	LDR R2, R0, STR2
 	LDR R3, R0, STR3
@@ -64,15 +64,23 @@ Segment CS:
 	ADD R1,R1,1  ; iNCREASE COL NUMBER
 	ADD R6,R1,R5
 	BRn I_LOOP
-	ADD R2,R2,1  ; Increment row number ; 
+	ADD R2,R2,1  ; Increment row number ;
 	NOT R5,R4
 	ADD R5,R5,1
 	ADD R5,R2,R5 ; Check if row number = Number of rows
 	BRn O_LOOP
         LDR R7, R0, STOREGOOD   ; Should be x600d if result is Ok
 	HALT:
-	BRnzp HALT
+  BRnzp HALT
+  ;LEA R0, PERFORMANCECOUNTERS
+  ;LDI R7, R0, COUNTER7 ; branch predicts
+  ;LDI R6, R0, COUNTER6 ; branch mispredicts
+  ;HALTTWO:
+	;BRnzp HALTTWO
 
+;Segment PERFORMANCECOUNTERS:
+;COUNTER7: DATA2 4xFFE4
+;COUNTER6: DATA2 4xFFE2
 
 Segment STORESEGMENT:
 SIXTYFOUR :  DATA2 4X0040  ; Matrix Dimesnions => Can change size to test Caches
@@ -90,18 +98,18 @@ STR8 : DATA2 4X0000
 TRAPVECTOR : DATA2 Transpose
 
  Transpose :
-; Exchanges element (x,y) with (y,x) of a particular matrix 
-; R1 is the x index  
+; Exchanges element (x,y) with (y,x) of a particular matrix
+; R1 is the x index
 ; R2 is the y index
-; R0 is the matrix start address 
+; R0 is the matrix start address
 ; R3 is number of columns
-; Caller saved 
+; Caller saved
     AND R4,R4 ,0
-    AND R5,R5,0	    
+    AND R5,R5,0
     NOT R6,R2
     ADD R6,R6,1
     BRz SECONDINDEX
-  
+
     MULT_LOOP:
     ADD R4,R4,R3
     ADD R6,R6,1
@@ -109,11 +117,11 @@ TRAPVECTOR : DATA2 Transpose
 
     SECONDINDEX:
     ADD R4,R4,R1
-   
-    
+
+
     NOT R6,R1
     ADD R6,R6,1
-    
+
     BRz FIN
     L:
     ADD R5,R5,R3
@@ -123,13 +131,13 @@ TRAPVECTOR : DATA2 Transpose
     ADD R5,R5,R2
     LSHF R5,R5,1
     LSHF R4,R4,1
-   
+
     ADD R5,R5,R0
     ADD R4,R4,R0
-    LDR R6,R5,0 
+    LDR R6,R5,0
     LDR R3,R4,0
-    STR R3,R5,0 
-    STR R6,R4,0 
+    STR R3,R5,0
+    STR R6,R4,0
     RET
 
 Segment MATRIX:
