@@ -60,6 +60,7 @@ lc3b_word i_mem_rdata, i_mem_address, i_mem_wdata;
 
 logic d_mem_resp, d_mem_read, d_mem_write;
 lc3b_mem_wmask d_mem_byte_enable;
+lc3b_cacheline pmem_wdata_inter;
 lc3b_word d_mem_rdata, d_mem_rdata_inter, d_mem_address, d_mem_address_inter, d_mem_wdata;
 logic eviction_l1_d, eviction_l1_i;
 
@@ -85,7 +86,7 @@ victim_cache victim_cache_l2
     .s_mem_rdata(pmem_rdata),
     .s_mem_read(pmem_read), .s_mem_write(pmem_write),
     .s_mem_address(pmem_address),
-    .s_mem_wdata(pmem_wdata),
+    .s_mem_wdata(pmem_wdata_inter),
 
     /******* Signals between Victim Cache and L2 Cache *******/
     .buf_mem_read(buf_mem_read_l2), .buf_mem_write(buf_mem_write_l2),
@@ -175,6 +176,7 @@ always_latch begin
     if(!clk) begin
         d_mem_rdata <= d_mem_rdata_inter;
         d_mem_address_inter <= d_mem_address;
+        pmem_wdata <= pmem_wdata_inter;
     end
 end
 
